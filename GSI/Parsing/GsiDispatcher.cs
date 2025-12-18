@@ -1,0 +1,15 @@
+﻿namespace CounterConnect.GSI.Parsing
+{
+	public sealed class GsiDispatcher(IEnumerable<IGsiParser> parsers)
+	{
+		private readonly IGsiParser[] _parsers = parsers.ToArray();
+
+		public IEnumerable<IGsiPayload> Dispatch(JsonDocument document)
+		{
+			JsonElement root = document.RootElement;
+
+			foreach (IGsiParser parser in _parsers.Where(parser => parser.CanParse(root))) yield return parser.Parse(root);
+		}
+	}
+
+}
