@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CounterConnect.csproj" />
-    <ProjectReference Include="..\CounterConnect\CounterConnect.csproj" />
   </ItemGroup>
 
 </Project>
