@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace CounterConnect.Extensions
+namespace StrikeLink.Extensions
 {
 	internal static class Logging
 	{

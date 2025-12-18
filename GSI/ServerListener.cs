@@ -1,12 +1,12 @@
-﻿using CounterConnect.Extensions;
-using CounterConnect.GSI.Parsing;
+﻿using StrikeLink.Extensions;
+using StrikeLink.GSI.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
 // ReSharper disable UseAwaitUsing
 
-namespace CounterConnect.GSI
+namespace StrikeLink.GSI
 {
 	public class ServerListener : IDisposable, IAsyncDisposable
 	{

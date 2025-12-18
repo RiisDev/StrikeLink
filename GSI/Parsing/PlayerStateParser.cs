@@ -1,5 +1,5 @@
 ﻿
-namespace CounterConnect.GSI.Parsing
+namespace StrikeLink.GSI.Parsing
 {
 	// Example class, non-functional
 	public sealed class PlayerStateParser : IGsiParser

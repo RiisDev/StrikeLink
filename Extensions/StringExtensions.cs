@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace CounterConnect.Extensions
+namespace StrikeLink.Extensions
 {
 	internal static class StringExtensions
 	{

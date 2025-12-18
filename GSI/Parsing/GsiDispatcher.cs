@@ -1,4 +1,4 @@
-﻿namespace CounterConnect.GSI.Parsing
+﻿namespace StrikeLink.GSI.Parsing
 {
 	public sealed class GsiDispatcher(IEnumerable<IGsiParser> parsers)
 	{

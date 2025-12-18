@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="StrikeLink.csproj" />
+  <Project Path="StrikeLink.Test.Suite/StrikeLinkTestSuite.csproj" />
+  <Project Path="StrikeLink.Tests/StrikeLink.Tests.csproj" Id="9b41ce82-5966-4456-a5b8-7be3c0cbe6e9" />
+</Solution>
