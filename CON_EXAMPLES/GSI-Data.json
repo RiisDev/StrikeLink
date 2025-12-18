@@ -1,0 +1,1347 @@
+[2025-12-18 12:22:48] [HandleClientAsync] New Client: 127.0.0.1:55569
+[2025-12-18 12:22:48] [HandleClientAsync] Valid request body: {
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"activity": "menu"
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060568
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:19] [HandleClientAsync] New Client: 127.0.0.1:55603
+[2025-12-18 12:23:19] [HandleClientAsync] Valid request body: {
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"activity": "menu"
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060599
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:19] [HandleClientAsync] New Client: 127.0.0.1:55604
+[2025-12-18 12:23:19] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_texture_wf",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060599
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": true
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:23] [HandleClientAsync] New Client: 127.0.0.1:55611
+[2025-12-18 12:23:23] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_texture_wf",
+		"phase": "warmup",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "WAITING",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 0,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 0
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060603
+	},
+	"previously": {
+		"map": {
+			"phase": "live"
+		},
+		"round": true
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:23] [HandleClientAsync] New Client: 127.0.0.1:55612
+[2025-12-18 12:23:23] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_texture_wf",
+		"phase": "warmup",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 0,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 0
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060603
+	},
+	"previously": {
+		"player": {
+			"clan": "WAITING"
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:24] [HandleClientAsync] New Client: 127.0.0.1:55613
+[2025-12-18 12:23:24] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_texture_wf",
+		"phase": "warmup",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "WAITING",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 0,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 0
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060604
+	},
+	"added": {
+		"player": {
+			"clan": true
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:32] [HandleClientAsync] New Client: 127.0.0.1:60697
+[2025-12-18 12:23:32] [HandleClientAsync] Valid request body: {
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"activity": "menu"
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060612
+	},
+	"previously": {
+		"map": true,
+		"player": {
+			"clan": "WAITING",
+			"observer_slot": 0,
+			"team": "T",
+			"activity": "playing",
+			"match_stats": {
+				"kills": 0,
+				"assists": 0,
+				"deaths": 0,
+				"mvps": 0,
+				"score": 0
+			},
+			"state": {
+				"health": 100,
+				"armor": 0,
+				"helmet": false,
+				"flashed": 0,
+				"smoked": 0,
+				"burning": 0,
+				"money": 0,
+				"round_kills": 0,
+				"round_killhs": 0,
+				"equip_value": 0
+			},
+			"weapons": {
+				"weapon_0": {
+					"name": "weapon_knife_falchion",
+					"paintkit": "aq_steel_knife",
+					"type": "Knife",
+					"state": "active"
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:37] [HandleClientAsync] New Client: 127.0.0.1:60703
+[2025-12-18 12:23:37] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "warmup",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060617
+	},
+	"previously": {
+		"player": true
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:48] [HandleClientAsync] New Client: 127.0.0.1:60714
+[2025-12-18 12:23:48] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 12,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060628
+	},
+	"round": {
+		"phase": "freezetime"
+	},
+	"previously": {
+		"map": {
+			"phase": "warmup"
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:51] [HandleClientAsync] New Client: 127.0.0.1:60717
+[2025-12-18 12:23:51] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 11,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060631
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_1": {
+					"ammo_clip": 12
+				}
+			}
+		},
+		"round": {
+			"phase": "freezetime"
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:51] [HandleClientAsync] New Client: 127.0.0.1:60718
+[2025-12-18 12:23:51] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 10,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060631
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_1": {
+					"ammo_clip": 11
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:52] [HandleClientAsync] New Client: 127.0.0.1:60720
+[2025-12-18 12:23:52] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 9,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060632
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_1": {
+					"ammo_clip": 10
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:53] [HandleClientAsync] New Client: 127.0.0.1:60721
+[2025-12-18 12:23:53] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060633
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_1": {
+					"ammo_clip": 9
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:54] [HandleClientAsync] New Client: 127.0.0.1:60724
+[2025-12-18 12:23:54] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 200
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060634
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_0": {
+					"state": "holstered"
+				},
+				"weapon_1": {
+					"name": "weapon_usp_silencer",
+					"paintkit": "default",
+					"type": "Pistol",
+					"ammo_clip": 8,
+					"ammo_clip_max": 12,
+					"ammo_reserve": 24,
+					"state": "active"
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:55] [HandleClientAsync] New Client: 127.0.0.1:60728
+[2025-12-18 12:23:55] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 850
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "holstered"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060635
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"state": {
+				"equip_value": 200
+			}
+		}
+	},
+	"added": {
+		"player": {
+			"weapons": {
+				"weapon_1": true
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:56] [HandleClientAsync] New Client: 127.0.0.1:60729
+[2025-12-18 12:23:56] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 850
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "holstered"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060636
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"clan": "ARENA 1 |"
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:56] [HandleClientAsync] New Client: 127.0.0.1:60730
+[2025-12-18 12:23:56] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 850
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060636
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_0": {
+					"state": "active"
+				},
+				"weapon_1": {
+					"state": "holstered"
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:56] [HandleClientAsync] New Client: 127.0.0.1:60731
+[2025-12-18 12:23:56] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 850
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "holstered"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "active"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060636
+	},
+	"round": {
+		"phase": "live"
+	},
+	"added": {
+		"player": {
+			"clan": true
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
+[2025-12-18 12:23:57] [HandleClientAsync] New Client: 127.0.0.1:60732
+[2025-12-18 12:23:57] [HandleClientAsync] Valid request body: {
+	"map": {
+		"mode": "casual",
+		"name": "am_water_j_spin",
+		"phase": "live",
+		"round": 0,
+		"team_ct": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"team_t": {
+			"score": 0,
+			"consecutive_round_losses": 0,
+			"timeouts_remaining": 1,
+			"matches_won_this_series": 0
+		},
+		"num_matches_to_win_series": 0
+	},
+	"player": {
+		"steamid": "76561199045809605",
+		"clan": "ARENA 1 |",
+		"name": "Cinnamon Toast Crunch",
+		"observer_slot": 0,
+		"team": "T",
+		"activity": "playing",
+		"match_stats": {
+			"kills": 0,
+			"assists": 0,
+			"deaths": 0,
+			"mvps": 0,
+			"score": 0
+		},
+		"state": {
+			"health": 100,
+			"armor": 100,
+			"helmet": false,
+			"flashed": 0,
+			"smoked": 0,
+			"burning": 0,
+			"money": 0,
+			"round_kills": 0,
+			"round_killhs": 0,
+			"equip_value": 850
+		},
+		"weapons": {
+			"weapon_0": {
+				"name": "weapon_knife_falchion",
+				"paintkit": "aq_steel_knife",
+				"type": "Knife",
+				"state": "active"
+			},
+			"weapon_1": {
+				"name": "weapon_usp_silencer",
+				"paintkit": "default",
+				"type": "Pistol",
+				"ammo_clip": 8,
+				"ammo_clip_max": 12,
+				"ammo_reserve": 24,
+				"state": "holstered"
+			}
+		}
+	},
+	"provider": {
+		"name": "Counter-Strike: Global Offensive",
+		"appid": 730,
+		"version": 14128,
+		"steamid": "76561199045809605",
+		"timestamp": 1766060637
+	},
+	"round": {
+		"phase": "live"
+	},
+	"previously": {
+		"player": {
+			"weapons": {
+				"weapon_0": {
+					"state": "holstered"
+				},
+				"weapon_1": {
+					"state": "active"
+				}
+			}
+		}
+	},
+	"auth": {
+		"token": "Q79v5tcxVQ8u"
+	}
+}
