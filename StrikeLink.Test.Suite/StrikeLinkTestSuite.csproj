@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CounterConnect.csproj" />
+    <ProjectReference Include="..\StrikeLink.csproj" />
   </ItemGroup>
 
 </Project>

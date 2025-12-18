@@ -1,5 +1,0 @@
-<Solution>
-  <Project Path="CounterConnect.csproj" />
-  <Project Path="CounterConnect.Test.Suite/CounterConnectTestSuite.csproj" />
-  <Project Path="CounterConnect.Tests/CounterConnect.Tests.csproj" Id="9b41ce82-5966-4456-a5b8-7be3c0cbe6e9" />
-</Solution>

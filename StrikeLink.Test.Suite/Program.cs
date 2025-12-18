@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System.Text.Json;
-using CounterConnect.GSI;
+using StrikeLink.GSI;
 
 ServerListener listen = new();
 HttpClient client = new();

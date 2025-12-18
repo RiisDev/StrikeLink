@@ -5,8 +5,8 @@
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
 	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-	<Title>CounterConnect</Title>
-	<RepositoryUrl>https://github.com/RiisDev/CounterConnect</RepositoryUrl>
+	<Title>StrikeLink</Title>
+	<RepositoryUrl>https://github.com/RiisDev/StrikeLink</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
 	<PackageTags>counter strike;counter strike 2;cs2;steam;valve;gsi</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -52,10 +52,10 @@
 
 	<!--Removes tests files on compile from library.-->
 	<ItemGroup>
-		<Compile Remove="CounterConnect.Tests\**;CounterConnect.Test.Suite\**;CON_EXAMPLES" />
-		<None Remove="CounterConnect.Tests\**;CounterConnect.Test.Suite\**;CON_EXAMPLES" />
-		<Content Remove="CounterConnect.Tests\**;CounterConnect.Test.Suite\**;CON_EXAMPLES" />
-		<EmbeddedResource Remove="CounterConnect.Tests\**;CounterConnect.Test.Suite\**;CON_EXAMPLES" />
+		<Compile Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
+		<None Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
+		<Content Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
+		<EmbeddedResource Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
 	</ItemGroup>
 
 	<!--Misc removaland includes-->

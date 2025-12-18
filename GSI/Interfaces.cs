@@ -1,4 +1,4 @@
-﻿namespace CounterConnect.GSI
+﻿namespace StrikeLink.GSI
 {
 	// Empty interface.
 #pragma warning disable CA1040
