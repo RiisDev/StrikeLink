@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using StrikeLink.GSI;
 
-ServerListener listen = new();
+ServerListener listen = new(port: 5000);
 HttpClient client = new();
 
 listen.OnReady += async () =>

@@ -1,5 +1,4 @@
-﻿
-namespace StrikeLink.GSI.Parsing
+﻿namespace StrikeLink.GSI.Parsing
 {
 	// Example class, non-functional
 	public sealed class PlayerStateParser : IGsiParser
@@ -9,12 +8,23 @@ namespace StrikeLink.GSI.Parsing
 		public IGsiPayload Parse(JsonElement root)
 		{
 			JsonElement player = root.GetProperty("player");
-
-			return new PlayerStatePayload
+			try
 			{
-				Health = player.GetProperty("health").GetInt32(),
-				Armor = player.GetProperty("armor").GetInt32()
-			};
+				return new PlayerStatePayload
+				{
+					Health = player.GetProperty("health").GetInt32(), 
+					Armor = player.GetProperty("armor").GetInt32()
+				};
+			}
+			catch
+			{
+				return new PlayerStatePayload
+				{
+					Health = -1,
+					Armor = -1
+				};
+			}
+			
 		}
 	}
 }

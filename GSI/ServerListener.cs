@@ -18,18 +18,20 @@ namespace StrikeLink.GSI
 		private readonly TcpListener _listener;
 		private readonly GsiDispatcher _dispatcher;
 		private readonly CancellationTokenSource _cts = new();
-		private readonly IPAddress _address = IPAddress.Loopback; 
 		private readonly SynchronizationContext? _syncContext;
 
 		// Public readable values
 		public event Action? OnReady;
 		public bool Ready { get; set { if (field == value) return; field = value; OnReady?.Invoke(); } }
-		public int Port { get; } = GetFreePort();
+		public IPAddress Address { get; }
+		public int Port { get; }
 
-		public ServerListener()
+		public ServerListener(IPAddress? address = null, int? port = null)
 		{
+			Port = port ?? GetFreePort();
+			Address = address ?? IPAddress.Loopback;
 			_syncContext = SynchronizationContext.Current;
-			_listener = new TcpListener(_address, Port);
+			_listener = new TcpListener(Address, Port);
 			_dispatcher = new GsiDispatcher(
 				[
 					new PlayerStateParser()
@@ -41,7 +43,7 @@ namespace StrikeLink.GSI
 		{
 			_listener.Start();
 
-			Log($"Listening on: http://{_address}:{Port}/");
+			Log($"Listening on: http://{Address}:{Port}/");
 			
 			_ = Task.Run(async () =>
 			{
