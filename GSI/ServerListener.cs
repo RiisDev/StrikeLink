@@ -11,7 +11,6 @@ namespace StrikeLink.GSI
 {
 	public class ServerListener : IDisposable, IAsyncDisposable
 	{
-
 		#region ServerLogic
 		// Private Vars
 		private readonly TcpListener _listener;
