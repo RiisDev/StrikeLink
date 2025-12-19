@@ -46,7 +46,7 @@ namespace StrikeLink.GSI
 			return !Directory.Exists(counterstrikeInstallPath) ? throw new DirectoryNotFoundException($"{counterstrikeInstallPath} does not exist") : counterstrikeInstallPath;
 		}
 
-		public static async Task GenerateGsiFile(IPAddress address, int port, string? steamPath = null)
+		internal static async Task GenerateGsiFile(IPAddress address, int port, string? steamPath = null)
 		{
 			string lookupPath = steamPath ?? GetSteamPath();
 
