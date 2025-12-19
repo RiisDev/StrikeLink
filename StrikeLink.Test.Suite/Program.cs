@@ -16,9 +16,15 @@ listen.OnReady += async () =>
 	await client.PostAsync($"http://127.0.0.1:{listen.Port}/", content);
 };
 
-listen.PlayerStateReceived += (data) =>
+listen.PlayerStateReceived += data =>
 {
+	Debug.WriteLine($"[PlayerState] {JsonSerializer.Serialize(data)}");
+};
 
+
+listen.MapStateReceived += data =>
+{
+	Debug.WriteLine($"[MapState] {JsonSerializer.Serialize(data)}");
 };
 
 listen.Start();

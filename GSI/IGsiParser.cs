@@ -2,14 +2,13 @@
 {
 	// Empty interface.
 #pragma warning disable CA1040
-	public interface IGsiPayload {}
+	internal interface IGsiPayload {}
 #pragma warning restore CA1040
 
-	public interface IGsiParser
+	internal interface IGsiParser
 	{
 		bool CanParse(JsonElement root);
 		IGsiPayload Parse(JsonElement root);
-		void Dispatch<T>(IGsiPayload payload, IGsiPayload? cachedPayload, ref Action<T>? action);
 	}
 
 }

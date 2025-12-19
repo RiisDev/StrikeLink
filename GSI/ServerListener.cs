@@ -1,4 +1,5 @@
 ﻿using StrikeLink.Extensions;
+using StrikeLink.GSI.ObjectStates;
 using StrikeLink.GSI.Parsing;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
@@ -20,6 +21,7 @@ namespace StrikeLink.GSI
 
 		// Public readable values
 		public event Action? OnReady;
+		public event Action<string>? OnPostReceived;
 		public bool Ready { get; set { if (field == value) return; field = value; OnReady?.Invoke(); } }
 		public IPAddress Address { get; }
 		public int Port { get; }
@@ -32,7 +34,8 @@ namespace StrikeLink.GSI
 			_listener = new TcpListener(Address, Port);
 			_dispatcher = new GsiDispatcher(
 				[
-					new PlayerStateParser()
+					new PlayerStateParser(),
+					new MapStateParser()
 				]
 			);
 		}
@@ -88,6 +91,7 @@ namespace StrikeLink.GSI
 			}
 
 			string requestBody = new(bodyBuffer);
+			OnPostReceived?.Invoke(requestBody);
 
 			try
 			{
@@ -220,6 +224,7 @@ namespace StrikeLink.GSI
 		private readonly Dictionary<Type, IGsiPayload> _payloadCache = [];
 
 		public event Action<PlayerState>? PlayerStateReceived;
+		public event Action<MapState>? MapStateReceived;
 
 		private void RaisePayload(IGsiPayload payload)
 		{
@@ -232,13 +237,18 @@ namespace StrikeLink.GSI
 			{
 				Type type = payload.GetType();
 				Log($"Payload detected: {type.FullName}");
+
 				bool exists = _payloadCache.TryGetValue(type, out IGsiPayload? oldPayload);
 
 				switch (payload)
 				{
-					case PlayerStateParser player:
-						try { player.Dispatch(payload, oldPayload, ref PlayerStateReceived); }
-						catch (Exception ex) { Log(ex.ToString()); }
+					case PlayerState playerState:
+						if (oldPayload is PlayerState oldPlayerState && playerState == oldPlayerState) return;
+						PlayerStateReceived?.Invoke(playerState);
+						break;
+					case MapState mapState:
+						if (oldPayload is MapState oldMapState && mapState == oldMapState) return;
+						MapStateReceived?.Invoke(mapState);
 						break;
 				}
 
@@ -246,6 +256,7 @@ namespace StrikeLink.GSI
 				else _payloadCache.TryAdd(type, payload);
 			}
 		}
+
 
 		#endregion
 	}
