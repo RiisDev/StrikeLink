@@ -40,8 +40,13 @@ namespace StrikeLink.GSI
 			);
 		}
 
-		public void Start()
+		public async Task StartAsync(string? steamPath = null)
 		{
+			if (Process.GetProcessesByName("cs2").Length > 0)
+				throw new InvalidOperationException("Counter Strike must not be running during initialization.");
+
+			await GsiManager.GenerateGsiFile(Address, Port, steamPath).ConfigureAwait(false);
+
 			_listener.Start();
 
 			Log($"Listening on: http://{Address}:{Port}/");
