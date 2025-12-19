@@ -280,6 +280,7 @@ dotnet_diagnostic.CA5359.severity = none     # ServerCertificateValidationCallba
 dotnet_diagnostic.CA1812.severity = none     # Internal class never instantiated
 dotnet_diagnostic.CA1852.severity = none     # Seal internal classes
 dotnet_diagnostic.CA5399.severity = none     # Do not disable certificate validation
+dotnet_diagnostic.CA1815.severity = none     # Override equals
 
 # System Library Warnings
 dotnet_diagnostic.SYSLIB1054.severity = none # Convert PINVOKE to LibraryImprot
