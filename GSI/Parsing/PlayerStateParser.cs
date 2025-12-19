@@ -4,7 +4,6 @@ using Activity = StrikeLink.GSI.ObjectStates.Activity;
 
 namespace StrikeLink.GSI.Parsing
 {
-	// Example class, non-functional
 	internal sealed class PlayerStateParser : IGsiParser
 	{
 		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out _);

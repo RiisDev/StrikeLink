@@ -1,0 +1,1241 @@
+﻿12/18 05:22:38 [RenderSystem] Determined driver version for graphics adapter 0 [output 0] '': 32.0.15.9144
+12/18 05:22:40 [RenderSystem] Creating device for graphics adapter 0 'NVIDIA GeForce RTX 2080 Ti' [vendorid 0x10DE]: 32.0.15.9144
+12/18 05:22:40 [RenderSystem] Loaded video settings config from 'cfg\cs2_video.txt'
+12/18 05:22:41 [RenderSystem] Successfully created dx11 swap chain [FlipDiscard | AllowTear]
+12/18 05:22:41 Pagefile: estimated 3388mb CPU 10259mb GPU needed, 41155mb pagefile free
+12/18 05:22:41 [Filesystem] ---------------
+12/18 05:22:41 [Filesystem] Path ID:             File Path:
+12/18 05:22:41 [Filesystem] ADDONS               "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_addons\" 
+12/18 05:22:41 [Filesystem] CONTENT              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\csgo\" 
+12/18 05:22:41 [Filesystem] CONTENT              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\csgo_imported\" 
+12/18 05:22:41 [Filesystem] CONTENT              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\csgo_core\" 
+12/18 05:22:41 [Filesystem] CONTENT              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\core\" 
+12/18 05:22:41 [Filesystem] CONTENTADDONS        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\csgo_addons\" 
+12/18 05:22:41 [Filesystem] CONTENTROOT          "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\content\" 
+12/18 05:22:41 [Filesystem] DEFAULT_WRITE_PATH   "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk
+12/18 05:22:41 [Filesystem] DEFAULT_WRITE_PATH   "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\" 
+12/18 05:22:41 [Filesystem] EXECUTABLE_PATH      "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\bin\win64\" 
+12/18 05:22:41 [Filesystem] EXECUTABLE_PATH      "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\bin\" 
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\pak01.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\pak01.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\pak01.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\shaders_pc.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\shaders_pc.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\shaders_pc.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\shaders_pc.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\shaders_pc.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\shaders_pc.vpk
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\" 
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\" 
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\" 
+12/18 05:22:41 [Filesystem] GAME                 "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\bin\win64\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\bin\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\bin\win64\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\bin\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\bin\win64\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\bin\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\bin\win64\" 
+12/18 05:22:41 [Filesystem] GAMEBIN              "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\bin\" 
+12/18 05:22:41 [Filesystem] GAMEROOT             "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\" 
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\pak01.vpk
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\pak01.vpk
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\pak01.vpk
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo\" 
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_imported\" 
+12/18 05:22:41 [Filesystem] MOD                  "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_core\" 
+12/18 05:22:41 [Filesystem] OFFICIAL_ADDONS      "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\csgo_community_addons\" 
+12/18 05:22:41 [Filesystem] PLATFORM             "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\pak01.vpk" (vpk) C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\pak01.vpk
+12/18 05:22:41 [Filesystem] PLATFORM             "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\csgo\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\csgo_imported\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\csgo_core\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\core\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE        "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\csgo_community_addons\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE_MOD    "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\csgo\" 
+12/18 05:22:41 [Filesystem] SHADER_SOURCE_ROOT   "C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\src\shaders\" 
+12/18 05:22:41 [Filesystem] USRLOCAL             "C:\Program Files (x86)\Steam\userdata\1085543877\730\local\" 
+12/18 05:22:41 [CommandLine] command line arguments:
+12/18 05:22:41 [CommandLine] -steam -condebug -high -console -novid
+12/18 05:22:43 [SteamNetSockets] Initialized low level socket/threading support.
+12/18 05:22:43 [SteamNetSockets] Set SteamNetworkingSockets P2P_STUN_ServerList to '205.196.6.215:3478' as per SteamNetworkingSocketsSerialized
+12/18 05:22:43 [SteamNetSockets] SDR RelayNetworkStatus:  avail=Attempting  config=Attempting  anyrelay=Not Attempted   (Attempt #1 to fetch config (only-if-cached) from https://api.steampowered.com/ISteamApps/GetSDRConfig/v1?appid=730)
+12/18 05:22:43 [SteamNetSockets] AuthStatus (steamid:76561199045809605):  Attempting  (Requesting cert)
+12/18 05:22:43 [SteamNetSockets] Pending ping measurement until network config is obtained.
+12/18 05:22:43 [SteamNetSockets] SDR RelayNetworkStatus:  avail=Attempting  config=Attempting  anyrelay=Waiting   (Attempt #1 to fetch config (only-if-cached) from https://api.steampowered.com/ISteamApps/GetSDRConfig/v1?appid=730)
+12/18 05:22:43 [Networking] Got ISteamNetworkingSockets user interfaces from standalone lib
+12/18 05:22:43 [Networking] Network System Initialized
+12/18 05:22:43 [SteamAudio] Initialized Embree v4.04.00.
+12/18 05:22:44 Physics Console Communications is not initialized
+12/18 05:22:44 [SoundSystem] Sound Initialization: Finish, Device Sampling Rate: 44100
+12/18 05:22:44 [Client] CClientSteamContext init ok, logged on = 1
+12/18 05:22:44 Steam config directory: C:\Program Files (x86)\Steam\steamapps\common\Counter-Strike Global Offensive\game\core\config
+12/18 05:22:44 ILocalize::AddFile() failed to load file "resource/platform_english.txt".
+12/18 05:22:44 [SceneFileCache] No .vcds loaded or no scenes/scenes.vrman
+12/18 05:22:44 [RenderPipelineCsgo] ERROR! Cannot load RenderingPipelineCsgoDeveloperMode resource manifest for the Csgo render pipeline!
+12/18 05:22:44 [Client] Unable to read video config convar videocfg_dynamic_shadows
+12/18 05:22:44 [RenderPipelineCsgo] 
+Scratch RT Allocations:
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA16161616F 4xMSAA : 66355200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA8888 4xMSAA : 33177600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA32323232F  : 33177600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8 4xMSAA : 33177600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA16161616F  : 16588800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA16161616F  : 16588800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA16161616F  : 16588800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA16161616F  : 16588800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RG3232F  : 16588800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA8888  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RGBA8888  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 R32F  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA32323232F  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 RG1616F  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 D24S8  : 8294400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA16161616F  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA16161616F  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA16161616F  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA16161616  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RG3232F  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 1920x1080 R16F  : 4147200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RGBA8888  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 R32F  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA32323232F  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RG1616F  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 RG1616F  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 D24S8  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 D24S8  : 2073600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 512x384 RGBA16161616F  : 1572864 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 512x384 RGBA16161616F  : 1572864 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 512x384 RGBA16161616F  : 1572864 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA16161616F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RG3232F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 R16F  : 1036800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 320x360 RGBA16161616  : 921600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 512x384 D24S8  : 786432 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 512x384 D24S8  : 786432 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 256x256 RGBA16161616F  : 524288 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA8888  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA8888  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RGBA8888  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 960x540 I8  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 R32F  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 RG1616F  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 D24S8  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 D24S8  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 D24S8  : 518400 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 320x360 D24S8  : 460800 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 R16F  : 259200 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 480x270 I8  : 129600 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 128x96 RGBA16161616F  : 98304 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 128x96 RGBA8888  : 49152 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 128x96 D24S8  : 49152 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] RT 4x4 D24S8  : 64 Bytes
+12/18 05:22:44 [RenderPipelineCsgo] 63 RTs, Total = 392918016 Bytes
+
+12/18 05:22:44 [Client] Event System loaded 94 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/core/pak01.vpk:resource/core.gameevents.
+12/18 05:22:44 [Client] Event System loaded 50 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/pak01.vpk:resource/game.gameevents.
+12/18 05:22:44 [Client] Event System loaded 145 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/pak01.vpk:./resource/mod.gameevents.
+12/18 05:22:44 GameTypes: missing mapgroupsSP entry for game type/mode (custom/custom).
+12/18 05:22:44 GameTypes: missing mapgroupsSP entry for game type/mode (cooperative/cooperative).
+12/18 05:22:44 GameTypes: missing mapgroupsSP entry for game type/mode (cooperative/coopmission).
+12/18 05:22:44 [Networking] CEntitySystem::BuildEntityNetworking (parallel build of client) took 27.254 msecs for 212 out of 292 classes
+12/18 05:22:44 [Server] Event System loaded 94 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/core/pak01.vpk:resource/core.gameevents.
+12/18 05:22:44 [Server] Event System loaded 50 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/pak01.vpk:resource/game.gameevents.
+12/18 05:22:44 [Server] Event System loaded 145 events from file: vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/pak01.vpk:./resource/mod.gameevents.
+12/18 05:22:44 [Networking] CEntitySystem::BuildEntityNetworking (parallel build of server) took 29.204 msecs for 206 out of 281 classes
+12/18 05:22:44 [STARTUP] {9.968} server module init ok
+12/18 05:22:44 CUiComponent_OptionsMenu::CUiComponent_OptionsMenu
+12/18 05:22:44 [Workshop] Requesting subscribed files...
+12/18 05:22:44 Loading Game State Integration: gamestate_integration_console.cfg
+12/18 05:22:45 [ResourceSystem] Failed loading resource "animation/skeletons/egg/pristine_egg_view.vnmskel_c" (ERROR_FILEOPEN: File not found)
+12/18 05:22:47 Valid options: 1 = Desktop, 2 = Classic.
+12/18 05:22:47 [HostStateManager] CHostStateMgr::QueueNewRequest( Idle (levelload), 1 )
+12/18 05:22:47 ChangeGameUIState: CSGO_GAME_UI_STATE_INVALID -> CSGO_GAME_UI_STATE_MAINMENU
+12/18 05:22:47 Source2Init OK
+12/18 05:22:47 [HostStateManager] HostStateRequest::Start(HSR_IDLE):  loop(levelload) id(1) addons() desc(Idle (levelload))
+12/18 05:22:47 [EngineServiceManager] SwitchToLoop levelload requested:  id [1] addons []
+12/18 05:22:47 **** Unable to localize '#matchdraft_phase_action_wait' on panel 'id-map-draft-phase-wait'
+12/18 05:22:47 **** Unable to localize '#Movie_Playing' on panel 'PlaybackSpeed'
+12/18 05:22:47 **** Unable to localize '#PANOHUD_Spectate_Navigation_ViewHighlight' on panel 'HotKey_ViewHighlight'
+12/18 05:22:47 **** Unable to localize '#PANOHUD_Spectate_Navigation_InspectLoadout_Show' on panel 'HotKey_InspectLoadout'
+12/18 05:22:47 **** Unable to localize '#Panorama_CSGO_Spray_Cursor_Hint' on panel 'RosettaInfoText'
+12/18 05:22:47 **** Unable to localize '#GameUI_Stationary' on panel 'MoveSpeedLabel'
+12/18 05:22:47 **** Unable to localize '#GameUI_Fire' on panel descendant of 'TestSpread'
+12/18 05:22:47 [Client] Unable to write video config convar videocfg_dynamic_shadows
+12/18 05:22:48 [Client] Unable to write video config convar videocfg_dynamic_shadows
+12/18 05:22:48 [Workshop] Requesting subscribed files...
+12/18 05:22:48 [HostStateManager] Host activate: Idle (levelload)
+12/18 05:22:48 [InputSystem] Raw keyboard mode: 0
+12/18 05:22:48 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:48 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:48 [Steam] Running SteamAPI_RunCallbacks for first time
+12/18 05:22:48 [SteamNetSockets] Certificate expires in 9h38m at 1766095256 (current time 1766060550), will renew in 7h38m
+12/18 05:22:48 [SteamNetSockets] SDR network config fetch attempt #1 failed.  HTTP 504.  .  Trying again.
+12/18 05:22:48 [Missions] Received recurring missions partial progress:
+12/18 05:22:48 [Missions] mission:11012 period:1765332000 progress:28 
+12/18 05:22:48 *** Sending RequestRecurringMissionSchedule
+12/18 05:22:48 [SteamNetSockets] Got SDR network config.  Loaded revision 1763157357 OK
+12/18 05:22:48 [SteamNetSockets] Performing ping measurement
+12/18 05:22:48 [SteamNetSockets] SDR RelayNetworkStatus:  avail=Attempting  config=OK  anyrelay=Attempting   (Performing ping measurement)
+12/18 05:22:48 [SteamNetSockets] AuthStatus (steamid:76561199045809605):  OK  (OK)
+12/18 05:22:48 [Client] CL:  CLoopModeLevelLoad::MaybeSwitchToGameLoop switching to "game" loopmode with addons ()
+12/18 05:22:48 [EngineServiceManager] SwitchToLoop game requested:  id [1] addons []
+12/18 05:22:48 Telling Steam it is safe to update the app
+12/18 05:22:48 **** Panel  has fill-parent-flow for height, but isn't in a flowing down or up layout
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "CSGOLoadingScreen"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "eom-winner"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "id-op-mainmenu-top"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "JsWatchNoticePanel"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "id-op-mainmenu-rewards"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "CSGOLoadingScreen"! Panel is possibly created dynamically.
+12/18 05:22:48 CCSGO_BlurTarget - Unable to find panel with the given id "CSGOLoadingScreen"! Panel is possibly created dynamically.
+12/18 05:22:48 [Server] CNetworkGameServerBase::SetServerState (ss_dead -> ss_waitingforgamesessionmanifest)
+12/18 05:22:48 [Server] SV:  maxplayers set to 1
+12/18 05:22:48 [VScript] Initializing CSGO VScript Game System
+12/18 05:22:48 **** Panel  has fill-parent-flow for height, but isn't in a flowing down or up layout
+12/18 05:22:48 [Server] SV:  Executing server defaults
+12/18 05:22:48 [Server] SV:  Executing listen server config file
+12/18 05:22:48 [STARTUP] {14.136} created game rules
+12/18 05:22:48 [Server] SV:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:22:48 [ResourceSystem] Failed loading resource "panorama/images/map_icons/screenshots/720p/de_canals_png.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:22:49 CPlayerVoiceListener::GameInit()
+12/18 05:22:49 Entry player was not found in surfaceproperties_footsteps.txt
+12/18 05:22:49 [InputService] execing gamemode_competitive.cfg
+12/18 05:22:49 [InputService] execing gamemode_competitive_offline.cfg
+12/18 05:22:49 [InputService] exec: couldn't exec '{*}cfg/gamemode_competitive_server.cfg', unable to read file
+12/18 05:22:49 [InputService] execing server_default.cfg
+12/18 05:22:49 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/1012790/2b454a55c489d8e66bc8e403b0b7d5d02b1d8cf8.webm
+12/18 05:22:49 [SteamNetSockets] L4S detection: no.  up_ecn1=plain_extra(DSCPOther)  down_dscp45=plain_extra(DSCPOther)
+12/18 05:22:49 [SteamNetSockets] We will send ECN=0 (ECN config value=-1)
+12/18 05:22:49 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:49 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:49 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:49 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:49 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:49 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:49 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:49 [SteamNetSockets] Cluster 'pww' has a selection penalty of 16ms for load balancing purposes.  (As per pww#214 (116.211.132.14:27066)).
+12/18 05:22:50 [Server] SV:  Spawn Server: <empty>
+12/18 05:22:50 [Server] CSource2Server::ApplyGameSettings game settings payload received:
+12/18 05:22:50 [Server]   ::ExecGameTypeCfg {
+12/18 05:22:50 [Server]     map {
+12/18 05:22:50 [Server]       mapname <empty>
+12/18 05:22:50 [Server]     }
+12/18 05:22:50 [Server]     launchoptions {
+12/18 05:22:50 [Server]       localonly int( 1 = 0x1 )
+12/18 05:22:50 [Server]       mode listenserver
+12/18 05:22:50 [Server]       loadmap int( 1 = 0x1 )
+12/18 05:22:50 [Server]       levelname <empty>
+12/18 05:22:50 [Server]       map_background int( 1 = 0x1 )
+12/18 05:22:50 [Server]       map <empty>
+12/18 05:22:50 [Server]       mapgroup 
+12/18 05:22:50 [Server]       requires_attr 
+12/18 05:22:50 [Server]       requires_attr_value int( -1 = 0xFFFFFFFF )
+12/18 05:22:50 [Server]       requires_attr_reward 
+12/18 05:22:50 [Server]       reward_drop_list int( -1 = 0xFFFFFFFF )
+12/18 05:22:50 [Server]       numSlots int( 10 = 0xA )
+12/18 05:22:50 [Server]       c_game_type int( 0 = 0x0 )
+12/18 05:22:50 [Server]       c_game_mode int( 1 = 0x1 )
+12/18 05:22:50 [Server]       default_game_type int( -1 = 0xFFFFFFFF )
+12/18 05:22:50 [Server]       default_game_mode int( -1 = 0xFFFFFFFF )
+12/18 05:22:50 [Server]       ct_arms 
+12/18 05:22:50 [Server]       t_arms 
+12/18 05:22:50 [Server]     }
+12/18 05:22:50 [Server]   }
+12/18 05:22:50 [Server] CNetworkGameServerBase::SetServerState (ss_waitingforgamesessionmanifest -> ss_loading)
+12/18 05:22:50 [Server] CNetworkGameServerBase::SetServerState (ss_loading -> ss_active)
+12/18 05:22:50 [Client] CL:  CWaitForGameServerStartupPrerequisite done waiting for server
+12/18 05:22:50 [Client] CL:  CCreateGameClientJob creating client connection to 'loopback'
+12/18 05:22:50 [SteamNetSockets] [#3370141286 pipe] connected
+12/18 05:22:50 [SteamNetSockets] [#2019320907 pipe] connected
+12/18 05:22:50 [Networking] Created poll group for socket 'client'
+12/18 05:22:50 [Networking] Created poll group for socket 'server'
+12/18 05:22:50 [Networking] Connected loopback client=c8e04666@loopback:1 <-> server=785c644b@loopback:0
+12/18 05:22:50 [Client] Tick packet desired receive margin now 5.0ms.  cl_tickpacket_recvmargin_desired=5  cl_tickpacket_desired_queuelength=0.  engine_frametime_warnings_enable=1, cl_async_usercmd_send=1
+12/18 05:22:50 [NetSteamConn] Associating NetChan Cinnamon Toa @ loopback:0 (loopback:0) with Steam Net Connection handle #2019320907 (userdata 0)
+12/18 05:22:50 [NetSteamConn] Associating NetChan server @ loopback:1 (loopback:1) with Steam Net Connection handle #3370141286 (userdata 1)
+12/18 05:22:50 [Client] CL:  Connected to 'loopback:1'
+12/18 05:22:50 ClientPutInServer create new player controller [Cinnamon Toast Crunch]
+12/18 05:22:50 [Server] Client 0 'Cinnamon Toast Crunch' setting rate to 786432
+12/18 05:22:50 [Server] [Cinnamon Toast Crunch] cl_interp_ratio='0', LerpTime=0
+12/18 05:22:50 [Client] Game: "Counter-Strike 2"
+12/18 05:22:50 [Client] Map: "<empty>"
+12/18 05:22:50 [Client] Players: 1 (0 bots) / 1 humans
+12/18 05:22:50 [Client] Build: 10603 (revision 10299884)
+12/18 05:22:50 [Client] Server Number: 1
+12/18 05:22:50 [SignonState] CL:  CNetworkGameClient::ProcessServerInfo
+12/18 05:22:50 [VScript] Initializing CSGO VScript Game System
+12/18 05:22:50 [Client] CL:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:22:50 ReadSteamRemoteStorageFile( bufOut, "voice_ban.dt" ) -> 0.000318 seconds
+12/18 05:22:50 LoadResponseSystem scripts/talker/response_rules.vrr - Start
+12/18 05:22:50 CResponseSystem:  scripts/talker/response_rules.vrr (7681 rules, 811 criteria, and 7681 responses)
+12/18 05:22:50 LoadResponseSystem scripts/talker/response_rules.vrr - Finish
+12/18 05:22:50 [Client] CNetworkGameClient::ProcessClassInfo: create on client true
+12/18 05:22:50 [Client] CNetworkGameClient::ProcessClassInfo: creating client serializers from local server serializers (crc 0, server api exists)
+12/18 05:22:50 [Client] CL:  loaded 36 replay compatability settings from 'vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/core/pak01.vpk:./scripts/replay_compatability_settings.txt'
+12/18 05:22:50 [Client] CL:  loaded 6 replay compatability settings from 'vpk:C:/Program Files (x86)/Steam/steamapps/common/Counter-Strike Global Offensive/game/csgo/pak01.vpk:./scripts/replay_compatability_settings.txt'
+12/18 05:22:50 [Client] CNetworkGameClientBase::LinkClasses took 28.347 msec
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/570/f9e16cabdadbff85067517ffab58be0e47448dd0.webm
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/1675200/9409613f915e1ab1155bc08977582338d8f87765.webm
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/570/f9e16cabdadbff85067517ffab58be0e47448dd0.webm
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/1675200/9409613f915e1ab1155bc08977582338d8f87765.webm
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/1528130/ff386ed852934373d6317e6265f92a661ce675cd.webm
+12/18 05:22:50 Invalid image URL (unknown type) to LoadImageFromURL: https://shared.steamstatic.com/community_assets/images/items/1528130/ff386ed852934373d6317e6265f92a661ce675cd.webm
+12/18 05:22:50 [Client] CL:  CGameClientConnectPrerequisite connection succeeded
+12/18 05:22:50 [Server] SV:  IGameSystem::LoopActivateAllSystems {
+12/18 05:22:50 [Host] HO:  IGameSystem::LoopActivateAllSystems {
+12/18 05:22:50 [Host] HO:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:22:50 [Server] SV:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:22:50 [Server] SV:  1 player server started
+12/18 05:22:50 [Client] CL:  IGameSystem::LoopActivateAllSystems {
+12/18 05:22:50 [Client] CL:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:22:50 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( game : success )
+12/18 05:22:50 [Server] SV:  Sending full update to client Cinnamon Toast Crunch (reason:  initial update)
+12/18 05:22:50 [Client] CNetworkGameClientBase::OnReceivedUncompressedPacket(), received full update
+12/18 05:22:50 [Prediction] Resetting prediction state because we received a full update
+12/18 05:22:50 [Client] Receiving 0.5K non-incremental update from server
+12/18 05:22:50 Cinnamon Toast Crunch connected
+12/18 05:22:50 [Networking] server @ loopback:1:  NetChan Setting Timeout to 30.00 seconds
+12/18 05:22:50 [Client] CL:  Signon traffic "server":  incoming 15.479 KB [15 netframes], outgoing 1.374 KB [14 netframes]
+12/18 05:22:50 [Prediction] Added prediction for player slot 0 (Cinnamon Toast Crunch)
+12/18 05:22:50 [Prediction] Scanned 63 entities, activated prediction for 1, total predictable entities now 1
+12/18 05:22:50 [Networking] Cinnamon Toa @ loopback:0:  NetChan Setting Timeout to 20.00 seconds
+12/18 05:22:50 [WorldRenderer] CWorldRendererMgr::ServiceWorldRequests long frame: 14.010317ms
+12/18 05:22:51 Named camera 'cam_default' not found in map 'ui/xpshop_item'
+12/18 05:22:51 [SceneSystem] Too many non-culled draws (alloc 288, need 297), resizing!
+12/18 05:22:51 [SplitScreen] Writing configuration for slot 0
+12/18 05:22:51 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:22:51 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:22:51 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:51 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:22:51 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:22:51 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:22:52 [SteamNetSockets] Ping measurement completed in 3.7s.  Relays: 25 valid, 0 great, 4 good+, 7 ok+, 23 ignored
+12/18 05:22:52 [SteamNetSockets] Ping location: sea=31+3,ord=46+4,lax=60+6/54+3,atl=75+7/64+4,iad=81+8/66+4,dfw=69+6/67+4,tyo=156+15/124+3,ams=149+14/137+4,ams4=158+15/138+4,fra=159+15/151+4,gru=175+17,sgp=221+22/222+22
+12/18 05:22:52 [SteamNetSockets] SDR RelayNetworkStatus:  avail=OK  config=OK  anyrelay=OK   (OK.  Relays: 25 valid, 0 great, 4 good+, 7 ok+, 23 ignored)
+12/18 05:23:12 Connecting to 172.93.101.24:27017
+12/18 05:23:12 [HostStateManager] CHostStateMgr::QueueNewRequest( Remote Connect (172.93.101.24:27017), 2 )
+12/18 05:23:12 [HostStateManager] HostStateRequest::Start(HSR_GAME):  loop(remoteconnect) id(2) addons() desc(Remote Connect (172.93.101.24:27017))
+12/18 05:23:12 [EngineServiceManager] SwitchToLoop remoteconnect requested:  id [2] addons []
+12/18 05:23:12 [Client] CL:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:23:12 [Client] CL:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:23:12 [Client] Disconnecting from server: NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:12 [NetSteamConn] Closing Steam Net Connection on socket 'client' to loopback:1, handle #3370141286 (2055 NETWORK_DISCONNECT_LOOPDEACTIVATE)
+12/18 05:23:12 [NetSteamConn] CloseSteamNetConnection handle #3370141286 (userdata 1)
+12/18 05:23:12 [NetSteamConn] Disassociating NetChan server @  (unknown) from Steam Net Connection handle #3370141286 (userdata 1)
+12/18 05:23:12 [SteamNetSockets] [#3370141286 pipe 'server'] closed by app, linger requested but not needed (2055) NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:12 [SteamNetSockets] [#2019320907 pipe 'Cinnamon Toast Crunch'] closed by peer (2055): NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:12 [NetSteamConn] Removing Steam Net Connection for loopback:1, handle #3370141286
+12/18 05:23:12 [Networking] Closing 'client' poll group
+12/18 05:23:12 [Server] SV:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:23:12 [Host] HO:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:23:12 [Host] HO:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:23:12 [Server] SV:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:23:12 [Server] SV:  Server shutting down: NETWORK_DISCONNECT_LOOPDEACTIVATE (55)
+12/18 05:23:12 [Server] CNetworkGameServerBase::SetServerState (ss_active -> ss_dead)
+12/18 05:23:12 [Server] Disconnect client 'Cinnamon Toast Crunch' from server: NETWORK_DISCONNECT_SHUTDOWN (Server shutdown)
+12/18 05:23:12 [SignonState] Client 0 'Cinnamon Toast Crunch' signon state SIGNONSTATE_FULL -> SIGNONSTATE_NONE
+12/18 05:23:12 [NetSteamConn] Closing Steam Net Connection on socket 'server' to loopback:0, handle #2019320907 (1001 NETWORK_DISCONNECT_SHUTDOWN)
+12/18 05:23:12 [NetSteamConn] CloseSteamNetConnection handle #2019320907 (userdata 0)
+12/18 05:23:12 [NetSteamConn] Disassociating NetChan Cinnamon Toa @  (unknown) from Steam Net Connection handle #2019320907 (userdata 0)
+12/18 05:23:12 [NetSteamConn] Removing Steam Net Connection for loopback:0, handle #2019320907
+12/18 05:23:12 CPlayerVoiceListener::PostSpawnGroupUnload()
+12/18 05:23:12 [Server] CSource2Server::GameServerSteamAPIDeactivated()
+12/18 05:23:12 [Networking] Closing 'server' poll group
+12/18 05:23:12 [stringtables] SV: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:23:12 [stringtables] CL: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:23:12 [BuildSparseShadowTree] CSparseShadowTreeGameSystem::GameShutdown
+12/18 05:23:12 [Client] CL:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:23:12 [Client] CL:  CGameRules::CGameRules destructed
+12/18 05:23:12 WriteSteamRemoteStorageFileAsync( "voice_ban.dt" ) -> at 37.302
+12/18 05:23:12 CPlayerVoiceListener::GameShutdown()
+12/18 05:23:12 [Server] SV:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:23:12 [Server] SV:  CGameRules::CGameRules destructed
+12/18 05:23:12 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( remoteconnect : success )
+12/18 05:23:12 [Client] Tick packet desired receive margin now 5.0ms.  cl_tickpacket_recvmargin_desired=5  cl_tickpacket_desired_queuelength=0.  engine_frametime_warnings_enable=1, cl_async_usercmd_send=1
+12/18 05:23:12 CAsyncWriteInProgress::OnComplete( "voice_ban.dt" ) -> Success at 37.303
+12/18 05:23:12 [NetSteamConn] Steam Net connection #2019320907 pipe 'Cinnamon Toast Crunch' closed by peer, reason 2055: NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:12 [NetSteamConn] CloseSteamNetConnection handle #2019320907 (userdata -1)
+12/18 05:23:12 [SteamNetSockets] Waited 7.7ms for SteamNetworkingSockets lock [ServiceThread]
+12/18 05:23:12 [NetSteamConn] Opened Steam Net Connection on socket 'client' to 172.93.101.24:27017, connection #2262542162 UDP invalid@172.93.101.24:27017
+12/18 05:23:12 [Networking] Created poll group for socket 'client'
+12/18 05:23:12 [SteamNetSockets] [#2262542162 UDP steamid:85568392935672895@172.93.101.24:27017] connected
+12/18 05:23:12 [Client] Sending connect to 172.93.101.24:27017
+12/18 05:23:12 [Client] Received S2C_CHALLENGE [0 auth 3] from 172.93.101.24:27017
+12/18 05:23:12 [Client] Sending C2S_CONNECT [14128 protocol 0 auth 3] to 172.93.101.24:27017
+12/18 05:23:12 [Client] Received S2C_CONNECTION from 172.93.101.24:27017 [addons:'3306343583']
+12/18 05:23:12 [NetSteamConn] Associating NetChan server @ 172.93.101.24:27017 (172.93.101.24:27017) with Steam Net Connection handle #2262542162 (userdata 0)
+12/18 05:23:12 [Client] CL:  Connected to '172.93.101.24:27017'
+12/18 05:23:12 [SignonState] CL:  Suppress INetchannel::Transmit() in loopmode( remoteconnect )
+12/18 05:23:14 **** Unable to localize '#GenericConfirmText_Label' on panel descendant of 'DownloadWorkshopMap'
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:15 [Workshop] Downloading ugc map"3306343583" with map (0 bytes/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (788.22 KB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (2.72 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.00 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (4.38 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (6.14 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (7.22 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (8.26 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (12.15 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (18.20 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (21.17 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (24.41 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Workshop] Downloading ugc map"3306343583" with map (25.11 MB/25.11 MB)
+12/18 05:23:16 [Client] CL:  CLoopModeRemoteConnect::OnClientFrameSimulate switching to "levelload" loopmode with addons:  3306343583
+12/18 05:23:16 [EngineServiceManager] SwitchToLoop levelload requested:  id [2] addons [3306343583]
+12/18 05:23:16 ResetBreakpadAppId: Universe is 1 (k_EUniversePublic)
+12/18 05:23:16 ResetBreakpadAppId: Setting non standard break pad app id: 2347771
+12/18 05:23:16 [EngineServiceManager] Mounting addon '3306343583'
+12/18 05:23:16 [SceneFileCache] No .vcds loaded or no scenes/scenes.vrman
+12/18 05:23:16 ChangeGameUIState: CSGO_GAME_UI_STATE_MAINMENU -> CSGO_GAME_UI_STATE_LOADINGSCREEN
+12/18 05:23:16 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( levelload : success )
+12/18 05:23:16 [SignonState] CL:  Permit INetchannel::Transmit()
+12/18 05:23:16 [Client] CL:  CLoopModeLevelLoad::MaybeSwitchToGameLoop switching to "game" loopmode with addons (3306343583)
+12/18 05:23:16 [EngineServiceManager] SwitchToLoop game requested:  id [2] addons [3306343583]
+12/18 05:23:17 [Client] CL:  CNetworkGameClient already exists for connection to '172.93.101.24:27017'
+12/18 05:23:17 [Client] CL:  connection to '172.93.101.24:27017' already started
+12/18 05:23:17 [Client] Game: "Counter-Strike 2"
+12/18 05:23:17 [Client] Map: "am_texture_wf"
+12/18 05:23:17 [Client] Players: 1 (0 bots) / 32 humans
+12/18 05:23:17 [Client] Build: 10603 (revision 10299884)
+12/18 05:23:17 [Client] Server Number: 4
+12/18 05:23:17 [SignonState] CL:  CNetworkGameClient::ProcessServerInfo
+12/18 05:23:17 [VScript] Initializing CSGO VScript Game System
+12/18 05:23:17 [Client] CL:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:23:17 ReadSteamRemoteStorageFile( bufOut, "voice_ban.dt" ) -> 0.000313 seconds
+12/18 05:23:17 **** Panel  has fill-parent-flow for height, but isn't in a flowing down or up layout
+12/18 05:23:17 [Client] CNetworkGameClient::ProcessClassInfo: create on client true
+12/18 05:23:17 [Client] CNetworkGameClient::ProcessClassInfo: creating client serializers from local server serializers (crc 0, server api exists)
+12/18 05:23:17 [Client] CNetworkGameClientBase::LinkClasses took 17.084 msec
+12/18 05:23:17 [WorldRenderer] CWorldRendererMgr::ServiceWorldRequests long frame: 32.060681ms
+12/18 05:23:18 [ResourceSystem] Failed loading resource "panorama/images/map_icons/map_icon_am_texture_wf.vsvg_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal3.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_phoenix.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_spectrum.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_hydra.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_horizon.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_26.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_gamma2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma3.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_winteroffensive.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_23.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_glove.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_29.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_27.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal1.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_bravo.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_25.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_dangerzone.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_clutch.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_huntsman.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_gamma.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_community_28.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_shadow.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:18 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_spectrum2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_community_22.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_community_31.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_wildfire.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_community_32.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_vanguard.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_community_30.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_breakout.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_revolver.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_community_24.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [AnimResource] Model models/props/crates/csgo_drop_crate_bloodhound.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:19 [Client] CL:  CGameClientConnectPrerequisite connection succeeded
+12/18 05:23:19 ChangeGameUIState: CSGO_GAME_UI_STATE_LOADINGSCREEN -> CSGO_GAME_UI_STATE_INGAME
+12/18 05:23:19 [Client] CL:  IGameSystem::LoopActivateAllSystems {
+12/18 05:23:19 [Host] HO:  IGameSystem::LoopActivateAllSystems {
+12/18 05:23:19 [Host] HO:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:23:19 [Client] CL:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:23:19 [HostStateManager] Host activate: Remote Connect (172.93.101.24:27017)
+12/18 05:23:19 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( game : success )
+12/18 05:23:19 [Client] CNetworkGameClientBase::OnReceivedUncompressedPacket(), received full update
+12/18 05:23:19 [Prediction] Resetting prediction state because we received a full update
+12/18 05:23:19 [Client] Receiving 2.9K non-incremental update from server
+12/18 05:23:19 [Client] Created physics for am_texture_wf
+12/18 05:23:19 [SteamAudio] Reverb: No baked reverb found in baked data file.
+12/18 05:23:19 [SteamAudio] Pathing: Loaded baked data file (maps\am_texture_wf.sapaths).
+12/18 05:23:19 [SteamAudio] Occlusion: Cannot find baked data file: maps\am_texture_wf.custom.occlusion.
+12/18 05:23:19 [SteamAudio] Dimensions: Cannot find baked data file: maps\am_texture_wf.custom.dimensions.
+12/18 05:23:19 [SteamAudio] Materials: Cannot find baked data file: maps\am_texture_wf.custom.materials.
+12/18 05:23:19 Cinnamon Toast Crunch connected
+12/18 05:23:19 [Networking] server @ 172.93.101.24:27017:  NetChan Setting Timeout to 30.00 seconds
+12/18 05:23:19 [Client] CL:  Signon traffic "server":  incoming 32.405 KB [14 netframes], outgoing 2.999 KB [169 netframes]
+12/18 05:23:19 [Prediction] Added prediction for player slot 1 (Cinnamon Toast Crunch)
+12/18 05:23:19 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'C_CSObserverPawn'
+12/18 05:23:19 ApplyOverrides_R: failed to find field 'm_flPrevCycle' in class 'C_CSObserverPawn'
+12/18 05:23:19 ApplyOverrides_R: failed to find field 'm_nNewSequenceParity' in class 'C_CSObserverPawn'
+12/18 05:23:19 ApplyOverrides_R: failed to find field 'm_nResetEventsParity' in class 'C_CSObserverPawn'
+12/18 05:23:19 [Prediction] Scanned 141 entities, activated prediction for 2, total predictable entities now 2
+12/18 05:23:19 [Shooting] cl: ReadFrameInput - Presented data has no mod info
+12/18 05:23:19 [Prediction] Expected tick base to be 86687+0=86687, but controller tick base is 86684
+12/18 05:23:19 [Client] 16790:weapon_xm1014::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20213.097656 0.000000 0.000000)
+12/18 05:23:19 [Client] 16792:weapon_ak47::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20213.097656 0.000000 0.000000)
+12/18 05:23:19 [Client] 16794:weapon_awp::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20213.097656 0.000000 0.000000)
+12/18 05:23:19 [Client] 16796:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20213.097656 0.000000 0.000000)
+12/18 05:23:19 [Client] 16798:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20213.097656 0.000000 0.000000)
+12/18 05:23:19 [Client] 16800:weapon_xm1014::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20267.093750 0.000000 0.000000)
+12/18 05:23:19 [Client] 16802:weapon_ak47::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20274.003906 0.000000 0.000000)
+12/18 05:23:19 [Client] 16804:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 36 is outside of cell bounds (0->32) @(21503.501953 0.000000 0.000000)
+12/18 05:23:19 [Client] 16806:weapon_elite::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20277.740234 0.000000 0.000000)
+12/18 05:23:19 [Client] 16808:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell 35 is outside of cell bounds (0->32) @(20259.128906 0.000000 0.000000)
+12/18 05:23:19 [Client] 16810:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3313.242188 21363.423828 0.000000)
+12/18 05:23:19 [Client] 16812:weapon_awp::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3313.242188 21363.423828 0.000000)
+12/18 05:23:19 [Client] 16814:weapon_m4a1::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3313.242188 21363.423828 0.000000)
+12/18 05:23:19 [Client] 16816:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3313.242188 21363.423828 0.000000)
+12/18 05:23:19 [Client] 16818:weapon_mp7::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3313.242188 21363.423828 0.000000)
+12/18 05:23:19 [Client] 16820:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3344.238281 21411.437500 0.000000)
+12/18 05:23:19 [Client] 16822:weapon_m4a1::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 37 is outside of cell bounds (0->32) @(-2261.189453 21526.068359 0.000000)
+12/18 05:23:19 [Client] 16824:weapon_elite::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 33 is outside of cell bounds (0->32) @(-12712.482422 17454.718750 0.000000)
+12/18 05:23:19 [Client] 16826:weapon_negev::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3360.505859 21444.667969 0.000000)
+12/18 05:23:19 [Client] 16828:weapon_mp7::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(3385.857422 21340.042969 0.000000)
+12/18 05:23:19 [Shooting] cl: ReadFrameInput - Presented data has no mod info
+12/18 05:23:19 CCSGO_BlurTarget - Unable to find panel with the given id "loadingscreen__blur-target"! Panel is possibly created dynamically.
+12/18 05:23:19 [CL CommandQueue] CQ enabled, using client-controlled JIT async send mode
+12/18 05:23:19 [ResourceSystem] Failed loading resource "panorama/images/map_icons/screenshots/1080p/am_texture_wf_png.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:19 [ResourceSystem] Failed loading resource "panorama/images/overheadmaps/am_texture_wf_radar_psd.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:19 [Client] c_cs_observer_for_precache([109): MarkInterpolationLatchFlagsDirty:  C_BaseEntity::IsLatchedPermissible() == false
+12/18 05:23:19 [Client] c_cs_observer_for_precache([109): MarkInterpolationLatchFlagsDirty:  C_BaseEntity::IsLatchedPermissible() == false
+12/18 05:23:19 [Client] c_cs_observer_for_precache([109): MarkInterpolationLatchFlagsDirty:  C_BaseEntity::IsLatchedPermissible() == false
+12/18 05:23:19 [Client] c_cs_observer_for_precache([109): MarkInterpolationLatchFlagsDirty:  C_BaseEntity::IsLatchedPermissible() == false
+12/18 05:23:19 Named camera 'cam_default' not found in map 'ui/xpshop_item'
+12/18 05:23:23 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'C_CSPlayerPawn'
+12/18 05:23:23 ApplyOverrides_R: failed to find field 'm_flPrevCycle' in class 'C_CSPlayerPawn'
+12/18 05:23:23 ApplyOverrides_R: failed to find field 'm_nNewSequenceParity' in class 'C_CSPlayerPawn'
+12/18 05:23:23 ApplyOverrides_R: failed to find field 'm_nResetEventsParity' in class 'C_CSPlayerPawn'
+12/18 05:23:23 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'CKnife'
+12/18 05:23:23 [Prediction] Shutdown prediction for player slot 1.  3 predictable entities and 0 client-created entities
+12/18 05:23:28 **** Unable to localize '#eom-characters' on panel ''
+12/18 05:23:28 [ResourceSystem] Failed loading resource "panorama/images/map_icons/screenshots/1080p/am_texture_wf_png.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:29 **** Unable to localize '#accolade_gimme_04_value' on panel 'card'
+12/18 05:23:31 [Networking] server @ 172.93.101.24:27017:  NetChan Setting Timeout to 120.00 seconds
+12/18 05:23:31 [HostStateManager] CHostStateMgr::QueueNewRequest( Downloading Addons (3176899146), 3 )
+12/18 05:23:31 [HostStateManager] HostStateRequest::Start(HSR_GAME):  loop(addondownload) id(3) addons(3306343583) desc(Downloading Addons (3176899146))
+12/18 05:23:31 [EngineServiceManager] SwitchToLoop addondownload requested:  id [3] addons [3306343583]
+12/18 05:23:31 [Client] CL:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:23:31 [Host] HO:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:23:31 [Host] HO:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:23:31 [Client] CL:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:23:31 [Client] Disconnecting from server: NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:31 [NetSteamConn] Closing Steam Net Connection on socket 'client' to 172.93.101.24:27017, handle #2262542162 (2055 NETWORK_DISCONNECT_LOOPDEACTIVATE)
+12/18 05:23:31 [NetSteamConn] CloseSteamNetConnection handle #2262542162 (userdata 0)
+12/18 05:23:31 [NetSteamConn] Disassociating NetChan server @  (unknown) from Steam Net Connection handle #2262542162 (userdata 0)
+12/18 05:23:31 [Networking] Summary of connection [#2262542162 UDP steamid:85568392935672895@172.93.101.24:27017 'server']:
+12/18 05:23:31 [Networking]     End-to-end connection: connected
+12/18 05:23:31 [Networking]         Current rates:
+12/18 05:23:31 [Networking]             Sent:  64.0 pkts/sec  28.6 K/sec
+12/18 05:23:31 [Networking]             Recv:  62.0 pkts/sec  11.4 K/sec
+12/18 05:23:31 [Networking]             Ping:76ms    Max latency variance: 0.6ms
+12/18 05:23:31 [Networking]             Quality:  100%  (Dropped:0.00%  WeirdSeq:0.00%)
+12/18 05:23:31 [Networking]             Est avail bandwidth: 768.0KB/s  
+12/18 05:23:31 [Networking]             Bytes buffered: 0
+12/18 05:23:31 [Networking]         Lifetime stats:
+12/18 05:23:31 [Networking]             Totals
+12/18 05:23:31 [Networking]                 Sent:        975 pkts         375,310 bytes
+12/18 05:23:31 [Networking]                 Recv:        806 pkts         163,759 bytes
+12/18 05:23:31 [Networking]                 Recv w seq:        804 pkts
+12/18 05:23:31 [Networking]                 Dropped   :          0 pkts   0.00%
+12/18 05:23:31 [Networking]                 OutOfOrder:          0 pkts   0.00%
+12/18 05:23:31 [Networking]                 OOOFixed  :          0 pkts   0.00%
+12/18 05:23:31 [Networking]                 Duplicate :          0 pkts   0.00%
+12/18 05:23:31 [Networking]                 SeqLurch  :          0 pkts   0.00%
+12/18 05:23:31 [Networking]             Ping histogram: (676 total samples)
+12/18 05:23:31 [Networking]                      0-25    25-50    50-75   75-100  100-125  125-150  150-200  200-300     300+
+12/18 05:23:31 [Networking]                         0        0        0      676        0        0        0        0        0
+12/18 05:23:31 [Networking]                      0.0%     0.0%     0.0%   100.0%     0.0%     0.0%     0.0%     0.0%     0.0%
+12/18 05:23:31 [Networking]             Ping distribution:
+12/18 05:23:31 [Networking]                 5th   50th   75th   95th   98th
+12/18 05:23:31 [Networking]                76ms   77ms   80ms   82ms   83ms
+12/18 05:23:31 [Networking]             No connection quality distribution available.  (3 measurement intervals)
+12/18 05:23:31 [Networking]             Latency variance histogram: (796 total measurements)
+12/18 05:23:31 [Networking]                       <1     1-2     2-5    5-10   10-20     >20
+12/18 05:23:31 [Networking]                      796       0       0       0       0       0
+12/18 05:23:31 [Networking]                   100.0%    0.0%    0.0%    0.0%    0.0%    0.0%
+12/18 05:23:31 [Networking]         No rate stats received from remote host
+12/18 05:23:31 [Networking]         No lifetime stats received from remote host
+12/18 05:23:31 [Networking]     
+12/18 05:23:31 [SteamNetSockets] [#2262542162 UDP steamid:85568392935672895@172.93.101.24:27017 'server'] closed by app, linger requested but not needed (2055) NETWORK_DISCONNECT_LOOPDEACTIVATE
+12/18 05:23:31 [NetSteamConn] Removing Steam Net Connection for 172.93.101.24:27017, handle #2262542162
+12/18 05:23:31 [Networking] Closing 'client' poll group
+12/18 05:23:31 [stringtables] CL: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:23:31 [BuildSparseShadowTree] CSparseShadowTreeGameSystem::GameShutdown
+12/18 05:23:31 [Client] CL:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:23:31 [Client] CL:  CGameRules::CGameRules destructed
+12/18 05:23:31 WriteSteamRemoteStorageFileAsync( "voice_ban.dt" ) -> at 57.098
+12/18 05:23:31 ChangeGameUIState: CSGO_GAME_UI_STATE_INGAME -> CSGO_GAME_UI_STATE_MAINMENU
+12/18 05:23:31 [HostStateManager] CHostStateMgr::QueueNewRequest( Remote Connect (172.93.101.24:27017), 4 )
+12/18 05:23:31 CAsyncWriteInProgress::OnComplete( "voice_ban.dt" ) -> Success at 57.133
+12/18 05:23:32 [ResourceSystem] Failed loading resource "panorama/images/map_icons/screenshots/720p/de_canals_png.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:32 [HostStateManager] Discarding pending request 'Downloading Addons (3176899146), 3'
+12/18 05:23:32 [HostStateManager] HostStateRequest::Start(HSR_GAME):  loop(remoteconnect) id(4) addons() desc(Remote Connect (172.93.101.24:27017))
+12/18 05:23:32 [EngineServiceManager] SwitchToLoop remoteconnect requested:  id [4] addons []
+12/18 05:23:32 [EngineServiceManager] Unmounting addon '3306343583'
+12/18 05:23:32 [SoundSystem] Addon unloaded, unloading sound resources.
+12/18 05:23:32 ResetBreakpadAppId: Universe is 1 (k_EUniversePublic)
+12/18 05:23:32 ResetBreakpadAppId: Setting non standard break pad app id: 2347771
+12/18 05:23:32 [SceneFileCache] No .vcds loaded or no scenes/scenes.vrman
+12/18 05:23:32 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( remoteconnect : success )
+12/18 05:23:32 [Client] Tick packet desired receive margin now 5.0ms.  cl_tickpacket_recvmargin_desired=5  cl_tickpacket_desired_queuelength=0.  engine_frametime_warnings_enable=1, cl_async_usercmd_send=1
+12/18 05:23:32 [NetSteamConn] Opened Steam Net Connection on socket 'client' to 172.93.101.24:27017, connection #253937812 UDP invalid@172.93.101.24:27017
+12/18 05:23:32 [Networking] Created poll group for socket 'client'
+12/18 05:23:33 [SteamNetSockets] [#253937812 UDP steamid:85568392935672895@172.93.101.24:27017] connected
+12/18 05:23:33 [Client] Sending connect to 172.93.101.24:27017
+12/18 05:23:33 [Client] Received S2C_CHALLENGE [0 auth 3] from 172.93.101.24:27017
+12/18 05:23:33 [Client] Sending C2S_CONNECT [14128 protocol 0 auth 3] to 172.93.101.24:27017
+12/18 05:23:33 [Client] Received S2C_CONNECTION from 172.93.101.24:27017 [addons:'3176899146']
+12/18 05:23:33 [NetSteamConn] Associating NetChan server @ 172.93.101.24:27017 (172.93.101.24:27017) with Steam Net Connection handle #253937812 (userdata 0)
+12/18 05:23:33 [Client] CL:  Connected to '172.93.101.24:27017'
+12/18 05:23:33 [SignonState] CL:  Suppress INetchannel::Transmit() in loopmode( remoteconnect )
+12/18 05:23:33 [Client] CL:  CLoopModeRemoteConnect::OnClientFrameSimulate switching to "levelload" loopmode with addons:  3176899146
+12/18 05:23:33 [EngineServiceManager] SwitchToLoop levelload requested:  id [4] addons [3176899146]
+12/18 05:23:33 ResetBreakpadAppId: Universe is 1 (k_EUniversePublic)
+12/18 05:23:33 ResetBreakpadAppId: Setting non standard break pad app id: 2347771
+12/18 05:23:33 [EngineServiceManager] Mounting addon '3176899146'
+12/18 05:23:33 [SceneFileCache] No .vcds loaded or no scenes/scenes.vrman
+12/18 05:23:34 ChangeGameUIState: CSGO_GAME_UI_STATE_MAINMENU -> CSGO_GAME_UI_STATE_LOADINGSCREEN
+12/18 05:23:34 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( levelload : success )
+12/18 05:23:34 [SignonState] CL:  Permit INetchannel::Transmit()
+12/18 05:23:34 [Client] CL:  CLoopModeLevelLoad::MaybeSwitchToGameLoop switching to "game" loopmode with addons (3176899146)
+12/18 05:23:34 [EngineServiceManager] SwitchToLoop game requested:  id [4] addons [3176899146]
+12/18 05:23:34 [ResourceSystem] Failed loading resource "panorama/images/map_icons/map_icon_am_texture_wf.vsvg_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:34 [Client] CL:  CNetworkGameClient already exists for connection to '172.93.101.24:27017'
+12/18 05:23:34 [Client] CL:  connection to '172.93.101.24:27017' already started
+12/18 05:23:34 [Client] Game: "Counter-Strike 2"
+12/18 05:23:34 [Client] Map: "am_water_j_spin"
+12/18 05:23:34 [Client] Players: 1 (0 bots) / 32 humans
+12/18 05:23:34 [Client] Build: 10603 (revision 10299884)
+12/18 05:23:34 [Client] Server Number: 5
+12/18 05:23:34 [SignonState] CL:  CNetworkGameClient::ProcessServerInfo
+12/18 05:23:34 **** Unable to localize '#loadingscreen_title_am_water_j_spin' on panel ''
+12/18 05:23:34 **** Unable to localize '#loadingscreen_title_am_water_j_spin_1' on panel ''
+12/18 05:23:34 **** Unable to localize '#loadingscreen_title_am_water_j_spin_2' on panel ''
+12/18 05:23:34 [VScript] Initializing CSGO VScript Game System
+12/18 05:23:34 [Client] CL:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:23:34 ReadSteamRemoteStorageFile( bufOut, "voice_ban.dt" ) -> 0.000254 seconds
+12/18 05:23:34 **** Panel  has fill-parent-flow for height, but isn't in a flowing down or up layout
+12/18 05:23:34 [ResourceSystem] Failed loading resource "panorama/images/map_icons/map_icon_am_water_j_spin.vsvg_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:34 [Client] CNetworkGameClient::ProcessClassInfo: create on client true
+12/18 05:23:34 [Client] CNetworkGameClient::ProcessClassInfo: creating client serializers from local server serializers (crc 0, server api exists)
+12/18 05:23:34 [Client] CNetworkGameClientBase::LinkClasses took 16.845 msec
+12/18 05:23:35 [WorldRenderer] CWorldRendererMgr::ServiceWorldRequests long frame: 37.227985ms
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_hydra.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_spectrum.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_22.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_dangerzone.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_breakout.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_vanguard.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_32.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_31.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_huntsman.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_30.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_phoenix.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_27.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal3.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_29.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_28.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_armsdeal1.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_chroma3.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:35 [AnimResource] Model models/props/crates/csgo_drop_crate_community_24.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_community_25.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_gamma.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_bravo.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_glove.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_shadow.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_gamma2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_bloodhound.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_winteroffensive.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_community_26.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_wildfire.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_revolver.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_horizon.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_clutch.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_community_23.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [AnimResource] Model models/props/crates/csgo_drop_crate_spectrum2.vmdl: sequence/animation name collision found "tools_preview"
+12/18 05:23:36 [Client] CL:  CGameClientConnectPrerequisite connection succeeded
+12/18 05:23:36 ChangeGameUIState: CSGO_GAME_UI_STATE_LOADINGSCREEN -> CSGO_GAME_UI_STATE_INGAME
+12/18 05:23:36 [Client] CL:  IGameSystem::LoopActivateAllSystems {
+12/18 05:23:36 [Host] HO:  IGameSystem::LoopActivateAllSystems {
+12/18 05:23:36 [Host] HO:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:23:36 [Client] CL:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:23:36 [HostStateManager] Host activate: Remote Connect (172.93.101.24:27017)
+12/18 05:23:36 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( game : success )
+12/18 05:23:36 [CL CommandQueue] CQ disabled, re-syncing usercmd and simulation clock remainders
+12/18 05:23:37 [Client] CNetworkGameClientBase::OnReceivedUncompressedPacket(), received full update
+12/18 05:23:37 [Prediction] Resetting prediction state because we received a full update
+12/18 05:23:37 [Client] Receiving 1.7K non-incremental update from server
+12/18 05:23:37 [Client] Created physics for am_water_j_spin
+12/18 05:23:37 [SteamAudio] Reverb: No baked reverb found in baked data file.
+12/18 05:23:37 [SteamAudio] Pathing: Loaded baked data file (maps\am_water_j_spin.sapaths).
+12/18 05:23:37 [SteamAudio] Occlusion: Cannot find baked data file: maps\am_water_j_spin.custom.occlusion.
+12/18 05:23:37 [SteamAudio] Dimensions: Cannot find baked data file: maps\am_water_j_spin.custom.dimensions.
+12/18 05:23:37 [SteamAudio] Materials: Cannot find baked data file: maps\am_water_j_spin.custom.materials.
+12/18 05:23:37 Cinnamon Toast Crunch connected
+12/18 05:23:37 [Networking] server @ 172.93.101.24:27017:  NetChan Setting Timeout to 30.00 seconds
+12/18 05:23:37 [Client] CL:  Signon traffic "server":  incoming 30.647 KB [12 netframes], outgoing 3.565 KB [223 netframes]
+12/18 05:23:37 [Prediction] Added prediction for player slot 0 (Cinnamon Toast Crunch)
+12/18 05:23:37 [Prediction] Scanned 138 entities, activated prediction for 2, total predictable entities now 2
+12/18 05:23:37 [Shooting] cl: ReadFrameInput - Presented data has no mod info
+12/18 05:23:37 [Prediction] Expected tick base to be 301+0=301, but controller tick base is 240
+12/18 05:23:37 [Client] 16585:weapon_xm1014::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7115.148438 20780.566406 0.000000)
+12/18 05:23:37 [Client] 16587:weapon_ak47::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7115.148438 20780.566406 0.000000)
+12/18 05:23:37 [Client] 16589:weapon_awp::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7115.148438 20780.566406 0.000000)
+12/18 05:23:37 [Client] 16591:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7115.148438 20780.566406 0.000000)
+12/18 05:23:37 [Client] 16593:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7115.148438 20780.566406 0.000000)
+12/18 05:23:37 [Client] 16595:weapon_xm1014::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7061.154297 20838.312500 0.000000)
+12/18 05:23:37 [Client] 16597:weapon_ak47::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7054.214844 20761.625000 0.000000)
+12/18 05:23:37 [Client] 16599:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 37 is outside of cell bounds (0->32) @(4274.470703 21555.816406 0.000000)
+12/18 05:23:37 [Client] 16601:weapon_elite::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7050.523438 20792.763672 0.000000)
+12/18 05:23:37 [Client] 16603:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellY cell 36 is outside of cell bounds (0->32) @(-7069.119141 20727.408203 0.000000)
+12/18 05:23:37 [Client] 16605:weapon_deagle::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21501.714844 0.000000 0.000000)
+12/18 05:23:37 [Client] 16607:weapon_awp::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21501.714844 0.000000 0.000000)
+12/18 05:23:37 [Client] 16609:weapon_m4a1::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21501.714844 0.000000 0.000000)
+12/18 05:23:37 [Client] 16611:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21501.714844 0.000000 0.000000)
+12/18 05:23:37 [Client] 16613:weapon_mp7::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21501.714844 0.000000 0.000000)
+12/18 05:23:37 [Client] 16615:weapon_knife::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21470.703125 0.000000 0.000000)
+12/18 05:23:37 [Client] 16617:weapon_m4a1::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -5 is outside of cell bounds (0->32) @(-21771.382812 0.000000 0.000000)
+12/18 05:23:37 [Client] 16619:weapon_elite::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -1 is outside of cell bounds (0->32) @(-18076.566406 0.000000 0.000000)
+12/18 05:23:37 [Client] 16621:weapon_negev::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21454.453125 0.000000 0.000000)
+12/18 05:23:37 [Client] 16623:weapon_mp7::m_vecOrigin CNetworkOriginCellCoordQuantizedVector m_cellX cell -4 is outside of cell bounds (0->32) @(-21429.128906 0.000000 0.000000)
+12/18 05:23:37 [Shooting] cl: ReadFrameInput - Presented data has no mod info
+12/18 05:23:37 CCSGO_BlurTarget - Unable to find panel with the given id "loadingscreen__blur-target"! Panel is possibly created dynamically.
+12/18 05:23:37 [CL CommandQueue] CQ enabled, using client-controlled JIT async send mode
+12/18 05:23:37 [ResourceSystem] Failed loading resource "panorama/images/overheadmaps/am_water_j_spin_radar_psd.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:23:37 Named camera 'cam_default' not found in map 'ui/xpshop_item'
+12/18 05:23:39 [CL CommandQueue] CQ: Server set re-sync at cmd 130
+12/18 05:23:41 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'CCSWeaponBase'
+12/18 05:23:41 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'CWeaponCZ75a'
+12/18 05:23:48 ApplyOverrides_R: failed to find field 'm_flCycle' in class 'CCSWeaponBaseGun'
+12/18 05:23:48 [CL CommandQueue] CQ: Server set re-sync at cmd 707
+12/18 05:23:52 [VProf] VProfLite started.
+12/18 05:24:11 [CL CommandQueue] CQ: Server set re-sync at cmd 2178
+12/18 05:24:12  Cinnamon Toast Crunch: etfgnl
+12/18 05:24:12  Cinnamon Toast Crunch: eet
+12/18 05:24:14   (T) Cinnamon Toast Crunch: yeet
+12/18 05:24:15  Cinnamon Toast Crunch: yeet
+12/18 05:24:18 [Client] CL:  disconnect
+12/18 05:24:18 [Client] Disconnected from server: NETWORK_DISCONNECT_DISCONNECT_BY_USER
+12/18 05:24:18 [VProf] 
+12/18 05:24:18 [VProf] -- Performance report --
+12/18 05:24:18 [VProf] Summary of 3178 frames and 11 1-second intervals.  (4212 frames excluded from analysis.)
+12/18 05:24:18 [VProf] FPS: Avg=384.5, P1=285.0
+12/18 05:24:18 [VProf] 
+12/18 05:24:18 [VProf]                       All frames         Active frames       1s max (all)      1s max (active)  
+12/18 05:24:18 [VProf]                         Avg    P99        N    Avg    P99      P50    P95        N    P50    P95
+12/18 05:24:18 [VProf] -------------------- ------ ------   ------ ------ ------   ------ ------   ------ ------ ------
+12/18 05:24:18 [VProf]           FrameTotal   2.60   3.51     3178   2.60   3.51     4.14   8.83       11   4.14   8.83
+12/18 05:24:18 [VProf]     Client Rendering   1.14   2.04     3178   1.14   2.04     2.49   3.85       11   2.49   3.85
+12/18 05:24:18 [VProf]       Frame Boundary   0.60   1.18     3178   0.60   1.18     1.74   3.14       11   1.74   3.14
+12/18 05:24:18 [VProf]    Client Simulation   0.54   1.49     3178   0.54   1.49     1.67   2.43       11   1.67   2.43
+12/18 05:24:18 [VProf]             Sleeping   0.51   1.23     2403   0.67   1.23     1.23   1.31       11   1.23   1.31
+12/18 05:24:18 [VProf]  ClientSimulateFrame   0.49   1.42     3178   0.49   1.42     1.67   2.43       11   1.67   2.43
+12/18 05:24:18 [VProf]           PanoramaUI   0.21   0.50     3178   0.21   0.50     0.71   4.17       11   0.71   4.17
+12/18 05:24:18 [VProf]           Prediction   0.18   1.02     3178   0.18   1.02     1.18   2.14       11   1.18   2.14
+12/18 05:24:18 [VProf]          Unaccounted   0.14   0.37     3178   0.14   0.37     0.48   0.59       11   0.48   0.59
+12/18 05:24:18 [VProf]                  HUD   0.10   0.28     3178   0.10   0.28     0.52   1.16       11   0.52   1.16
+12/18 05:24:18 [VProf] Present_RenderDevice   0.07   0.70     3178   0.07   0.70     0.99   2.37       11   0.99   2.37
+12/18 05:24:18 [VProf]   ClientSimulateTick   0.06   0.50      530   0.35   0.67     0.65   0.72       11   0.65   0.72
+12/18 05:24:18 [VProf]           Javascript   0.00   0.00       19   0.64   5.28     0.10   5.19        8   0.12   5.23
+12/18 05:24:18 [VProf] 
+12/18 05:24:18 [Client] Source2 engine networking summary.  44 seconds.
+12/18 05:24:18 [Client]     UPSTREAM (client->server):
+12/18 05:24:18 [Client]         Bandwidth . . . . . . . : Total:1223.4kb   Reliable:3.2kb   Voice:0.0kb
+12/18 05:24:18 [Client]           Kb/sec. . . . . . . . : Avg:27.8   P95:42.7   P99:45.8
+12/18 05:24:18 [Client]         Tick messages . . . . . : 2606 total
+12/18 05:24:18 [Client]           Arrived on time . . . : 2598 (99.7%)   9 (0.3%) below desired recv margin
+12/18 05:24:18 [Client]           Corrected/smoothed. . : 5 (0.2%)   0 (0.0%) dropped   5 (0.2%) late
+12/18 05:24:18 [Client]           Missed. . . . . . . . : 3 (0.1%)   0 (0.0%) dropped   0 (0.0%) late   3 (0.1%) non-network
+12/18 05:24:18 [Client]         Tick miss rate. . . . . : 10 measurement intervals   10 (100.0%) net-perfect   8 (80.0%) perfect
+12/18 05:24:18 [Client]           Distribution. . . . . : P75:0.0%   P95:0.0%   P99:0.0%
+12/18 05:24:18 [Client]         Receive margin (ms) . . : P1:6   P5:9   P25:12   P50:14   P75:16   P95:19
+12/18 05:24:18 [Client]         Network frames. . . . . : 2838 total
+12/18 05:24:18 [Client]           Size. . . . . . . . . : Avg:431   0 (0.00%) > MTU
+12/18 05:24:18 [Client]           Misdelivered lifetime : 0 (0.00%)    0 (0.00%) dropped    0 (0.00%) out of order
+12/18 05:24:18 [Client]           Jitter (ms) . . . . . : P50:2   P99:8
+12/18 05:24:18 [Client]         Packets
+12/18 05:24:18 [Client]           Misdelivery rate. . . : P50:0.0%   P95:0.0%
+12/18 05:24:18 [Client]           Jitter, 1-sec max (ms): P50:7   P95:10
+12/18 05:24:18 [Client]         Network ping (ms) . . . : P5:75   P50:76   P95:76
+12/18 05:24:18 [Client]     DOWNSTREAM (server->client):
+12/18 05:24:18 [Client]         Bandwidth . . . . . . . : Total:618.8kb   Reliable:187.7kb
+12/18 05:24:18 [Client]           Kb/sec. . . . . . . . : Avg:14.1   P95:34.1   P99:84.4
+12/18 05:24:18 [Client]         Netchan messages. . . . : Total msgs:5915   Avg size:104.6bytes
+12/18 05:24:18 [Client]           Messages/sec. . . . . : Avg:134.4   P95:196   P99:196
+12/18 05:24:18 [Client]         Tick messages . . . . . : 2607 total
+12/18 05:24:18 [Client]           Arrived on time . . . : 2601 (99.8%)   41 (1.6%) below desired recv margin
+12/18 05:24:18 [Client]           Corrected/smoothed. . : 0 (0.0%)   0 (0.0%) dropped   0 (0.0%) late
+12/18 05:24:18 [Client]           Missed. . . . . . . . : 6 (0.2%)   1 (0.0%) dropped   0 (0.0%) late   5 (0.2%) non-network
+12/18 05:24:18 [Client]         Tick miss rate. . . . . : 10 measurement intervals   9 (90.0%) net-perfect   6 (60.0%) perfect
+12/18 05:24:18 [Client]           Distribution. . . . . : P75:0.0%   P95:0.4%   P99:0.4%
+12/18 05:24:18 [Client]         Receive margin (ms) . . : P1:3   P5:5   P25:6   P50:6   P75:7   P95:34
+12/18 05:24:18 [Client]         Network frames. . . . . : 2629 total
+12/18 05:24:18 [Client]           Size. . . . . . . . . : Avg:235   0 (0.00%) > MTU
+12/18 05:24:18 [Client]           Misdelivered lifetime : 1 (0.04%)    1 (0.04%) dropped    0 (0.00%) out of order
+12/18 05:24:18 [Client]           Jitter (ms) . . . . . : P50:0   P99:0
+12/18 05:24:18 [Client]         Packets
+12/18 05:24:18 [Client]           Misdelivery rate. . . : P50:0.0%   P95:0.2%
+12/18 05:24:18 [Client]           Jitter, 1-sec max (ms): P50:0   P95:1
+12/18 05:24:18 [Client] Disconnecting from server: NETWORK_DISCONNECT_DISCONNECT_BY_USER
+12/18 05:24:18 [NetSteamConn] Closing Steam Net Connection on socket 'client' to 172.93.101.24:27017, handle #253937812 (1002 NETWORK_DISCONNECT_DISCONNECT_BY_USER)
+12/18 05:24:18 [NetSteamConn] CloseSteamNetConnection handle #253937812 (userdata 0)
+12/18 05:24:18 [NetSteamConn] Disassociating NetChan server @  (unknown) from Steam Net Connection handle #253937812 (userdata 0)
+12/18 05:24:18 [Networking] Summary of connection [#253937812 UDP steamid:85568392935672895@172.93.101.24:27017 'server']:
+12/18 05:24:18 [Networking]     End-to-end connection: connected
+12/18 05:24:18 [Networking]         Current rates:
+12/18 05:24:18 [Networking]             Sent:  63.9 pkts/sec  33.1 K/sec
+12/18 05:24:18 [Networking]             Recv:  65.7 pkts/sec  24.0 K/sec
+12/18 05:24:18 [Networking]             Ping:76ms    Max latency variance: 0.6ms
+12/18 05:24:18 [Networking]             Quality:  100%  (Dropped:0.00%  WeirdSeq:0.00%)
+12/18 05:24:18 [Networking]             Est avail bandwidth: 768.0KB/s  
+12/18 05:24:18 [Networking]             Bytes buffered: 0
+12/18 05:24:18 [Networking]         Lifetime stats:
+12/18 05:24:18 [Networking]             Totals
+12/18 05:24:18 [Networking]                 Sent:      2,845 pkts       1,331,287 bytes
+12/18 05:24:18 [Networking]                 Recv:      2,699 pkts         724,639 bytes
+12/18 05:24:18 [Networking]                 Recv w seq:      2,697 pkts
+12/18 05:24:18 [Networking]                 Dropped   :          1 pkts   0.04%
+12/18 05:24:18 [Networking]                 OutOfOrder:          0 pkts   0.00%
+12/18 05:24:18 [Networking]                 OOOFixed  :          0 pkts   0.00%
+12/18 05:24:18 [Networking]                 Duplicate :          0 pkts   0.00%
+12/18 05:24:18 [Networking]                 SeqLurch  :          0 pkts   0.00%
+12/18 05:24:18 [Networking]             Ping histogram: (2098 total samples)
+12/18 05:24:18 [Networking]                      0-25    25-50    50-75   75-100  100-125  125-150  150-200  200-300     300+
+12/18 05:24:18 [Networking]                         0        0       32     2066        0        0        0        0        0
+12/18 05:24:18 [Networking]                      0.0%     0.0%     1.5%    98.5%     0.0%     0.0%     0.0%     0.0%     0.0%
+12/18 05:24:18 [Networking]             Ping distribution:
+12/18 05:24:18 [Networking]                 5th   50th   75th   95th   98th
+12/18 05:24:18 [Networking]                76ms   77ms   79ms   82ms   83ms
+12/18 05:24:18 [Networking]             Connection quality histogram: (8 measurement intervals)
+12/18 05:24:18 [Networking]                 perfect    99+  97-99  95-97  90-95  75-90  50-75    <50   dead
+12/18 05:24:18 [Networking]                       7      1      0      0      0      0      0      0      0
+12/18 05:24:18 [Networking]                   87.5%  12.5%   0.0%   0.0%   0.0%   0.0%   0.0%   0.0%   0.0%
+12/18 05:24:18 [Networking]             Connection quality distribution:
+12/18 05:24:18 [Networking]               50th  25th
+12/18 05:24:18 [Networking]               100%  100%
+12/18 05:24:18 [Networking]             Latency variance histogram: (2691 total measurements)
+12/18 05:24:18 [Networking]                       <1     1-2     2-5    5-10   10-20     >20
+12/18 05:24:18 [Networking]                     2688       1       0       2       0       0
+12/18 05:24:18 [Networking]                    99.9%    0.0%    0.0%    0.1%    0.0%    0.0%
+12/18 05:24:18 [Networking]         Rate stats received from remote host 4.6s ago:
+12/18 05:24:18 [Networking]             Sent:  65.7 pkts/sec  23.9 K/sec
+12/18 05:24:18 [Networking]             Recv:  63.9 pkts/sec  33.1 K/sec
+12/18 05:24:18 [Networking]             Ping:76ms    Max latency variance: 13.9ms
+12/18 05:24:18 [Networking]             Quality:  100%  (Dropped:0.00%  WeirdSeq:0.00%)
+12/18 05:24:18 [Networking]             Bytes buffered: 0
+12/18 05:24:18 [Networking]         No lifetime stats received from remote host
+12/18 05:24:18 [Networking]     
+12/18 05:24:18 [SteamNetSockets] [#253937812 UDP steamid:85568392935672895@172.93.101.24:27017 'server'] closed by app, linger requested but not needed (1002) NETWORK_DISCONNECT_DISCONNECT_BY_USER
+12/18 05:24:18 [NetSteamConn] Removing Steam Net Connection for 172.93.101.24:27017, handle #253937812
+12/18 05:24:18 [Networking] Closing 'client' poll group
+12/18 05:24:18 [HostStateManager] CHostStateMgr::QueueNewRequest( Idle (levelload), 5 )
+12/18 05:24:18 [HostStateManager] HostStateRequest::Start(HSR_IDLE):  loop(levelload) id(5) addons() desc(Idle (levelload))
+12/18 05:24:18 [EngineServiceManager] SwitchToLoop levelload requested:  id [5] addons []
+12/18 05:24:18 [VProf] VProfLite stopped.
+12/18 05:24:18 [CL CommandQueue] CQ disabled, re-syncing usercmd and simulation clock remainders
+12/18 05:24:18 [Client] CL:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:24:18 [Host] HO:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:24:18 [Host] HO:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:24:18 [Client] CL:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:24:18 [stringtables] CL: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:24:18 [BuildSparseShadowTree] CSparseShadowTreeGameSystem::GameShutdown
+12/18 05:24:18 [Client] CL:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:24:18 [Client] CL:  CGameRules::CGameRules destructed
+12/18 05:24:18 WriteSteamRemoteStorageFileAsync( "voice_ban.dt" ) -> at 103.557
+12/18 05:24:18 [EngineServiceManager] Unmounting addon '3176899146'
+12/18 05:24:18 [SoundSystem] Addon unloaded, unloading sound resources.
+12/18 05:24:18 ResetBreakpadAppId: Universe is 1 (k_EUniversePublic)
+12/18 05:24:18 ResetBreakpadAppId: Setting non standard break pad app id: 2347771
+12/18 05:24:18 [SceneFileCache] No .vcds loaded or no scenes/scenes.vrman
+12/18 05:24:18 ChangeGameUIState: CSGO_GAME_UI_STATE_INGAME -> CSGO_GAME_UI_STATE_MAINMENU
+12/18 05:24:18 [HostStateManager] Host activate: Idle (levelload)
+12/18 05:24:18 CAsyncWriteInProgress::OnComplete( "voice_ban.dt" ) -> Success at 103.672
+12/18 05:24:18 [Client] CL:  CLoopModeLevelLoad::MaybeSwitchToGameLoop switching to "game" loopmode with addons ()
+12/18 05:24:18 [EngineServiceManager] SwitchToLoop game requested:  id [5] addons []
+12/18 05:24:18 [ResourceSystem] Failed loading resource "panorama/images/map_icons/screenshots/720p/de_canals_png.vtex_c" (ERROR_FILEOPEN: File not found)
+12/18 05:24:18 [Server] CNetworkGameServerBase::SetServerState (ss_dead -> ss_waitingforgamesessionmanifest)
+12/18 05:24:18 [Server] SV:  maxplayers set to 1
+12/18 05:24:18 [VScript] Initializing CSGO VScript Game System
+12/18 05:24:18 [Server] SV:  Executing server defaults
+12/18 05:24:18 [Server] SV:  Executing listen server config file
+12/18 05:24:18 [Server] SV:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:24:18 CPlayerVoiceListener::GameInit()
+12/18 05:24:18 [InputService] execing gamemode_competitive.cfg
+12/18 05:24:18 [InputService] exec: couldn't exec '{*}cfg/gamemode_competitive_server.cfg', unable to read file
+12/18 05:24:18 [InputService] execing server_default.cfg
+12/18 05:24:19 [Server] SV:  Spawn Server: <empty>
+12/18 05:24:19 [Server] CSource2Server::ApplyGameSettings game settings payload received:
+12/18 05:24:19 [Server]   ::ExecGameTypeCfg {
+12/18 05:24:19 [Server]     map {
+12/18 05:24:19 [Server]       mapname <empty>
+12/18 05:24:19 [Server]     }
+12/18 05:24:19 [Server]     launchoptions {
+12/18 05:24:19 [Server]       localonly int( 1 = 0x1 )
+12/18 05:24:19 [Server]       mode listenserver
+12/18 05:24:19 [Server]       loadmap int( 1 = 0x1 )
+12/18 05:24:19 [Server]       levelname <empty>
+12/18 05:24:19 [Server]       map_background int( 1 = 0x1 )
+12/18 05:24:19 [Server]       map <empty>
+12/18 05:24:19 [Server]       mapgroup 
+12/18 05:24:19 [Server]       requires_attr 
+12/18 05:24:19 [Server]       requires_attr_value int( -1 = 0xFFFFFFFF )
+12/18 05:24:19 [Server]       requires_attr_reward 
+12/18 05:24:19 [Server]       reward_drop_list int( -1 = 0xFFFFFFFF )
+12/18 05:24:19 [Server]       numSlots int( 10 = 0xA )
+12/18 05:24:19 [Server]       c_game_type int( 0 = 0x0 )
+12/18 05:24:19 [Server]       c_game_mode int( 1 = 0x1 )
+12/18 05:24:19 [Server]       default_game_type int( -1 = 0xFFFFFFFF )
+12/18 05:24:19 [Server]       default_game_mode int( -1 = 0xFFFFFFFF )
+12/18 05:24:19 [Server]       ct_arms 
+12/18 05:24:19 [Server]       t_arms 
+12/18 05:24:19 [Server]     }
+12/18 05:24:19 [Server]   }
+12/18 05:24:19 [Server] CNetworkGameServerBase::SetServerState (ss_waitingforgamesessionmanifest -> ss_loading)
+12/18 05:24:19 [Server] CNetworkGameServerBase::SetServerState (ss_loading -> ss_active)
+12/18 05:24:19 [Client] CL:  CWaitForGameServerStartupPrerequisite done waiting for server
+12/18 05:24:19 [Client] CL:  CCreateGameClientJob creating client connection to 'loopback'
+12/18 05:24:19 [SteamNetSockets] [#3920464298 pipe] connected
+12/18 05:24:19 [SteamNetSockets] [#2572115179 pipe] connected
+12/18 05:24:19 [Networking] Created poll group for socket 'client'
+12/18 05:24:19 [Networking] Created poll group for socket 'server'
+12/18 05:24:19 [Networking] Connected loopback client=e9ad89aa@loopback:1 <-> server=994f5ceb@loopback:0
+12/18 05:24:19 [Client] Tick packet desired receive margin now 5.0ms.  cl_tickpacket_recvmargin_desired=5  cl_tickpacket_desired_queuelength=0.  engine_frametime_warnings_enable=1, cl_async_usercmd_send=1
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (0.015625) by excessive amount (45.703125)?  Clamping offset
+12/18 05:24:19 [NetSteamConn] Associating NetChan Cinnamon Toa @ loopback:0 (loopback:0) with Steam Net Connection handle #2572115179 (userdata 0)
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (0.015625) by excessive amount (45.703125)?  Clamping offset
+12/18 05:24:19 [NetSteamConn] Associating NetChan server @ loopback:1 (loopback:1) with Steam Net Connection handle #3920464298 (userdata 1)
+12/18 05:24:19 [Client] CL:  Connected to 'loopback:1'
+12/18 05:24:19 ClientPutInServer create new player controller [Cinnamon Toast Crunch]
+12/18 05:24:19 [Server] Client 0 'Cinnamon Toast Crunch' setting rate to 786432
+12/18 05:24:19 [Server] [Cinnamon Toast Crunch] cl_interp_ratio='0', LerpTime=0
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.093750) by excessive amount (44.625000)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.109375) by excessive amount (44.609375)?  Clamping offset
+12/18 05:24:19 [Client] Game: "Counter-Strike 2"
+12/18 05:24:19 [Client] Map: "<empty>"
+12/18 05:24:19 [Client] Players: 1 (0 bots) / 1 humans
+12/18 05:24:19 [Client] Build: 10603 (revision 10299884)
+12/18 05:24:19 [Client] Server Number: 2
+12/18 05:24:19 [SignonState] CL:  CNetworkGameClient::ProcessServerInfo
+12/18 05:24:19 [VScript] Initializing CSGO VScript Game System
+12/18 05:24:19 [Client] CL:  CGameRulesGameSystem::GameInit installed game rules
+12/18 05:24:19 ReadSteamRemoteStorageFile( bufOut, "voice_ban.dt" ) -> 0.000246 seconds
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.125000) by excessive amount (44.593750)?  Clamping offset
+12/18 05:24:19 [Client] CNetworkGameClient::ProcessClassInfo: create on client true
+12/18 05:24:19 [Client] CNetworkGameClient::ProcessClassInfo: creating client serializers from local server serializers (crc 0, server api exists)
+12/18 05:24:19 [Client] CNetworkGameClientBase::LinkClasses took 12.622 msec
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.140625) by excessive amount (44.578125)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.156250) by excessive amount (44.562500)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.171875) by excessive amount (44.546875)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.187500) by excessive amount (44.531250)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.203125) by excessive amount (44.515625)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.218750) by excessive amount (44.500000)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.234375) by excessive amount (44.484375)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.718750) is ahead of sim time (1.250000) by excessive amount (44.468750)?  Clamping offset
+12/18 05:24:19 [Client] CL:  CGameClientConnectPrerequisite connection succeeded
+12/18 05:24:19 [Server] SV:  IGameSystem::LoopActivateAllSystems {
+12/18 05:24:19 [Host] HO:  IGameSystem::LoopActivateAllSystems {
+12/18 05:24:19 [Host] HO:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:24:19 [Server] SV:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:24:19 [Server] SV:  1 player server started
+12/18 05:24:19 [Client] CL:  IGameSystem::LoopActivateAllSystems {
+12/18 05:24:19 [Client] CL:  } IGameSystem::LoopActivateAllSystems done
+12/18 05:24:19 [SignonState] CL:  CNetworkGameClient::OnSwitchLoopModeFinished( game : success )
+12/18 05:24:19 [Prediction] Prediction time (45.718849) is ahead of sim time (1.250100) by excessive amount (44.468750)?  Clamping offset
+12/18 05:24:19 [Prediction] Prediction time (45.729088) is ahead of sim time (1.260339) by excessive amount (44.468750)?  Clamping offset
+12/18 05:24:19 [Server] SV:  Sending full update to client Cinnamon Toast Crunch (reason:  initial update)
+12/18 05:24:19 [Client] CNetworkGameClientBase::OnReceivedUncompressedPacket(), received full update
+12/18 05:24:19 [Prediction] Resetting prediction state because we received a full update
+12/18 05:24:19 [Client] Receiving 0.5K non-incremental update from server
+12/18 05:24:19 Cinnamon Toast Crunch connected
+12/18 05:24:19 [Networking] server @ loopback:1:  NetChan Setting Timeout to 30.00 seconds
+12/18 05:24:19 [Client] CL:  Signon traffic "server":  incoming 15.434 KB [13 netframes], outgoing 1.290 KB [12 netframes]
+12/18 05:24:19 [Prediction] Added prediction for player slot 0 (Cinnamon Toast Crunch)
+12/18 05:24:19 [Prediction] Scanned 63 entities, activated prediction for 1, total predictable entities now 1
+12/18 05:24:19 [Networking] Cinnamon Toa @ loopback:0:  NetChan Setting Timeout to 20.00 seconds
+12/18 05:24:19 [WorldRenderer] CWorldRendererMgr::ServiceWorldRequests long frame: 12.083979ms
+12/18 05:24:20 Named camera 'cam_default' not found in map 'ui/xpshop_item'
+12/18 05:24:20 [HostStateManager] CHostStateMgr::QueueNewRequest( Quitting, 6 )
+12/18 05:24:20 [HostStateManager] HostStateRequest::Start(HSR_QUIT)
+12/18 05:24:20 [Client] Disconnecting from server: NETWORK_DISCONNECT_EXITING
+12/18 05:24:20 [NetSteamConn] Closing Steam Net Connection on socket 'client' to loopback:1, handle #3920464298 (1059 NETWORK_DISCONNECT_EXITING)
+12/18 05:24:20 [NetSteamConn] CloseSteamNetConnection handle #3920464298 (userdata 1)
+12/18 05:24:20 [NetSteamConn] Disassociating NetChan server @  (unknown) from Steam Net Connection handle #3920464298 (userdata 1)
+12/18 05:24:20 [SteamNetSockets] [#3920464298 pipe 'server'] closed by app, linger requested but not needed (1059) NETWORK_DISCONNECT_EXITING
+12/18 05:24:20 [SteamNetSockets] [#2572115179 pipe 'Cinnamon Toast Crunch'] closed by peer (1059): NETWORK_DISCONNECT_EXITING
+12/18 05:24:20 [NetSteamConn] Removing Steam Net Connection for loopback:1, handle #3920464298
+12/18 05:24:20 [Networking] Closing 'client' poll group
+12/18 05:24:20 [Server] SV:  Server shutting down: NETWORK_DISCONNECT_EXITING (59)
+12/18 05:24:20 [Server] CNetworkGameServerBase::SetServerState (ss_active -> ss_dead)
+12/18 05:24:20 [Server] Disconnect client 'Cinnamon Toast Crunch' from server: NETWORK_DISCONNECT_SHUTDOWN (Server shutdown)
+12/18 05:24:20 [SignonState] Client 0 'Cinnamon Toast Crunch' signon state SIGNONSTATE_FULL -> SIGNONSTATE_NONE
+12/18 05:24:20 [NetSteamConn] Closing Steam Net Connection on socket 'server' to loopback:0, handle #2572115179 (1001 NETWORK_DISCONNECT_SHUTDOWN)
+12/18 05:24:20 [NetSteamConn] CloseSteamNetConnection handle #2572115179 (userdata 0)
+12/18 05:24:20 [NetSteamConn] Disassociating NetChan Cinnamon Toa @  (unknown) from Steam Net Connection handle #2572115179 (userdata 0)
+12/18 05:24:20 [NetSteamConn] Removing Steam Net Connection for loopback:0, handle #2572115179
+12/18 05:24:20 CPlayerVoiceListener::PostSpawnGroupUnload()
+12/18 05:24:20 [Server] CSource2Server::GameServerSteamAPIDeactivated()
+12/18 05:24:20 [Networking] Closing 'server' poll group
+12/18 05:24:20 [Client] CL:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:24:20 [Client] CL:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:24:20 [stringtables] CL: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:24:20 [Server] SV:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:24:20 [Host] HO:  IGameSystem::LoopDeactivateAllSystems {
+12/18 05:24:20 [Host] HO:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:24:20 [Server] SV:  } IGameSystem::LoopDeactivateAllSystems done
+12/18 05:24:20 [stringtables] SV: CNetworkStringTableContainer::RemoveAllTables:  removing 13 tables
+12/18 05:24:20 [BuildSparseShadowTree] CSparseShadowTreeGameSystem::GameShutdown
+12/18 05:24:20 [Client] CL:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:24:20 [Client] CL:  CGameRules::CGameRules destructed
+12/18 05:24:20 WriteSteamRemoteStorageFileAsync( "voice_ban.dt" ) -> at 106.113
+12/18 05:24:20 CPlayerVoiceListener::GameShutdown()
+12/18 05:24:20 [Server] SV:  CGameRulesGameSystem::GameShutdown uninstalled game rules
+12/18 05:24:20 [Server] SV:  CGameRules::CGameRules destructed
+12/18 05:24:20 [HostStateManager] Host activate: Quitting
+12/18 05:24:20 Dispatching EventAppShutdown_t {
+12/18 05:24:20 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:24:20 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:24:21 [SplitScreen] Saved 'cs2_user_convars.vcfg' to SteamRemoteStorage, 3326 bytes OK
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg': type 1
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_convars_0_slot0.vcfg_lastclouded': type 3
+12/18 05:24:21 [SplitScreen] Saved 'cs2_user_keys.vcfg' to SteamRemoteStorage, 200 bytes OK
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg': type 1
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot0.vcfg_lastclouded': type 3
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot1.vcfg': type 1
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot2.vcfg': type 1
+12/18 05:24:21 [SplitScreen] Saved user config file 'cfg/cs2_user_keys_0_slot3.vcfg': type 1
+12/18 05:24:21 } Dispatched EventAppShutdown_t
+12/18 05:24:21 MainLoop returning
+12/18 05:24:21 Source2Shutdown
+12/18 05:24:21 ShutdownSource2Logging
