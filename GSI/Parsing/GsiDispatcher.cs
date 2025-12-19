@@ -1,6 +1,6 @@
 ﻿namespace StrikeLink.GSI.Parsing
 {
-	public sealed class GsiDispatcher(IEnumerable<IGsiParser> parsers)
+	internal sealed class GsiDispatcher(IEnumerable<IGsiParser> parsers)
 	{
 		private readonly IGsiParser[] _parsers = parsers.ToArray();
 
