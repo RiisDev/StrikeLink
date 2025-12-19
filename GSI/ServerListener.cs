@@ -10,10 +10,8 @@ namespace StrikeLink.GSI
 {
 	public class ServerListener : IDisposable, IAsyncDisposable
 	{
-		// Events
-		public event Action<PlayerStatePayload>? PlayerStateReceived;
-		public event Action<MatchStatePayload>? MatchStateReceived;
 
+		#region ServerLogic
 		// Private Vars
 		private readonly TcpListener _listener;
 		private readonly GsiDispatcher _dispatcher;
@@ -44,7 +42,7 @@ namespace StrikeLink.GSI
 			_listener.Start();
 
 			Log($"Listening on: http://{Address}:{Port}/");
-			
+
 			_ = Task.Run(async () =>
 			{
 				while (!_cts.IsCancellationRequested)
@@ -58,8 +56,8 @@ namespace StrikeLink.GSI
 							catch (Exception ex) { Log(ex.ToString()); }
 						});
 					}
-					catch (OperationCanceledException) {}
-					catch (ObjectDisposedException) {}
+					catch (OperationCanceledException) { }
+					catch (ObjectDisposedException) { }
 				}
 			});
 
@@ -71,21 +69,21 @@ namespace StrikeLink.GSI
 			Log($"New Client: {tcpClient.Client.RemoteEndPoint}");
 			NetworkStream networkStream = tcpClient.GetStream();
 
-			using StreamReader streamReader = new (networkStream, Encoding.UTF8, leaveOpen: true);
-			using StreamWriter streamWriter = new (networkStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
+			using StreamReader streamReader = new(networkStream, Encoding.UTF8, leaveOpen: true);
+			using StreamWriter streamWriter = new(networkStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
 			streamWriter.AutoFlush = true;
 
 			int contentLength = await VerifyContentLength(streamReader).ConfigureAwait(false);
 
 			if (contentLength <= 1) { tcpClient.Close(); return; }
 
-			char[] bodyBuffer = new char[contentLength]; 
+			char[] bodyBuffer = new char[contentLength];
 			int readTotal = 0;
 
 			while (readTotal < contentLength)
 			{
-				int read = await streamReader.ReadAsync(bodyBuffer, readTotal, contentLength - readTotal).ConfigureAwait(false); 
-				if (read == 0) break; 
+				int read = await streamReader.ReadAsync(bodyBuffer, readTotal, contentLength - readTotal).ConfigureAwait(false);
+				if (read == 0) break;
 				readTotal += read;
 			}
 
@@ -118,13 +116,13 @@ namespace StrikeLink.GSI
 			int methodIndex = headerSpan.IndexOf(' ');
 			if (headerSpan.Length == 0 || methodIndex <= 0) { Log($"Invalid span: {headerSpan.Length} - {methodIndex}"); return -1; }
 			ReadOnlySpan<char> methodSpan = httpHeaders.AsSpan()[..methodIndex];
-			
+
 			if (!methodSpan.Equals("POST", StringComparison.OrdinalIgnoreCase)) { Log($"Invalid method on caller: {methodSpan}"); return -1; }
-			
+
 			int contentLength = GetContentLength(httpHeaders);
 
 			if (contentLength <= 0) { Log("ContentLength is empty"); return -1; }
-			
+
 			return contentLength;
 		}
 
@@ -162,7 +160,7 @@ namespace StrikeLink.GSI
 
 			return -1;
 		}
-		
+
 		private static async Task<string> ReadHeadersAsync(StreamReader streamReader)
 		{
 			StringBuilder headersBuilder = new();
@@ -190,30 +188,6 @@ namespace StrikeLink.GSI
 			await streamWriter.BaseStream.WriteAsync(body).ConfigureAwait(false);
 		}
 
-		private void RaisePayload(IGsiPayload payload)
-		{
-			if (_syncContext is null) Invoke();
-			else _syncContext.Post(_ => Invoke(), null);
-
-			return;
-
-			void Invoke()
-			{
-				Log($"Payload detected: {payload.GetType().FullName}");
-				switch (payload)
-				{
-					case PlayerStatePayload player:
-						try { PlayerStateReceived?.Invoke(player); }
-						catch (Exception ex) { Log(ex.ToString()); }
-						break;
-					case MatchStatePayload match:
-						try { MatchStateReceived?.Invoke(match); }
-						catch (Exception ex) { Log(ex.ToString()); }
-						break;
-				}
-			}
-		}
-
 		private static int GetFreePort()
 		{
 			TcpListener listener = new(IPAddress.Loopback, 0);
@@ -238,5 +212,42 @@ namespace StrikeLink.GSI
 			_listener.Dispose();
 			_cts.Dispose();
 		}
+
+		#endregion
+
+		#region Event Logic
+
+		private readonly Dictionary<Type, IGsiPayload> _payloadCache = [];
+
+		public event Action<PlayerState>? PlayerStateReceived;
+
+		private void RaisePayload(IGsiPayload payload)
+		{
+			if (_syncContext is null) Invoke();
+			else _syncContext.Post(_ => Invoke(), null);
+
+			return;
+
+			void Invoke()
+			{
+				Type type = payload.GetType();
+				Log($"Payload detected: {type.FullName}");
+				bool exists = _payloadCache.TryGetValue(type, out IGsiPayload? oldPayload);
+
+				switch (payload)
+				{
+					case PlayerStateParser player:
+						try { player.Dispatch(payload, oldPayload, ref PlayerStateReceived); }
+						catch (Exception ex) { Log(ex.ToString()); }
+						break;
+				}
+
+				if (exists) _payloadCache[type] = payload;
+				else _payloadCache.TryAdd(type, payload);
+			}
+		}
+
+		#endregion
 	}
+
 }

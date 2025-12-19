@@ -18,7 +18,7 @@ listen.OnReady += async () =>
 
 listen.PlayerStateReceived += (data) =>
 {
-	Debug.WriteLine(JsonSerializer.Serialize(data));
+
 };
 
 listen.Start();
