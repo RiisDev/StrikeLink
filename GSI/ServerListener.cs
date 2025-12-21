@@ -1,7 +1,6 @@
 ﻿using StrikeLink.Extensions;
 using StrikeLink.GSI.ObjectStates;
 using StrikeLink.GSI.Parsing;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 
@@ -75,26 +74,25 @@ namespace StrikeLink.GSI
 		{
 			Log($"New Client: {tcpClient.Client.RemoteEndPoint}");
 			NetworkStream networkStream = tcpClient.GetStream();
-
-			using StreamReader streamReader = new(networkStream, Encoding.UTF8, leaveOpen: true);
+			Log("Stream grabbed.");
 			using StreamWriter streamWriter = new(networkStream, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true);
 			streamWriter.AutoFlush = true;
+			Log("Streams hooked.");
 
-			int contentLength = await VerifyContentLength(streamReader).ConfigureAwait(false);
+			(int contentLength, byte[] prefetchedBody, int prefetchedLength) = await VerifyContentLength(networkStream).ConfigureAwait(false);
 
-			if (contentLength <= 1) { tcpClient.Close(); return; }
+			Log($"Content length: {contentLength}");
+			if (contentLength <= 1) { tcpClient.Close(); Log("Invalid content length."); return; }
+			
+			string requestBody = await ReadBodyAsync(
+				networkStream,
+				contentLength,
+				prefetchedBody,
+				prefetchedLength,
+				_cts.Token
+			).ConfigureAwait(false);
 
-			char[] bodyBuffer = new char[contentLength];
-			int readTotal = 0;
 
-			while (readTotal < contentLength)
-			{
-				int read = await streamReader.ReadAsync(bodyBuffer, readTotal, contentLength - readTotal).ConfigureAwait(false);
-				if (read == 0) break;
-				readTotal += read;
-			}
-
-			string requestBody = new(bodyBuffer);
 			OnPostReceived?.Invoke(requestBody);
 
 			try
@@ -114,30 +112,116 @@ namespace StrikeLink.GSI
 			tcpClient.Close();
 		}
 
-		[SuppressMessage("ReSharper", "InvertIf")]
-		private static async Task<int> VerifyContentLength(StreamReader streamReader)
+		private static async Task<string> ReadBodyAsync(NetworkStream networkStream, int contentLength, byte[] prefetchedBody, int prefetchedLength, CancellationToken cancellationToken)
 		{
-			string httpHeaders = await ReadHeadersAsync(streamReader).ConfigureAwait(false);
-			if (httpHeaders.IsNullOrEmpty()) { Log("Request data empty"); return -1; }
+			Log($"Grabbing body bytes: {contentLength}");
 
-			ReadOnlySpan<char> headerSpan = httpHeaders.AsSpan();
-			int methodIndex = headerSpan.IndexOf(' ');
-			if (headerSpan.Length == 0 || methodIndex <= 0) { Log($"Invalid span: {headerSpan.Length} - {methodIndex}"); return -1; }
-			ReadOnlySpan<char> methodSpan = httpHeaders.AsSpan()[..methodIndex];
+			byte[] buffer = new byte[contentLength];
 
-			if (!methodSpan.Equals("POST", StringComparison.OrdinalIgnoreCase)) { Log($"Invalid method on caller: {methodSpan}"); return -1; }
+			if (prefetchedLength > 0)
+			{
+				Buffer.BlockCopy(
+					prefetchedBody,
+					0,
+					buffer,
+					0,
+					prefetchedLength
+				);
+			}
 
-			int contentLength = GetContentLength(httpHeaders);
+			int totalRead = prefetchedLength;
 
-			if (contentLength <= 0) { Log("ContentLength is empty"); return -1; }
+			while (totalRead < contentLength)
+			{
+				int bytesRead = await networkStream.ReadAsync(
+					buffer.AsMemory(totalRead, contentLength - totalRead),
+					cancellationToken
+				).ConfigureAwait(false);
 
-			return contentLength;
+				if (bytesRead == 0)
+					throw new IOException("Client closed connection while reading body.");
+
+				totalRead += bytesRead;
+			}
+
+			Log("Body bytes gathered");
+
+			return Encoding.UTF8.GetString(buffer);
 		}
+
+		private static async Task<(int ContentLength, byte[] PrefetchedBody, int PrefetchedLength)> VerifyContentLength(NetworkStream networkStream)
+		{
+			(string headers, byte[] prefetchedBody, int prefetchedLength) = await ReadHeadersAsync(networkStream).ConfigureAwait(false);
+
+			if (headers.IsNullOrEmpty())
+				return (-1, [], 0);
+
+			ReadOnlySpan<char> headerSpan = headers.AsSpan();
+			int methodIndex = headerSpan.IndexOf(' ');
+			if (methodIndex <= 0)
+				return (-1, [], 0);
+
+			ReadOnlySpan<char> methodSpan = headerSpan[..methodIndex];
+
+			Log("Checking HTTP Method");
+			if (!methodSpan.Equals("POST", StringComparison.OrdinalIgnoreCase))
+				return (-1, [], 0);
+
+			int contentLength = GetContentLength(headers);
+			return contentLength <= 0 ? (-1, [], 0) : (contentLength, prefetchedBody, prefetchedLength);
+		}
+
+		private static async Task<(string Headers, byte[] PrefetchedBody, int PrefetchedLength)> ReadHeadersAsync(NetworkStream networkStream)
+		{
+			Log("Reading headers...");
+
+			byte[] buffer = new byte[8192];
+			int totalRead = 0;
+
+			while (true)
+			{
+				int bytesRead = await networkStream.ReadAsync(
+					buffer.AsMemory(totalRead),
+					CancellationToken.None
+				).ConfigureAwait(false);
+
+				if (bytesRead == 0)
+					throw new IOException("Client closed connection while reading headers.");
+
+				totalRead += bytesRead;
+
+				int headerEndIndex = FindHeaderTerminator(buffer.AsSpan(0, totalRead));
+				if (headerEndIndex >= 0)
+				{
+					string headers = Encoding.ASCII.GetString(buffer, 0, headerEndIndex);
+
+					int prefetchedBodyLength = totalRead - headerEndIndex;
+					byte[] prefetchedBody = new byte[prefetchedBodyLength];
+
+					if (prefetchedBodyLength > 0)
+					{
+						Buffer.BlockCopy(
+							buffer,
+							headerEndIndex,
+							prefetchedBody,
+							0,
+							prefetchedBodyLength
+						);
+					}
+
+					return (headers, prefetchedBody, prefetchedBodyLength);
+				}
+
+				if (totalRead == buffer.Length)
+					throw new InvalidOperationException("HTTP headers too large.");
+			}
+		}
+
 
 		private static int GetContentLength(string input)
 		{
 			ReadOnlySpan<char> headers = input.AsSpan();
-
+			Log(input);
 			while (!headers.IsEmpty)
 			{
 				int lineEndIndex = headers.IndexOf("\r\n");
@@ -168,19 +252,21 @@ namespace StrikeLink.GSI
 
 			return -1;
 		}
-
-		private static async Task<string> ReadHeadersAsync(StreamReader streamReader)
+		
+		private static int FindHeaderTerminator(ReadOnlySpan<byte> buffer)
 		{
-			StringBuilder headersBuilder = new();
-
-			while (true)
+			for (int i = 0; i <= buffer.Length - 4; i++)
 			{
-				string? line = await streamReader.ReadLineAsync().ConfigureAwait(false);
-				if (line is null || line.Length == 0) break;
-				headersBuilder.AppendLine(line);
+				if (buffer[i] == (byte)'\r' &&
+				    buffer[i + 1] == (byte)'\n' &&
+				    buffer[i + 2] == (byte)'\r' &&
+				    buffer[i + 3] == (byte)'\n')
+				{
+					return i + 4;
+				}
 			}
 
-			return headersBuilder.ToString();
+			return -1;
 		}
 
 		private static async Task WriteResponseAsync(StreamWriter streamWriter, int statusCode, string message, string excessMessage = "OK")

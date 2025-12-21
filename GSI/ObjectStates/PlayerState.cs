@@ -16,7 +16,8 @@ public enum Activity
 public enum HeldState
 {
 	Active,
-	Holstered
+	Holstered,
+	Reloading
 }
 
 public enum HeldType
@@ -31,6 +32,78 @@ public enum HeldType
 	Knife,
 	Zeus
 }
+
+public enum WeaponType
+{
+	DesertEagle,
+	DualBerettas,
+	FiveSeven,
+	Glock18,
+	Ak47,
+	Aug,
+	Awp,
+	Famas,
+	G3sg1,
+	Galil,
+	M249,
+	M4a4,
+	Mac10,
+	P90,
+	Mp5,
+	Ump45,
+	Xm1014,
+	PpBizon,
+	Mag7,
+	Negev,
+	SawedOff,
+	Tec9,
+	Zeus,
+	P2000,
+	Mp7,
+	Mp9,
+	Nova,
+	P250,
+	Scar20,
+	Sg553,
+	Ssg08,
+	M4a1S,
+	UspS,
+	Cz75,
+	R8Revolver,
+
+	// Utilities
+	C4,
+	Flashbang,
+	HighExplosiveGrenade,
+	SmokeGrenade,
+	DecoyGrenade,
+	IncendiaryGrenade,
+	Molotov,
+
+	// Knives
+	DefaultKnife,
+	M9Bayonet,
+	Karambit,
+	Bayonet,
+	BowieKnife,
+	ButterflyKnife,
+	FalchionKnife,
+	FlipKnife,
+	GutKnife,
+	HuntsmanKnife,
+	ShadowDaggers,
+	NavajaKnife,
+	StilettoKnife,
+	TalonKnife,
+	UrsusKnife,
+	ClassicKnife,
+	ParacordKnife,
+	SurvivalKnife,
+	NomadKnife,
+	SkeletonKnife,
+	KukriKnife
+}
+
 
 public record MatchStats(
 	int Kills,
@@ -56,7 +129,7 @@ public record Vitals(
 
 public record Weapon(
 	int Slot,
-	string Name,
+	WeaponType Name,
 	string PaintKit,
 	HeldType Type,
 	HeldState State,
