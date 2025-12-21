@@ -82,12 +82,12 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
-		private static List<Weapons>? ParseWeapons(JsonElement player)
+		private static List<Weapon>? ParseWeapons(JsonElement player)
 		{
 			if (!player.TryGetProperty("weapons", out JsonElement weaponsElement))
 				return null;
 
-			List<Weapons> weapons = [];
+			List<Weapon> weapons = [];
 
 			foreach (JsonProperty weaponProperty in weaponsElement.EnumerateObject())
 			{
