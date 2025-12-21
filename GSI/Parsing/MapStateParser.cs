@@ -1,4 +1,5 @@
 ﻿using StrikeLink.GSI.ObjectStates;
+using System.Numerics;
 
 namespace StrikeLink.GSI.Parsing
 {
@@ -23,12 +24,12 @@ namespace StrikeLink.GSI.Parsing
 
 		public MapMode ParseMode(string? mode)
 		{
-			return MapMode.ArmsRace;
+			return mode == null ? MapMode.Casual : Enum.Parse<MapMode>(mode, ignoreCase: true);
 		}
 
 		public MapPhase ParsePhase(string? phase)
 		{
-			return MapPhase.Intermission;
+			return phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
 		}
 
 		public Stats ParseStats(JsonElement root)

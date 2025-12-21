@@ -21,13 +21,15 @@ public enum HeldState
 
 public enum HeldType
 {
+	SniperRifle,
 	Rifle,
 	SMG,
 	Pistol,
 	Heavy,
-	Equipment,
 	Grenade,
-	Miscellaneous
+	C4,
+	Knife,
+	Zeus
 }
 
 public record MatchStats(
@@ -52,7 +54,7 @@ public record Vitals(
 	int? EquippedValue
 );
 
-public record Weapons(
+public record Weapon(
 	int Slot,
 	string Name,
 	string PaintKit,
@@ -74,5 +76,5 @@ public record PlayerState(
 
 	MatchStats? MatchStats,
 	Vitals? Vitals,
-	IReadOnlyList<Weapons>? Weapons
+	IReadOnlyList<Weapon>? Weapons
 ) : IGsiPayload;
