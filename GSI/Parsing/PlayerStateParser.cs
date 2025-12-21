@@ -6,7 +6,8 @@ namespace StrikeLink.GSI.Parsing
 {
 	internal sealed class PlayerStateParser : IGsiParser
 	{
-		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out _);
+		// When spectating it doesn't have this data
+		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out JsonElement playerElement) && playerElement.TryGetProperty("name", out _);
 
 		public IGsiPayload Parse(JsonElement root)
 		{
@@ -98,16 +99,21 @@ namespace StrikeLink.GSI.Parsing
 				string name = weaponElement.GetProperty("name").GetString()!;
 				string paintKit = weaponElement.GetProperty("paintkit").GetString()!;
 
-				HeldType type = Enum.Parse<HeldType>(weaponElement.GetProperty("type").GetString()!, ignoreCase: true);
+				HeldType type = name switch
+				{
+					"weapon_taser" => HeldType.Zeus,
+					"Submachine Gun" => HeldType.SMG,
+					_ => Enum.Parse<HeldType>(weaponElement.GetProperty("type").GetString()!, ignoreCase: true)
+				};
 				HeldState state = Enum.Parse<HeldState>(weaponElement.GetProperty("state").GetString()!, ignoreCase: true);
 
 				int? ammoClip = weaponElement.TryGetProperty("ammo_clip", out JsonElement clip) ? clip.GetInt32() : null;
 				int? ammoClipMax = weaponElement.TryGetProperty("ammo_clip_max", out JsonElement clipMax) ? clipMax.GetInt32() : null;
 				int? ammoReserve = weaponElement.TryGetProperty("ammo_reserve", out JsonElement reserve) ? reserve.GetInt32() : null;
 
-				weapons.Add(new Weapons(
+				weapons.Add(new Weapon(
 					Slot: slot,
-					Name: name,
+					Name: WeaponList[name],
 					PaintKit: paintKit,
 					Type: type,
 					State: state,
@@ -119,6 +125,80 @@ namespace StrikeLink.GSI.Parsing
 
 			return weapons;
 		}
+
+		private static readonly Dictionary<string, WeaponType> WeaponList = new()
+		{
+			// Weapons
+			{ "weapon_deagle", WeaponType.DesertEagle },
+			{ "weapon_elite", WeaponType.DualBerettas },
+			{ "weapon_fiveseven", WeaponType.FiveSeven },
+			{ "weapon_glock", WeaponType.Glock18 },
+			{ "weapon_ak47", WeaponType.Ak47 },
+			{ "weapon_aug", WeaponType.Aug },
+			{ "weapon_awp", WeaponType.Awp },
+			{ "weapon_famas", WeaponType.Famas },
+			{ "weapon_g3sg1", WeaponType.G3sg1 },
+			{ "weapon_galilar", WeaponType.Galil },
+			{ "weapon_m249", WeaponType.M249 },
+			{ "weapon_m4a1", WeaponType.M4a4 },
+			{ "weapon_mac10", WeaponType.Mac10 },
+			{ "weapon_p90", WeaponType.P90 },
+			{ "weapon_mp5sd", WeaponType.Mp5 },
+			{ "weapon_ump45", WeaponType.Ump45 },
+			{ "weapon_xm1014", WeaponType.Xm1014 },
+			{ "weapon_bizon", WeaponType.PpBizon },
+			{ "weapon_mag7", WeaponType.Mag7 },
+			{ "weapon_negev", WeaponType.Negev },
+			{ "weapon_sawedoff", WeaponType.SawedOff },
+			{ "weapon_tec9", WeaponType.Tec9 },
+			{ "weapon_taser", WeaponType.Zeus },
+			{ "weapon_hkp2000", WeaponType.P2000 },
+			{ "weapon_mp7", WeaponType.Mp7 },
+			{ "weapon_mp9", WeaponType.Mp9 },
+			{ "weapon_nova", WeaponType.Nova },
+			{ "weapon_p250", WeaponType.P250 },
+			{ "weapon_scar20", WeaponType.Scar20 },
+			{ "weapon_sg556", WeaponType.Sg553 },
+			{ "weapon_ssg08", WeaponType.Ssg08 },
+			{ "weapon_m4a1_silencer", WeaponType.M4a1S },
+			{ "weapon_usp_silencer", WeaponType.UspS },
+			{ "weapon_cz75a", WeaponType.Cz75 },
+			{ "weapon_revolver", WeaponType.R8Revolver },
+			
+			// Knives
+			{ "weapon_knife", WeaponType.DefaultKnife },
+			{ "weapon_knife_t", WeaponType.DefaultKnife },
+			{ "weapon_knife_ct", WeaponType.DefaultKnife },
+			{ "weapon_knife_m9_bayonet", WeaponType.M9Bayonet },
+			{ "weapon_knife_karambit", WeaponType.Karambit },
+			{ "weapon_bayonet", WeaponType.Bayonet },
+			{ "weapon_knife_survival_bowie", WeaponType.BowieKnife },
+			{ "weapon_knife_butterfly", WeaponType.ButterflyKnife },
+			{ "weapon_knife_falchion", WeaponType.FalchionKnife },
+			{ "weapon_knife_flip", WeaponType.FlipKnife },
+			{ "weapon_knife_gut", WeaponType.GutKnife },
+			{ "weapon_knife_tactical", WeaponType.HuntsmanKnife },
+			{ "weapon_knife_push", WeaponType.ShadowDaggers },
+			{ "weapon_knife_gypsy_jackknife", WeaponType.NavajaKnife },
+			{ "weapon_knife_stiletto", WeaponType.StilettoKnife },
+			{ "weapon_knife_widowmaker", WeaponType.TalonKnife },
+			{ "weapon_knife_ursus", WeaponType.UrsusKnife },
+			{ "weapon_knife_css", WeaponType.ClassicKnife },
+			{ "weapon_knife_cord", WeaponType.ParacordKnife },
+			{ "weapon_knife_canis", WeaponType.SurvivalKnife },
+			{ "weapon_knife_outdoor", WeaponType.NomadKnife },
+			{ "weapon_knife_skeleton", WeaponType.SkeletonKnife },
+			{ "weapon_knife_kukri", WeaponType.KukriKnife },
+			
+			// Utilities
+			{ "weapon_c4", WeaponType.C4 },
+			{ "weapon_hegrenade", WeaponType.HighExplosiveGrenade },
+			{ "weapon_flashbang", WeaponType.Flashbang },
+			{ "weapon_smokegrenade", WeaponType.SmokeGrenade },
+			{ "weapon_decoy", WeaponType.DecoyGrenade },
+			{ "weapon_incgrenade", WeaponType.IncendiaryGrenade },
+			{ "weapon_molotov", WeaponType.Molotov },
+		};
 
 	}
 }

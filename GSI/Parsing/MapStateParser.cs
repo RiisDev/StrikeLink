@@ -1,5 +1,5 @@
 ﻿using StrikeLink.GSI.ObjectStates;
-using System.Numerics;
+using System.Globalization;
 
 namespace StrikeLink.GSI.Parsing
 {
@@ -18,19 +18,22 @@ namespace StrikeLink.GSI.Parsing
 				Round: map.GetProperty("round").GetInt32(),
 				CounterTerroristStats: ParseStats(map.GetProperty("team_ct")),
 				TerroristsStats: ParseStats(map.GetProperty("team_t")),
-				MatchesToWinSeries: map.GetProperty("num_matches_to_win_series").GetInt32()
+				MatchesToWinSeries: map.GetProperty("num_matches_to_win_series").GetInt32(),
+				RoundWins: ParseRoundWins(map)
 			);
 		}
 
 		public MapMode ParseMode(string? mode)
 		{
-			return mode == null ? MapMode.Casual : Enum.Parse<MapMode>(mode, ignoreCase: true);
+			return mode switch
+			{
+				"gungameprogressive" => MapMode.ArmsRace,
+				"scrimcomp2v2" => MapMode.Wingman,
+				_ => Enum.TryParse(mode, true, out MapMode modeData) ? modeData : MapMode.Casual
+			};
 		}
 
-		public MapPhase ParsePhase(string? phase)
-		{
-			return phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
-		}
+		public MapPhase ParsePhase(string? phase) => phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
 
 		public Stats ParseStats(JsonElement root)
 		{
@@ -42,5 +45,27 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
+		public Dictionary<int, WinState> ParseRoundWins(JsonElement root)
+		{
+			Dictionary<int, WinState> roundWins = [];
+
+			if (!root.TryGetProperty("round_wins", out JsonElement roundWinsElement)) return roundWins;
+
+			foreach (JsonProperty property in roundWinsElement.EnumerateObject())
+			{
+				int roundNumber = int.Parse(property.Name, CultureInfo.InvariantCulture);
+				roundWins.Add(roundNumber, WinStateMappings[property.Value.GetString() ?? "t_win_bomb"]);
+			}
+
+			return roundWins;
+		}
+
+		private static readonly Dictionary<string, WinState> WinStateMappings = new()
+		{
+			{ "t_win_elimination", WinState.CounterTerroristEliminated },
+			{ "ct_win_elimination", WinState.TerroristsEliminated },
+			{ "ct_win_defuse", WinState.BombDefused },
+			{ "t_win_bomb", WinState.BombExploded }
+		};
 	}
 }

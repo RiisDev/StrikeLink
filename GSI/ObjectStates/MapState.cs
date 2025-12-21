@@ -5,20 +5,25 @@ public enum MapPhase
 {
 	Live,
 	WarmUp,
-	FreezeTime,
 	Intermission,
-	GameOver,
-	Bomb
+	GameOver
 }
 
 public enum MapMode
 {
 	Casual,
 	Competitive,
-	Premier,
 	Deathmatch,
 	Wingman,
 	ArmsRace
+}
+
+public enum WinState
+{
+	CounterTerroristEliminated,
+	TerroristsEliminated,
+	BombDefused,
+	BombExploded
 }
 
 public record Stats(
@@ -35,5 +40,6 @@ public record MapState(
 	int Round,
 	Stats CounterTerroristStats,
 	Stats TerroristsStats,
-	int MatchesToWinSeries
+	int MatchesToWinSeries,
+	Dictionary<int, WinState> RoundWins
 ) : IGsiPayload;
