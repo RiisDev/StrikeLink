@@ -9,7 +9,7 @@
 			options ??= ConfigWriterOptions.Default;
 
 			StringBuilder builder = new();
-			WriteNode(builder, document.Root, options, indentLevel: 0);
+			WriteNode(builder, document.Node, options, indentLevel: 0);
 			return builder.ToString();
 		}
 
