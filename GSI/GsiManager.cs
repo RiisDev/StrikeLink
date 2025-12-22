@@ -1,5 +1,5 @@
 ﻿using Microsoft.Win32;
-using StrikeLink.Extensions;
+using StrikeLink.Services.Config;
 using System.Net;
 using System.Runtime.InteropServices;
 
@@ -18,32 +18,29 @@ namespace StrikeLink.GSI
 			return value as string ?? throw new KeyNotFoundException("Steam path key could not be found.");
 		}
 
-		internal static async Task<string> GetCounterStrikePath(string steamPath)
+		internal static string GetCounterStrikePath(string steamPath)
 		{
 			string vdfPath = Path.Combine(steamPath, "steamapps", "libraryfolders.vdf");
 
 			if (!File.Exists(vdfPath)) throw new FileNotFoundException($"Failed to find libraryfolders.vdf at {vdfPath}");
 
-			string vdfText = await File.ReadAllTextAsync(vdfPath).ConfigureAwait(false);
-			string[] paths = vdfText.Split("path\"").Skip(1).ToArray();
+			ValveCfgReader reader = new(vdfPath);
 
-			string? pathContainingCs = paths.FirstOrDefault(x=> x.Contains("\"730\"", StringComparison.InvariantCulture));
+			foreach (KeyValuePair<string, ConfigNode> node in reader.Document.Root.EnumerateObject())
+			{
+				bool appsFound = node.Value.TryGetProperty("apps", out ConfigNode appsNode);
+				if (!appsFound) continue;
 
-			if (pathContainingCs.IsNullOrEmpty()) throw new KeyNotFoundException("Failed to detect Counter Strike in VDF.");
+				bool hasCs = appsNode.TryGetProperty("730", out ConfigNode _);
+				if (!hasCs) continue;
 
-			int firstQuoteIndex = pathContainingCs.IndexOf('"', StringComparison.InvariantCulture);
-			int secondQuoteIndex = pathContainingCs.IndexOf('"', firstQuoteIndex + 1);
+				string path = node.Value.GetProperty("path").GetString();
+				string counterstrikeInstallPath = Path.Combine(path.Replace(@"\\", @"\", StringComparison.InvariantCulture), "steamapps", "common", "Counter-Strike Global Offensive");
 
-			string pathContent = pathContainingCs[(firstQuoteIndex + 1)..secondQuoteIndex];
+				return !Directory.Exists(counterstrikeInstallPath) ? throw new DirectoryNotFoundException($"{counterstrikeInstallPath} does not exist") : counterstrikeInstallPath;
+			}
 
-			string cleanedPath = pathContent.Replace(@"\\", @"\", StringComparison.InvariantCulture);
-
-			if (!Directory.Exists(cleanedPath))
-				throw new DirectoryNotFoundException($"{cleanedPath} does not exist");
-
-			string counterstrikeInstallPath = Path.Combine(cleanedPath, "steamapps", "common", "Counter-Strike Global Offensive");
-
-			return !Directory.Exists(counterstrikeInstallPath) ? throw new DirectoryNotFoundException($"{counterstrikeInstallPath} does not exist") : counterstrikeInstallPath;
+			throw new FileNotFoundException("Could not find Counter-Strike: Global Offensive installation in any Steam library folder.");
 		}
 
 		internal static async Task GenerateGsiFile(IPAddress address, int port, string? steamPath = null)
@@ -53,7 +50,7 @@ namespace StrikeLink.GSI
 			if (!Directory.Exists(lookupPath))
 				throw new DirectoryNotFoundException($"{lookupPath} does not exist");
 
-			string counterPath = await GetCounterStrikePath(lookupPath).ConfigureAwait(false);
+			string counterPath = GetCounterStrikePath(lookupPath);
 
 			string cfgPath = Path.Combine(counterPath, "game", "csgo", "cfg");
 			string gsiCfg = Path.Combine(cfgPath, "gamestate_integration_strikelink.cfg");

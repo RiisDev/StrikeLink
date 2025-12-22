@@ -2,7 +2,10 @@
 #pragma warning disable CA1024 // Use properties where appropriate
 namespace StrikeLink.Services.Config
 {
-	public sealed record ConfigDocument(ConfigNode Root);
+	public sealed record ConfigDocument(ConfigNode Node)
+	{
+		public ConfigNode Root { get; } = Node.EnumerateObject().First().Value;
+	};
 
 	public enum ConfigNodeType
 	{

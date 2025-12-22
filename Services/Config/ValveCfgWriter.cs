@@ -19,6 +19,7 @@
 
 			foreach (KeyValuePair<string, ConfigNode> kvp in node.EnumerateObject())
 			{
+				Debug.WriteLine("node start");
 				WriteIndent(builder, options, indentLevel);
 				WriteQuoted(builder, kvp.Key);
 				builder.AppendLine();
@@ -30,6 +31,7 @@
 
 				WriteIndent(builder, options, indentLevel);
 				builder.AppendLine("}");
+				Debug.WriteLine("node end");
 			}
 
 			if (options.WriteTrailingNewline) builder.AppendLine();
