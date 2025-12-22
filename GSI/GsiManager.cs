@@ -43,7 +43,7 @@ namespace StrikeLink.GSI
 			throw new FileNotFoundException("Could not find Counter-Strike: Global Offensive installation in any Steam library folder.");
 		}
 
-		internal static async Task GenerateGsiFile(IPAddress address, int port, string? steamPath = null)
+		internal static async Task<(IPAddress, int)> GenerateGsiFile(IPAddress address, int port, string? steamPath = null)
 		{
 			string lookupPath = steamPath ?? GetSteamPath();
 
@@ -55,38 +55,61 @@ namespace StrikeLink.GSI
 			string cfgPath = Path.Combine(counterPath, "game", "csgo", "cfg");
 			string gsiCfg = Path.Combine(cfgPath, "gamestate_integration_strikelink.cfg");
 
-			await File.WriteAllTextAsync(gsiCfg,
-				$$"""
-			            "Strikelink Connection File"
-			            {
-			             "uri" "http:{{address}}:{{port}}"
-			             "timeout" "5.0"
-			             "buffer"  "0"
-			             "throttle" "0"
-			             "heartbeat" "30.0"
-			             "data"
-			             {
-			            	"map_round_wins" "1"          // history of round wins
-			            	"map" "1"                     // mode, map, phase, team scores
-			            	"player_id" "1"               // steamid
-			            	"player_match_stats" "1"      // scoreboard info
-			            	"player_state" "1"            // armor, flashed, equip_value, health, etc.
-			            	"player_weapons" "1"          // list of player weapons and weapon state
-			            	"provider" "1"                // info about the game providing info 
-			            	"round" "1"                   // round phase and the winning team
-			            	"allgrenades" "1"             // grenade effecttime, lifetime, owner, position, type, velocity
-			            	"allplayers_id" "1"           // the steam id of each player
-			            	"allplayers_match_stats" "1"  // the scoreboard info for each player
-			            	"allplayers_position" "1"     // player_position but for each player
-			            	"allplayers_state" "1"        // the player_state for each player
-			            	"allplayers_weapons" "1"      // the player_weapons for each player
-			            	"bomb" "1"                    // location of the bomb, who's carrying it, dropped or not
-			            	"phase_countdowns" "1"        // time remaining in tenths of a second, which phase
-			            	"player_position" "1"         // forward direction, position for currently spectated player
-			             }
-			            }                 
-			            """)
-				.ConfigureAwait(false);
+			if (File.Exists(gsiCfg))
+			{
+				ValveCfgReader existingReader = new(gsiCfg);
+				ConfigNode existingRoot = existingReader.Document.Root;
+				if (existingRoot.TryGetProperty("Strikelink Connection File", out ConfigNode existingConnection))
+				{
+					bool foundUri = existingConnection.TryGetProperty("uri", out ConfigNode uriNode);
+					if (foundUri)
+					{
+						Uri uri = new(uriNode.GetString());
+						IPAddress existingAddress = IPAddress.Parse(uri.Host);
+						int existingPort = uri.Port;
+						return (existingAddress, existingPort);
+					}
+				}
+			}
+
+			ConfigNode data = ConfigNodeFactory.Object(
+				new Dictionary<string, ConfigNode>
+				{
+					["map_round_wins"] = ConfigNodeFactory.Value("1"),
+					["map"] = ConfigNodeFactory.Value("1"),
+					["player_id"] = ConfigNodeFactory.Value("1"),
+					["player_match_stats"] = ConfigNodeFactory.Value("1"),
+					["player_state"] = ConfigNodeFactory.Value("1"),
+					["player_weapons"] = ConfigNodeFactory.Value("1"),
+					["provider"] = ConfigNodeFactory.Value("1"),
+					["round"] = ConfigNodeFactory.Value("1"),
+					["allgrenades"] = ConfigNodeFactory.Value("1"),
+					["allplayers_id"] = ConfigNodeFactory.Value("1"),
+					["allplayers_match_stats"] = ConfigNodeFactory.Value("1"),
+					["allplayers_position"] = ConfigNodeFactory.Value("1"),
+					["allplayers_state"] = ConfigNodeFactory.Value("1"),
+					["allplayers_weapons"] = ConfigNodeFactory.Value("1"),
+					["bomb"] = ConfigNodeFactory.Value("1"),
+					["phase_countdowns"] = ConfigNodeFactory.Value("1"),
+					["player_position"] = ConfigNodeFactory.Value("1"),
+				});
+
+			ConfigNode connectionFile = ConfigNodeFactory.Object(
+				new Dictionary<string, ConfigNode>
+				{
+					["uri"] = ConfigNodeFactory.Value($"http://{address}:{port}"),
+					["timeout"] = ConfigNodeFactory.Value("5.0"),
+					["buffer"] = ConfigNodeFactory.Value("0"),
+					["throttle"] = ConfigNodeFactory.Value("0"),
+					["heartbeat"] = ConfigNodeFactory.Value("30.0"),
+					["data"] = data
+				});
+
+			ConfigDocument document = new(ConfigNodeFactory.Object(new Dictionary<string, ConfigNode> { ["Strikelink Connection File"] = connectionFile }));
+
+			await File.WriteAllTextAsync(gsiCfg, ValveCfgWriter.Write(document)).ConfigureAwait(false);
+
+			return (address, port);
 		}
 	}
 }

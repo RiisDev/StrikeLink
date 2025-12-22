@@ -1,22 +1,27 @@
-﻿using System.Diagnostics;
+﻿using StrikeLink.GSI;
+using StrikeLink.Services.Config;
+using System.Diagnostics;
+using System.Net;
 using System.Text;
 using System.Text.Json;
-using StrikeLink.GSI;
 
+while (true) Console.ReadLine();
+
+return;
 object lockObj = new();
-ServerListener listen = new(port: 5000);
+ServerListener listen = new();
 HttpClient client = new();
 
-listen.OnReady += () =>
-{
-	ProcessStartInfo processStartInfo = new ProcessStartInfo
-	{
-		FileName = "steam://rungameid/730",
-		UseShellExecute = true
-	};
+//listen.OnReady += () =>
+//{
+//	ProcessStartInfo processStartInfo = new ProcessStartInfo
+//	{
+//		FileName = "steam://rungameid/730",
+//		UseShellExecute = true
+//	};
 
-	Process.Start(processStartInfo);
-};
+//	Process.Start(processStartInfo);
+//};
 
 listen.OnPostReceived += data =>
 {

@@ -12,39 +12,37 @@ namespace StrikeLink.GSI
 	{
 		#region ServerLogic
 		// Private Vars
-		private readonly TcpListener _listener;
-		private readonly GsiDispatcher _dispatcher;
+		private TcpListener _listener = null!;
+		private readonly GsiDispatcher _dispatcher = new(
+			[
+				new PlayerStateParser(),
+				new MapStateParser()
+			]
+		);
 		private readonly CancellationTokenSource _cts = new();
-		private readonly SynchronizationContext? _syncContext;
+		private readonly SynchronizationContext? _syncContext = SynchronizationContext.Current;
 
 		// Public readable values
-		public event Action? OnReady;
+		public event Action<Uri>? OnReady;
 		public event Action<string>? OnPostReceived;
-		public bool Ready { get; set { if (field == value) return; field = value; OnReady?.Invoke(); } }
-		public IPAddress Address { get; }
-		public int Port { get; }
+		public bool Ready { get; set { if (field == value) return; field = value; OnReady?.Invoke(new Uri($"http://{Address}:{Port}")); } }
+		public IPAddress Address { get; private set; } = null!;
+		public int Port { get; private set; }
 
-		public ServerListener(IPAddress? address = null, int? port = null)
-		{
-			Port = port ?? GetFreePort();
-			Address = address ?? IPAddress.Loopback;
-			_syncContext = SynchronizationContext.Current;
-			_listener = new TcpListener(Address, Port);
-			_dispatcher = new GsiDispatcher(
-				[
-					new PlayerStateParser(),
-					new MapStateParser()
-				]
-			);
-		}
-
-		public async Task StartAsync(string? steamPath = null)
+		public async Task StartAsync(IPAddress? address = null, int? port = null, string? steamPath = null)
 		{
 			if (Process.GetProcessesByName("cs2").Length > 0)
 				throw new InvalidOperationException("Counter Strike must not be running during initialization.");
 
-			await GsiManager.GenerateGsiFile(Address, Port, steamPath).ConfigureAwait(false);
+			Address = address ?? IPAddress.Loopback;
+			Port = port ?? GetFreePort();
 
+			(IPAddress newAddress, int newPort) = await GsiManager.GenerateGsiFile(Address, Port, steamPath).ConfigureAwait(false);
+
+			Address = newAddress;
+			Port = newPort;
+
+			_listener = new TcpListener(Address, Port);
 			_listener.Start();
 
 			Log($"Listening on: http://{Address}:{Port}/");
