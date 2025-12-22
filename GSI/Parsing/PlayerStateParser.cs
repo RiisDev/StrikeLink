@@ -7,7 +7,7 @@ namespace StrikeLink.GSI.Parsing
 	internal sealed class PlayerStateParser : IGsiParser
 	{
 		// When spectating it doesn't have this data
-		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out JsonElement playerElement) && playerElement.TryGetProperty("name", out _);
+		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out JsonElement playerElement) && playerElement.TryGetProperty("steamid", out _);
 
 		public IGsiPayload Parse(JsonElement root)
 		{
