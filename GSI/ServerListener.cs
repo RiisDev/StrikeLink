@@ -42,8 +42,22 @@ namespace StrikeLink.GSI
 			Address = newAddress;
 			Port = newPort;
 
-			_listener = new TcpListener(Address, Port);
-			_listener.Start();
+			try
+			{
+				_listener = new TcpListener(Address, Port);
+				_listener.Start();
+			}
+			catch (SocketException ex)
+			{
+				if (ex.SocketErrorCode == SocketError.AddressAlreadyInUse)
+				{
+					throw new InvalidOperationException("Port is already in-use, please use another port.");
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new InvalidOperationException("Unknown error occured during socket creation", ex);
+			}
 
 			Log($"Listening on: http://{Address}:{Port}/");
 
