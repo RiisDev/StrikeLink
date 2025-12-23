@@ -48,6 +48,9 @@ namespace StrikeLink.Services
 
 						string[] logLines = logText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
+						if (_lastLineIndex > logLines.Length)
+							_lastLineIndex = 0;
+
 						for (int lineIndex = _lastLineIndex; lineIndex < logLines.Length; lineIndex++)
 						{
 							string lineText = logLines[lineIndex];
@@ -57,7 +60,6 @@ namespace StrikeLink.Services
 						}
 
 						_lastLineIndex = logLines.Length;
-
 					}
 				}
 				catch (OperationCanceledException) { }
