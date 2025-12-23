@@ -21,7 +21,8 @@ namespace StrikeLink.Services.Config
 		[
 			".cfg",
 			".vdf",
-			".vcfg"
+			".vcfg",
+			".acf"
 		];
 
 		public ValveCfgReader(string filePath)
@@ -126,19 +127,47 @@ namespace StrikeLink.Services.Config
 					throw new FormatException($"Unexpected character '{c}' at {_position}");
 			}
 		}
-
+		
 		private string ReadString()
 		{
 			_position++;
-			int start = _position;
 
-			while (_position < _input.Length && _input[_position] != '"') _position++;
+			StringBuilder builder = new();
+			bool escape = false;
 
-			if (_position >= _input.Length) throw new FormatException("Unterminated string.");
+			while (_position < _input.Length)
+			{
+				char c = _input[_position++];
 
-			string value = _input[start.._position].ToString();
-			_position++;
-			return value;
+				if (escape)
+				{
+					builder.Append(c switch
+					{
+						'"' => '"',
+						'\\' => '\\',
+						'n' => '\n',
+						't' => '\t',
+						_ => c
+					});
+
+					escape = false;
+					continue;
+				}
+
+				switch (c)
+				{
+					case '\\':
+						escape = true;
+						continue;
+					case '"':
+						return builder.ToString();
+					default:
+						builder.Append(c);
+						break;
+				}
+			}
+
+			throw new FormatException("Unterminated string.");
 		}
 
 		private void SkipWhitespaceAndComments()
