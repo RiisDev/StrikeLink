@@ -15,7 +15,8 @@ namespace StrikeLink.GSI
 		private readonly GsiDispatcher _dispatcher = new(
 			[
 				new PlayerStateParser(),
-				new MapStateParser()
+				new MapStateParser(),
+				new RoundStateParser()
 			]
 		);
 		private readonly CancellationTokenSource _cts = new();
