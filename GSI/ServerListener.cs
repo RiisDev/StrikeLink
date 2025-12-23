@@ -31,13 +31,13 @@ namespace StrikeLink.GSI
 
 		public async Task StartAsync(IPAddress? address = null, int? port = null, string? steamPath = null)
 		{
-			if (Process.GetProcessesByName("cs2").Length > 0)
-				throw new InvalidOperationException("Counter Strike must not be running during initialization.");
-
 			Address = address ?? IPAddress.Loopback;
 			Port = port ?? GetFreePort();
 
 			(IPAddress newAddress, int newPort) = await GsiManager.GenerateGsiFile(Address, Port, steamPath).ConfigureAwait(false);
+
+			if (port != newPort && Process.GetProcessesByName("cs2").Length > 0)
+				throw new InvalidOperationException("Counter Strike must not be running during first run.");
 
 			Address = newAddress;
 			Port = newPort;
