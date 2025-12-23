@@ -33,7 +33,6 @@ namespace StrikeLink.Services
 		public event Action<string>? OnLogReceived;
 		public event Action<string>? OnPlayerConnected;
 		public event Action<string>? OnMapJoined;
-		//public event Action<string>? OnPlayerDisconnected;
 
 		public event Action<ChatMessage>? OnGlobalChatMessageReceived;
 		public event Action<ChatMessage>? OnTeamChatMessageReceived;
@@ -70,7 +69,12 @@ namespace StrikeLink.Services
 
 			OnLogReceived?.Invoke("");
 		}
-
+		/*
+		 *
+		 * Note for future self:
+		 * Can parse the status output by first checking if the lineText contains status, and then waiting for the last line that contains "end of status".
+		 *
+		 */
 		private void ParseLineData(string lineText)
 		{
 			OnLogReceived?.Invoke(lineText);
@@ -161,7 +165,7 @@ namespace StrikeLink.Services
 
 			}
 		}
-		//12/23 08:30:15 Connecting to 138.199.12.138:26532
+
 		private void ParseChatLine(string lineText, bool team)
 		{
 			string splitTypeData = team ? "Team" : "All";
@@ -204,7 +208,10 @@ namespace StrikeLink.Services
 						{
 							string lineText = logLines[lineIndex];
 							if (lineText == _lastLineText) continue;
-							ParseLineData(lineText);
+
+							try { ParseLineData(lineText); }
+							catch { /**/ }
+							
 							_lastLineText = lineText;
 						}
 
