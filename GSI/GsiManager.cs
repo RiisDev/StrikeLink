@@ -1,5 +1,4 @@
-﻿using StrikeLink.Extensions;
-using StrikeLink.Services;
+﻿using StrikeLink.Services;
 using StrikeLink.Services.Config;
 using System.Net;
 
@@ -60,7 +59,7 @@ namespace StrikeLink.GSI
 				new Dictionary<string, ConfigNode>
 				{
 					["uri"] = ConfigNodeFactory.Value($"http://{address}:{port}"),
-					["timeout"] = ConfigNodeFactory.Value("5.0"),
+					["timeout"] = ConfigNodeFactory.Value("2.0"),
 					["buffer"] = ConfigNodeFactory.Value("0"),
 					["throttle"] = ConfigNodeFactory.Value("0"),
 					["heartbeat"] = ConfigNodeFactory.Value("30.0"),
