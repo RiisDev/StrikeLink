@@ -73,7 +73,7 @@ namespace StrikeLink.Services
 
 		public static string GetGamePath(int gameId) => TryGetGamePath(gameId, out string? path) ? path! : throw new DirectoryNotFoundException($"Could not find game with ID {gameId} in any Steam library folder.");
 
-		public static ValveCfgReader GetUserConfig(long? userId = 0)
+		public static ValveCfgReader GetUserConfig(long? userId = null)
 		{
 			string steamPath = GetSteamPath();
 			long id = userId ?? GetCurrentUserId();
@@ -153,7 +153,7 @@ namespace StrikeLink.Services
 				if (TryExtractUserId(line, out long userId)) return userId;
 			}
 
-			return 0;
+			throw new InvalidOperationException("Failed to gather SteamId from log");
 		}
 
 		private static bool TryExtractUserId(string line, out long userId)

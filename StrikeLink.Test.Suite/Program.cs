@@ -1,27 +1,27 @@
 ﻿using StrikeLink.GSI;
+using StrikeLink.Services;
 using StrikeLink.Services.Config;
 using System.Diagnostics;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 
-while (true) Console.ReadLine();
-
-return;
 object lockObj = new();
 ServerListener listen = new();
-HttpClient client = new();
+ConsoleService service = new();
+service.OnLogReceived += Console.WriteLine;
+service.StartListening();
 
-//listen.OnReady += () =>
-//{
-//	ProcessStartInfo processStartInfo = new ProcessStartInfo
-//	{
-//		FileName = "steam://rungameid/730",
-//		UseShellExecute = true
-//	};
+listen.OnReady += _ =>
+{
+	ProcessStartInfo processStartInfo = new ProcessStartInfo
+	{
+		FileName = "steam://rungameid/730",
+		UseShellExecute = true
+	};
 
-//	Process.Start(processStartInfo);
-//};
+	Process.Start(processStartInfo);
+};
 
 listen.OnPostReceived += data =>
 {
@@ -47,6 +47,6 @@ listen.MapStateReceived += data =>
 	Debug.WriteLine($"[MapState] {JsonSerializer.Serialize(data)}");
 };
 
-await listen.StartAsync();
+//await listen.StartAsync();
 
 while (true) Console.ReadLine();

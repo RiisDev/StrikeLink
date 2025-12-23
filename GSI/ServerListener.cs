@@ -1,5 +1,4 @@
-﻿using StrikeLink.Extensions;
-using StrikeLink.GSI.ObjectStates;
+﻿using StrikeLink.GSI.ObjectStates;
 using StrikeLink.GSI.Parsing;
 using System.Net;
 using System.Net.Sockets;
@@ -31,14 +30,35 @@ namespace StrikeLink.GSI
 
 		public async Task StartAsync(IPAddress? address = null, int? port = null, string? steamPath = null)
 		{
-			Address = address ?? IPAddress.Loopback;
-			Port = port ?? GetFreePort();
+			// This block checks if we need to generate and use a new port and address
+			// in case the user specified one that is already in use or invalid
+			bool userSpecifiedAddress = address is not null;
+			bool userSpecifiedPort = port is not null;
 
-			(IPAddress newAddress, int newPort) = await GsiManager.GenerateGsiFile(Address, Port, steamPath).ConfigureAwait(false);
+			IPAddress requestedAddress = address ?? IPAddress.Loopback;
+			int requestedPort = port ?? GetFreePort();
 
-			if (port != newPort && Process.GetProcessesByName("cs2").Length > 0)
-				throw new InvalidOperationException("Counter Strike must not be running during first run.");
+			(IPAddress newAddress, int newPort) =
+				await GsiManager.GenerateGsiFile(requestedAddress, requestedPort, steamPath)
+					.ConfigureAwait(false);
 
+			bool addressChanged = !requestedAddress.Equals(newAddress);
+			bool portChanged = requestedPort != newPort;
+
+			// This is cancer I apologize
+			bool shouldCheckProcess = 
+				(userSpecifiedAddress || userSpecifiedPort) &&
+				(addressChanged || portChanged) || (!userSpecifiedAddress &&
+				!userSpecifiedPort && (addressChanged || portChanged));
+
+			if (shouldCheckProcess && Process.GetProcessesByName("cs2").Length > 0)
+			{
+				throw new InvalidOperationException(
+					"Counter Strike must not be running during first run."
+				);
+			}
+
+			// Now we can start the listener
 			Address = newAddress;
 			Port = newPort;
 
