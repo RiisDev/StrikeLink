@@ -1,5 +1,6 @@
 ﻿using StrikeLink.Services;
 using StrikeLink.Services.Config;
+using System.Collections.Concurrent;
 using System.Globalization;
 
 namespace StrikeLink.ChatBot
@@ -10,6 +11,9 @@ namespace StrikeLink.ChatBot
 		private readonly ConsoleService _consoleService;
 		private readonly Config _config;
 
+		private readonly ConcurrentQueue<(string Message, DateTime Timestamp)> _sentMessages = [];
+		private static readonly TimeSpan SentMessageTtl = TimeSpan.FromSeconds(2);
+		
 		public ChatService(Config config)
 		{
 			_config = config;
@@ -19,10 +23,35 @@ namespace StrikeLink.ChatBot
 
 			_chatCfgLocation = Path.Combine(SteamService.GetGamePath(730), "game", "csgo", "cfg", "strike_link.cfg");
 
+			string localUsername = GetLocalUsername();
+
 			if (config.OnTeamChat is not null)
-				_consoleService.OnTeamChatMessageReceived += config.OnTeamChat;
+			{
+				_consoleService.OnTeamChatMessageReceived += data =>
+				{
+					if (IsProgrammedMessage(data.Message))
+						return;
+
+					if (config.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
+						return;
+
+					config.OnTeamChat(data);
+				};
+			}
+
 			if (config.OnGlobalChat is not null)
-				_consoleService.OnGlobalChatMessageReceived += config.OnGlobalChat;
+			{
+				_consoleService.OnGlobalChatMessageReceived += data =>
+				{
+					if (IsProgrammedMessage(data.Message))
+						return;
+
+					if (config.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
+						return;
+
+					config.OnGlobalChat(data);
+				};
+			}
 		}
 
 		public async Task SendChatAsync(NewChatMessage message)
@@ -36,7 +65,12 @@ namespace StrikeLink.ChatBot
 			string messageActual = message.Message.Length > 256 ? message.Message[..256] : message.Message;
 			string messagePrefix = message.Channel == ChatChannel.Global ? "say " : "say_team ";
 
+			_sentMessages.Enqueue((messageActual, DateTime.UtcNow));
+
 			await File.WriteAllTextAsync(_chatCfgLocation, $"{messagePrefix}{messageActual}").ConfigureAwait(false);
+
+			// Allow some time for CS2 to process the file write
+			await Task.Delay(250).ConfigureAwait(false);
 
 			for (int retryCount = 0; retryCount < 5; retryCount++)
 			{
@@ -45,7 +79,7 @@ namespace StrikeLink.ChatBot
 					await Task.Delay(250).ConfigureAwait(false);
 					continue;
 				}
-
+				
 				Win32.PressKey(_config.Keybind);
 				sent = true;
 				Log($"Sent chat message after {retryCount} retries");
@@ -55,7 +89,7 @@ namespace StrikeLink.ChatBot
 			if (!sent)
 				Log("Failed to send chat message: CS2 window not focused.");
 		}
-
+		
 		private void CheckCs2UserConfig()
 		{
 			long userId = SteamService.GetCurrentUserId();
@@ -94,6 +128,46 @@ namespace StrikeLink.ChatBot
 			}
 
 			return (false, "");
+		}
+
+		private static string GetLocalUsername()
+		{
+			long userId = SteamService.GetCurrentUserId();
+			string steamPath = SteamService.GetSteamPath();
+			string counterStrikeKeybindPath = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
+
+			if (!Directory.Exists(counterStrikeKeybindPath))
+				throw new DirectoryNotFoundException($"Failed to find user config path: {counterStrikeKeybindPath}");
+
+			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
+
+			string firstUserKey = Directory
+				.GetFiles(localConfigPath, "cs2_user_convars*.vcfg")
+				.OrderBy(filePath => filePath, StringComparer.OrdinalIgnoreCase)
+				.First();
+
+			ValveCfgReader reader = new(firstUserKey);
+			bool foundBindings = reader.Document.Root.TryGetProperty("convars", out ConfigNode conVars);
+			if (!foundBindings) throw new InvalidOperationException("Cannot find local username (MISSING_CONVARS)");
+
+			return conVars.TryGetProperty("name", out ConfigNode nameNode) ? nameNode.GetString() : throw new InvalidOperationException("Cannot find local username");
+		}
+
+
+		private bool IsProgrammedMessage(string incomingMessage)
+		{
+			string normalizedIncomingMessage = incomingMessage.NormalizeForComparison();
+			DateTime now = DateTime.UtcNow;
+
+			while (_sentMessages.TryPeek(out (string Message, DateTime Timestamp) entry))
+			{
+				if (now - entry.Timestamp > SentMessageTtl) { _sentMessages.TryDequeue(out _); continue; }
+				if (entry.Message.NormalizeForComparison().Contains(normalizedIncomingMessage, StringComparison.InvariantCulture)) { _sentMessages.TryDequeue(out _); return true; }
+
+				break;
+			}
+
+			return false;
 		}
 
 		public void Dispose()

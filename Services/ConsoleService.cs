@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services
 {
-	public class ConsoleService : IDisposable
+	public partial class ConsoleService : IDisposable
 	{
 		public enum GameUiState
 		{
@@ -55,7 +55,8 @@ namespace StrikeLink.Services
 
 		private int _lastLineIndex;
 		private string? _lastLineText;
-
+		private bool _firstRun = true;
+		
 		public ConsoleService()
 		{
 			if (!SteamService.TryGetGamePath(730, out string? counterStrikePath) || counterStrikePath.IsNullOrEmpty())
@@ -66,8 +67,6 @@ namespace StrikeLink.Services
 
 			_consoleLogPath = Path.Combine(counterStrikePath, "game", "csgo", "console.log");
 			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
-
-			OnLogReceived?.Invoke("");
 		}
 		/*
 		 *
@@ -77,14 +76,18 @@ namespace StrikeLink.Services
 		 */
 		private void ParseLineData(string lineText)
 		{
+			if (_firstRun) return;
+
+			Debug.WriteLine(lineText);
 			OnLogReceived?.Invoke(lineText);
 
 			switch (lineText)
 			{
-				case var _ when lineText.Contains("[All]", StringComparison.InvariantCulture) && lineText.Contains(';', StringComparison.InvariantCulture):
+				case var _ when lineText.Contains(" [ALL] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
 					ParseChatLine(lineText,false);
 					break;
-				case var _ when lineText.Contains("[Team]", StringComparison.InvariantCulture) && lineText.Contains(';', StringComparison.InvariantCulture):
+				case var _ when lineText.Contains(" [T] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
+				case var _ when lineText.Contains(" [CT] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
 					ParseChatLine(lineText, true);
 					break;
 				case var _ when lineText.Contains("GameChangeUIState", StringComparison.InvariantCulture):
@@ -168,12 +171,12 @@ namespace StrikeLink.Services
 
 		private void ParseChatLine(string lineText, bool team)
 		{
-			string splitTypeData = team ? "Team" : "All";
+			string actualText = lineText[15..].Trim();
+			Match chatMatch = ChatRegex().Match(actualText);
 
-			string[] splitData = lineText.Split([$"[{splitTypeData}]", ":"], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-			if (splitData.Length < 2) return;
-			string username = splitData[0];
-			string message = splitData[1];
+			string username = chatMatch.Groups[2].Value;
+			string message = chatMatch.Groups[3].Value;
+
 			bool dead = false;
 
 			if (username.Contains("[DEAD]", StringComparison.InvariantCulture))
@@ -181,7 +184,11 @@ namespace StrikeLink.Services
 				dead = true;
 				username = username.Replace("[DEAD]", string.Empty, StringComparison.InvariantCulture).Trim();
 			}
-
+			if (team && !dead && username.Contains('﹫', StringComparison.InvariantCulture))
+			{
+				username = username[..username.LastIndexOf('﹫')];
+			}
+			
 			if (team) OnTeamChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 			else OnGlobalChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 		}
@@ -216,6 +223,7 @@ namespace StrikeLink.Services
 						}
 
 						_lastLineIndex = logLines.Length;
+						_firstRun = false;
 					}
 				}
 				catch (OperationCanceledException) { }
@@ -254,5 +262,9 @@ namespace StrikeLink.Services
 			_cancellationTokenSource.Cancel();
 			_cancellationTokenSource.Dispose();
 		}
+
+		[GeneratedRegex(@"^\[([^\]]+)\]\s+([^:]+):\s+(.+)$", RegexOptions.Singleline)]
+		private static partial Regex ChatRegex();
+
 	}
 }
