@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using StrikeLink.ChatBot;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
@@ -23,7 +24,6 @@ namespace StrikeLink.Services
 			Gigabyte
 		}
 
-		public record ChatMessage(string Username, string Message, bool Dead);
 		public record StateChanged(GameUiState OldState, GameUiState NewState);
 
 		public record Progress(double Downloaded, Size SizeType);

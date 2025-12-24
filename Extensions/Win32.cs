@@ -1,7 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 #pragma warning disable CA1008
 #pragma warning disable CA1028
 #pragma warning disable CA1720
@@ -14,7 +13,6 @@ namespace StrikeLink.Extensions
 		{
 			Backspace = 0x08,
 			Tab = 0x09,
-			Clear = 0x0C,
 			Enter = 0x0D,
 			Shift = 0x10,
 			Ctrl = 0x11,
@@ -31,12 +29,8 @@ namespace StrikeLink.Extensions
 			UpArrow = 0x26,
 			RightArrow = 0x27,
 			DownArrow = 0x28,
-			Select = 0x29,
-			Print = 0x2A,
-			PrintScreen = 0x2C,
 			Insert = 0x2D,
 			Delete = 0x2E,
-			Help = 0x2F,
 
 			// Numbers
 			D0 = 0x30,
@@ -91,7 +85,6 @@ namespace StrikeLink.Extensions
 			Numpad9 = 0x69,
 			Multiply = 0x6A,
 			Add = 0x6B,
-			Separator = 0x6C,
 			Subtract = 0x6D,
 			Decimal = 0x6E,
 			Divide = 0x6F,
@@ -121,10 +114,7 @@ namespace StrikeLink.Extensions
 			F22 = 0x85,
 			F23 = 0x86,
 			F24 = 0x87,
-
-			NumLock = 0x90,
-			ScrollLock = 0x91,
-
+			
 			LeftShift = 0xA0,
 			RightShift = 0xA1,
 			LeftCtrl = 0xA2,
@@ -142,32 +132,15 @@ namespace StrikeLink.Extensions
 			Backslash = 0xDC,
 			RightBrace = 0xDD,
 			Apostrophe = 0xDE,
-			OEM8 = 0xDF,
-			OEM102 = 0xE2,
 
-			// Gamepad
-			GamepadA = 0xC3,
-			GamepadB = 0xC4,
-			GamepadX = 0xC5,
-			GamepadY = 0xC6,
-			GamepadRightShoulder = 0xC7,
-			GamepadLeftShoulder = 0xC8,
-			GamepadLeftTrigger = 0xC9,
-			GamepadRightTrigger = 0xCA,
-			GamepadDpadUp = 0xCB,
-			GamepadDpadDown = 0xCC,
-			GamepadDpadLeft = 0xCD,
-			GamepadDpadRight = 0xCE,
-			GamepadMenu = 0xCF,
-			GamepadView = 0xD0,
+			ScrollLock = 0x91,
+			NumLock = 0x90
 		}
 		
 		[DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
 		private static extern void keybd_event(uint bVk, uint bScan, uint dwFlags, uint dwExtraInfo);
 
-		public static void SendLKey(VirtualKey key) => keybd_event((uint)key, 0, 0, 0);
-
-		private static void PressKey(VirtualKey key)
+		internal static void PressKey(VirtualKey key)
 		{
 			keybd_event((uint)key, 0, 0, 0); 
 			keybd_event((uint)key, 0, 2, 0);
@@ -179,12 +152,142 @@ namespace StrikeLink.Extensions
 		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 		private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
 
-		public static bool IsPrcoessActivated(Process process)
+		internal static bool IsPrcoessActivated(Process process)
 		{
 			IntPtr activatedHandle = GetForegroundWindow();
 			if (activatedHandle == IntPtr.Zero) return false;
 			_ = GetWindowThreadProcessId(activatedHandle, out int activeProcId);
 			return activeProcId == process.Id;
 		}
+
+		internal static readonly IReadOnlyDictionary<VirtualKey, string> VirtualKeyToChar = new Dictionary<VirtualKey, string>
+		{
+		    // Number row (unshifted)
+		    { VirtualKey.D0, "0" },
+			{ VirtualKey.D1, "1" },
+			{ VirtualKey.D2, "2" },
+			{ VirtualKey.D3, "3" },
+			{ VirtualKey.D4, "4" },
+			{ VirtualKey.D5, "5" },
+			{ VirtualKey.D6, "6" },
+			{ VirtualKey.D7, "7" },
+			{ VirtualKey.D8, "8" },
+			{ VirtualKey.D9, "9" },
+
+			// Function keys
+			{ VirtualKey.F1, "f1" },
+			{ VirtualKey.F2, "f2" },
+			{ VirtualKey.F3, "f3" },
+			{ VirtualKey.F4, "f4" },
+			{ VirtualKey.F5, "f5" },
+			{ VirtualKey.F6, "f6" },
+			{ VirtualKey.F7, "f7" },
+			{ VirtualKey.F8, "f8" },
+			{ VirtualKey.F9, "f9" },
+			{ VirtualKey.F10, "f10" },
+			{ VirtualKey.F11, "f11" },
+			{ VirtualKey.F12, "f12" },
+			{ VirtualKey.F13, "f13" },
+			{ VirtualKey.F14, "f14" },
+			{ VirtualKey.F15, "f15" },
+			{ VirtualKey.F16, "f16" },
+			{ VirtualKey.F17, "f17" },
+			{ VirtualKey.F18, "f18" },
+			{ VirtualKey.F19, "f19" },
+			{ VirtualKey.F20, "f20" },
+			{ VirtualKey.F21, "f21" },
+			{ VirtualKey.F22, "f22" },
+			{ VirtualKey.F23, "f23" },
+			{ VirtualKey.F24, "f24" },
+
+		    // Letters (lowercase, unshifted)
+		    { VirtualKey.A, "a" },
+			{ VirtualKey.B, "b" },
+			{ VirtualKey.C, "c" },
+			{ VirtualKey.D, "d" },
+			{ VirtualKey.E, "e" },
+			{ VirtualKey.F, "f" },
+			{ VirtualKey.G, "g" },
+			{ VirtualKey.H, "h" },
+			{ VirtualKey.I, "i" },
+			{ VirtualKey.J, "j" },
+			{ VirtualKey.K, "k" },
+			{ VirtualKey.L, "l" },
+			{ VirtualKey.M, "m" },
+			{ VirtualKey.N, "n" },
+			{ VirtualKey.O, "o" },
+			{ VirtualKey.P, "p" },
+			{ VirtualKey.Q, "q" },
+			{ VirtualKey.R, "r" },
+			{ VirtualKey.S, "s" },
+			{ VirtualKey.T, "t" },
+			{ VirtualKey.U, "u" },
+			{ VirtualKey.V, "v" },
+			{ VirtualKey.W, "w" },
+			{ VirtualKey.X, "x" },
+			{ VirtualKey.Y, "y" },
+			{ VirtualKey.Z, "z" },
+
+		    // Punctuation (US keyboard)
+		    { VirtualKey.Semicolon, "semicolon" },
+			{ VirtualKey.Plus, "=" },
+			{ VirtualKey.Comma, "," },
+			{ VirtualKey.Minus, "-" },
+			{ VirtualKey.Period, "." },
+			{ VirtualKey.Slash, "/" },
+			{ VirtualKey.LeftBrace, "[" },
+			{ VirtualKey.RightBrace, "]" },
+			{ VirtualKey.Backslash, "\\" },
+			{ VirtualKey.Apostrophe, "'" },
+
+		    // Numpad (NumLock ON)
+		    { VirtualKey.Numpad0, "kp_0" },
+			{ VirtualKey.Numpad1, "kp_1" },
+			{ VirtualKey.Numpad2, "kp_2" },
+			{ VirtualKey.Numpad3, "kp_3" },
+			{ VirtualKey.Numpad4, "kp_4" },
+			{ VirtualKey.Numpad5, "kp_5" },
+			{ VirtualKey.Numpad6, "kp_6" },
+			{ VirtualKey.Numpad7, "kp_7" },
+			{ VirtualKey.Numpad8, "kp_8" },
+			{ VirtualKey.Numpad9, "kp_9" },
+			{ VirtualKey.Add, "kp_plus" },
+			{ VirtualKey.Subtract, "kp_minus" },
+			{ VirtualKey.Multiply, "kp_multiply" },
+			{ VirtualKey.Divide, "kp_divide" },
+			{ VirtualKey.Decimal, "kp_del" },
+
+			// Others
+			{ VirtualKey.Tab, "tab" },
+			{ VirtualKey.CapsLock, "capslock" },
+			{ VirtualKey.LeftShift, "shift" },
+			{ VirtualKey.LeftCtrl, "ctrl" },
+			{ VirtualKey.LeftAlt, "alt" },
+			{ VirtualKey.Spacebar, "space" },
+			{ VirtualKey.RightShift, "shift" },
+			{ VirtualKey.RightCtrl, "rctrl" },
+			{ VirtualKey.RightAlt, "ralt" },
+			{ VirtualKey.Enter, "enter" },
+			{ VirtualKey.Backspace, "backspace" },
+			{ VirtualKey.Insert, "ins" },
+			{ VirtualKey.PageUp, "pgup" },
+			{ VirtualKey.PageDown, "pgdn" },
+			{ VirtualKey.Delete, "del" },
+			{ VirtualKey.End, "end" },
+			{ VirtualKey.Home, "home" },
+			{ VirtualKey.Esc, "escape" },
+			{ VirtualKey.Pause, "pause" },
+			{ VirtualKey.Shift, "shift" },
+			{ VirtualKey.Ctrl, "ctrl" },
+			{ VirtualKey.Alt, "alt" },
+			{ VirtualKey.ScrollLock, "scrolllock" },
+			{ VirtualKey.NumLock, "numlock" },
+
+			// Arrows
+			{ VirtualKey.UpArrow, "uparrow" },
+			{ VirtualKey.DownArrow, "downarrow" },
+			{ VirtualKey.LeftArrow, "leftarrow" },
+			{ VirtualKey.RightArrow, "rightarrow" },
+		};
 	}
 }
