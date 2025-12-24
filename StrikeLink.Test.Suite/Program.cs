@@ -1,4 +1,5 @@
-﻿using StrikeLink.Extensions;
+﻿using StrikeLink.ChatBot;
+using StrikeLink.Extensions;
 using StrikeLink.GSI;
 using StrikeLink.Services;
 using StrikeLink.Services.Config;
@@ -8,22 +9,29 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 
-Process cs2Proc = Process.GetProcessesByName("cs2")[0];
+bool sent = false;
 
-_ = Task.Run(async () =>
+Console.OutputEncoding = Encoding.UTF8;
+Console.InputEncoding = Encoding.UTF8;
+
+ChatService? chatService = null;
+
+Action<ChatMessage> onChatMessage = async message =>
 {
-	while (true)
-	{
-		await Task.Delay(250);
+	Console.WriteLine($"[ChatMessage] [{message.Username}] [{message.Message}]");
+	await chatService?.SendChatAsync(new NewChatMessage
+	(
+		ChatChannel.Global,
+		$"Hello, {message.Username}! You said: {message.Message}"
+	));
+};
 
-		bool active = Win32.IsPrcoessActivated(cs2Proc);
+chatService = new ChatService(new Config(Win32.VirtualKey.L, false, onChatMessage, onChatMessage));
 
-		Debug.WriteLine($"CS Active: {active}");
 
-		if (active)
-			Win32.SendLKey(Win32.VirtualKey.L);
-	}
-});
+while (true) Console.ReadLine();
+
+return;
 
 object lockObj = new();
 ServerListener listen = new();

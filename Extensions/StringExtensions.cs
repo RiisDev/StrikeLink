@@ -29,6 +29,25 @@ namespace StrikeLink.Extensions
 			internal int IntParse() => int.Parse(haystack, CultureInfo.InvariantCulture);
 
 			internal bool IntTryParse(out int value) => int.TryParse(haystack, CultureInfo.InvariantCulture, out value);
+
+			internal string NormalizeForComparison()
+			{
+				if (string.IsNullOrEmpty(haystack))
+				{
+					return string.Empty;
+				}
+
+				string normalized = haystack.Normalize(NormalizationForm.FormKC);
+
+				StringBuilder builder = new(normalized.Length);
+
+				foreach (char character in from character in normalized let category = char.GetUnicodeCategory(character) where category != UnicodeCategory.Format && category != UnicodeCategory.Control select character)
+				{
+					builder.Append(character);
+				}
+
+				return builder.ToString();
+			}
 		}
 
 		internal static bool IsNullOrEmpty([NotNullWhen(false)] this string? value) => string.IsNullOrWhiteSpace(value);
