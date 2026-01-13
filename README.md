@@ -5,7 +5,7 @@ It provides structured access to **chat events**, **game state changes**, **clie
 
 > 📦 Available on **NuGet** as **StrikeLInk**
 
-**Documentation**: [https://github.com/RiisDev/StrikeLink/docs/index.md](https://github.com/RiisDev/StrikeLink/docs/index.md)
+**Documentation**: [https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md](https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md)
 
 ---
 
