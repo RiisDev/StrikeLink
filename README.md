@@ -7,6 +7,11 @@ It provides structured access to **chat events**, **game state changes**, **clie
 
 **Documentation**: [https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md](https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md)
 
+![C#](https://img.shields.io/badge/-.NET%208.0-blueviolet?style=for-the-badge&logo=windows&logoColor=white)
+[![Support Server](https://img.shields.io/discord/477201632204161025.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/yyuggrH)
+![GitHub](https://img.shields.io/github/license/RiisDev/StrikeLink?style=for-the-badge)
+![Nuget All Releases](https://img.shields.io/nuget/dt/StrikeLink?label=Nuget%20Downloads&style=for-the-badge)
+
 ---
 
 ## ✨ Features
