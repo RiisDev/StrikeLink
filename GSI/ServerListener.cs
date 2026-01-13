@@ -7,6 +7,14 @@ using System.Net.Sockets;
 
 namespace StrikeLink.GSI
 {
+	/// <summary>
+	/// Listens for incoming Game State Integration (GSI) HTTP/TCP requests
+	/// and dispatches parsed payloads to strongly-typed events.
+	/// </summary>
+	/// <remarks>
+	/// This listener is responsible for configuring the GSI file, validating
+	/// network bindings, and managing the lifetime of the underlying socket server.
+	/// </remarks>
 	public class ServerListener : IDisposable, IAsyncDisposable
 	{
 		#region ServerLogic
@@ -22,13 +30,58 @@ namespace StrikeLink.GSI
 		private readonly CancellationTokenSource _cts = new();
 		private readonly SynchronizationContext? _syncContext = SynchronizationContext.Current;
 
-		// Public readable values
+		/// <summary>
+		/// Occurs when the listener has successfully started and is ready to accept connections.
+		/// </summary>
+		/// <remarks>
+		/// The provided <see cref="Uri"/> represents the bound listening endpoint.
+		/// </remarks>
 		public event Action<Uri>? OnReady;
+
+		/// <summary>
+		/// Occurs when a raw POST payload is received by the listener.
+		/// </summary>
 		public event Action<string>? OnPostReceived;
+
+		/// <summary>
+		/// Bool to indicate if the server is ready to accept connections, as well as invokes the OnReady event with the built Uri.
+		/// </summary>
 		public bool Ready { get; set { if (field == value) return; field = value; OnReady?.Invoke(new Uri($"http://{Address}:{Port}")); } }
+
+		/// <summary>
+		/// <see cref="IPAddress"/> the server is bound to.
+		/// </summary>
 		public IPAddress Address { get; private set; } = null!;
+
+		/// <summary>
+		/// Port number the server is listening on.
+		/// </summary>
 		public int Port { get; private set; }
 
+		/// <summary>
+		/// Starts the server listener asynchronously.
+		/// </summary>
+		/// <param name="address">
+		/// Optional IP address to bind to. If <c>null</c>, <see cref="IPAddress.Loopback"/> is used.
+		/// </param>
+		/// <param name="port">
+		/// Optional port to bind to. If <c>null</c>, an available free port is selected.
+		/// </param>
+		/// <param name="steamPath">
+		/// Optional explicit Steam installation path used for GSI file generation.
+		/// </param>
+		/// <returns>
+		/// A task that represents the asynchronous startup operation.
+		/// </returns>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown when Counter-Strike is running during initial configuration,
+		/// when the requested port is already in use, or when socket creation fails.
+		/// </exception>
+		/// <remarks>
+		/// If the requested address or port is invalid or unavailable, a new endpoint
+		/// may be generated automatically. If Counter-Strike is already running during
+		/// this initial setup, the operation will fail to avoid inconsistent GSI state.
+		/// </remarks>
 		public async Task StartAsync(IPAddress? address = null, int? port = null, string? steamPath = null)
 		{
 			// This block checks if we need to generate and use a new port and address
@@ -324,6 +377,12 @@ namespace StrikeLink.GSI
 			return port;
 		}
 
+		/// <summary>
+		/// Releases all resources used by the <see cref="ServerListener"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
@@ -332,6 +391,12 @@ namespace StrikeLink.GSI
 			_cts.Dispose();
 		}
 
+		/// <summary>
+		/// Releases all resources used by the <see cref="ServerListener"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
 		public async ValueTask DisposeAsync()
 		{
 			GC.SuppressFinalize(this);
@@ -346,8 +411,20 @@ namespace StrikeLink.GSI
 
 		private readonly Dictionary<Type, IGsiPayload> _payloadCache = [];
 
-		public event Action<PlayerState>? PlayerStateReceived;
-		public event Action<MapState>? MapStateReceived;
+		/// <summary>
+		/// Occurs when a player state update is received.
+		/// </summary>
+		public event Action<PlayerState>? OnPlayerStateReceived;
+
+		/// <summary>
+		/// Occurs when a map state update is received.
+		/// </summary>
+		public event Action<MapState>? OnMapStateReceived;
+
+		/// <summary>
+		/// Occurs when a round state update is received.
+		/// </summary>
+		public event Action<RoundState>? OnRoundStateReceived;
 
 		private void RaisePayload(IGsiPayload payload)
 		{
@@ -367,11 +444,15 @@ namespace StrikeLink.GSI
 				{
 					case PlayerState playerState:
 						if (oldPayload is PlayerState oldPlayerState && playerState == oldPlayerState) return;
-						PlayerStateReceived?.Invoke(playerState);
+						OnPlayerStateReceived?.Invoke(playerState);
 						break;
 					case MapState mapState:
 						if (oldPayload is MapState oldMapState && mapState == oldMapState) return;
-						MapStateReceived?.Invoke(mapState);
+						OnMapStateReceived?.Invoke(mapState);
+						break;
+					case RoundState roundState:
+						if (oldPayload is RoundState oldRoundState && roundState == oldRoundState) return;
+						OnRoundStateReceived?.Invoke(roundState);
 						break;
 				}
 

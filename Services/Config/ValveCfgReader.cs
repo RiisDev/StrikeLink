@@ -2,19 +2,51 @@
 
 namespace StrikeLink.Services.Config
 {
+	/// <summary>
+	/// Represents the type of token encountered while parsing a Valve configuration file.
+	/// </summary>
 	public enum ConfigTokenType
 	{
+		/// <summary>
+		/// A quoted string token.
+		/// </summary>
 		String,
+
+		/// <summary>
+		/// An opening brace (<c>{</c>) token.
+		/// </summary>
 		OpenBrace,
+
+		/// <summary>
+		/// A closing brace (<c>}</c>) token.
+		/// </summary>
 		CloseBrace,
+
+		/// <summary>
+		/// Indicates the end of the input stream.
+		/// </summary>
 		EndOfFile
 	}
 
+	/// <summary>
+	/// Reads and parses Valve configuration files (<c>.cfg</c>, <c>.vdf</c>, <c>.vcfg</c>, <c>.acf</c>)
+	/// into a structured <see cref="ConfigDocument"/>.
+	/// </summary>
 	public class ValveCfgReader
 	{
+		/// <summary>
+		/// Gets the name of the configuration root object.
+		/// </summary>
 		public string ConfigName { get; private set; }
+
+		/// <summary>
+		/// Gets the file name (without extension) of the parsed configuration file.
+		/// </summary>
 		public string FileName { get; private set; }
 
+		/// <summary>
+		/// Gets the parsed configuration document.
+		/// </summary>
 		public ConfigDocument Document { get; private set; }
 
 		private readonly List<string> _supportedExtensions =
@@ -25,6 +57,19 @@ namespace StrikeLink.Services.Config
 			".acf"
 		];
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ValveCfgReader"/> class
+		/// and parses the specified configuration file.
+		/// </summary>
+		/// <param name="filePath">
+		/// The path to the configuration file.
+		/// </param>
+		/// <exception cref="FileNotFoundException">
+		/// Thrown when the specified file does not exist.
+		/// </exception>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown when the file format or structure is invalid.
+		/// </exception>
 		public ValveCfgReader(string filePath)
 		{
 			if (!File.Exists(filePath))
@@ -46,7 +91,7 @@ namespace StrikeLink.Services.Config
 			Document = Parse(File.ReadAllText(filePath).AsSpan());
 		}
 
-		public static ConfigDocument Parse(ReadOnlySpan<char> input)
+		private static ConfigDocument Parse(ReadOnlySpan<char> input)
 		{
 			ConfigReader reader = new(input);
 
@@ -93,15 +138,16 @@ namespace StrikeLink.Services.Config
 		}
 	}
 
-	public ref struct ConfigReader(ReadOnlySpan<char> input)
+	internal ref struct ConfigReader(ReadOnlySpan<char> input)
 	{
-		private ReadOnlySpan<char> _input = input;
+		private readonly ReadOnlySpan<char> _input = input;
 		private int _position = 0;
 
-		public ConfigTokenType TokenType { get; private set; }
-		public string? StringValue { get; private set; }
+		internal ConfigTokenType TokenType { get; private set; }
 
-		public bool Read()
+		internal string? StringValue { get; private set; }
+
+		internal bool Read()
 		{
 			SkipWhitespaceAndComments();
 

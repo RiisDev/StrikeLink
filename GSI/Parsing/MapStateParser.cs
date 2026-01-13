@@ -1,12 +1,15 @@
 ﻿using StrikeLink.GSI.ObjectStates;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace StrikeLink.GSI.Parsing
 {
 	internal sealed class MapStateParser : IGsiParser
 	{
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public bool CanParse(JsonElement root) => root.TryGetProperty("map", out _);
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public IGsiPayload Parse(JsonElement root)
 		{
 			JsonElement map = root.GetProperty("map");
@@ -23,7 +26,7 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
-		public MapMode ParseMode(string? mode)
+		private MapMode ParseMode(string? mode)
 		{
 			return mode switch
 			{
@@ -33,9 +36,9 @@ namespace StrikeLink.GSI.Parsing
 			};
 		}
 
-		public MapPhase ParsePhase(string? phase) => phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
+		private MapPhase ParsePhase(string? phase) => phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
 
-		public Stats ParseStats(JsonElement root)
+		private Stats ParseStats(JsonElement root)
 		{
 			return new Stats(
 				Score: root.GetProperty("score").GetInt32(),
@@ -45,7 +48,7 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
-		public Dictionary<int, WinState> ParseRoundWins(JsonElement root)
+		private Dictionary<int, WinState> ParseRoundWins(JsonElement root)
 		{
 			Dictionary<int, WinState> roundWins = [];
 

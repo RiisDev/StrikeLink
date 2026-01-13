@@ -1,4 +1,3 @@
 <Solution>
   <Project Path="StrikeLink.csproj" />
-  <Project Path="StrikeLink.Test.Suite/StrikeLinkTestSuite.csproj" />
 </Solution>

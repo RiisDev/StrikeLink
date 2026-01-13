@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 // ReSharper disable IdentifierTypo
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #pragma warning disable CA1008
 #pragma warning disable CA1028
 #pragma warning disable CA1720
