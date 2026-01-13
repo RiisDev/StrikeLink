@@ -1,11 +1,14 @@
 ﻿using StrikeLink.GSI.ObjectStates;
+using System.ComponentModel;
 
 namespace StrikeLink.GSI.Parsing
 {
 	internal sealed class RoundStateParser : IGsiParser
 	{
+		[EditorBrowsable(EditorBrowsableState.Never)] // Fix public intellisense
 		public bool CanParse(JsonElement root) => root.TryGetProperty("round", out JsonElement playerElement) && playerElement.TryGetProperty("phase", out _);
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public IGsiPayload Parse(JsonElement root)
 		{
 			JsonElement player = root.GetProperty("round");

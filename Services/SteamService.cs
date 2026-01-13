@@ -8,12 +8,31 @@ using System.Runtime.InteropServices;
 
 namespace StrikeLink.Services
 {
+	/// <summary>
+	/// Provides utility methods for interacting with the local Steam installation,
+	/// including resolving install paths, game locations, user configuration, and launch options.
+	/// </summary>
 	public static class SteamService
 	{
 		private const string FlatPackLinux = "~/.var/app/com.valvesoftware.Steam/.local/share/Steam/";
 		private const string BaseLinuxInstall = "~/.local/share/Steam/";
 		private const string SteamSubKey = @"Software\Valve\Steam";
 
+		/// <summary>
+		/// Gets the root installation path of Steam for the current operating system.
+		/// </summary>
+		/// <returns>
+		/// The absolute path to the Steam installation directory.
+		/// </returns>
+		/// <exception cref="DirectoryNotFoundException">
+		/// Thrown when Steam cannot be located.
+		/// </exception>
+		/// <exception cref="KeyNotFoundException">
+		/// Thrown when the Steam registry key or path value cannot be found on Windows.
+		/// </exception>
+		/// <exception cref="FileNotFoundException">
+		/// Thrown when the operating system is unsupported.
+		/// </exception>
 		public static string GetSteamPath()	
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
@@ -39,6 +58,22 @@ namespace StrikeLink.Services
 			throw new FileNotFoundException("Unable to automatically find steam, (OS_NOT_WINDOWS_LINUX)");
 		}
 
+		/// <summary>
+		/// Attempts to locate the installation directory of a Steam game.
+		/// </summary>
+		/// <param name="gameId">
+		/// The Steam application ID of the game.
+		/// </param>
+		/// <param name="gamePath">
+		/// When this method returns, contains the absolute path to the game directory if found;
+		/// otherwise, <c>null</c>.
+		/// </param>
+		/// <returns>
+		/// <c>true</c> if the game was found in a Steam library folder; otherwise, <c>false</c>.
+		/// </returns>
+		/// <exception cref="FileNotFoundException">
+		/// Thrown when the Steam library configuration file cannot be found.
+		/// </exception>
 		public static bool TryGetGamePath(int gameId, out string? gamePath)
 		{
 			string vdfPath = Path.Combine(GetSteamPath(), "steamapps", "libraryfolders.vdf");
@@ -71,8 +106,32 @@ namespace StrikeLink.Services
 			return false;
 		}
 
+		/// <summary>
+		/// Gets the installation directory of a Steam game.
+		/// </summary>
+		/// <param name="gameId">
+		/// The Steam application ID of the game.
+		/// </param>
+		/// <returns>
+		/// The absolute path to the game's installation directory.
+		/// </returns>
+		/// <exception cref="DirectoryNotFoundException">
+		/// Thrown when the game cannot be found in any Steam library folder.
+		/// </exception>
 		public static string GetGamePath(int gameId) => TryGetGamePath(gameId, out string? path) ? path! : throw new DirectoryNotFoundException($"Could not find game with ID {gameId} in any Steam library folder.");
-
+		
+		/// <summary>
+		/// Gets the Steam user configuration for the specified or currently active user.
+		/// </summary>
+		/// <param name="userId">
+		/// Optional Steam user ID. If <c>null</c>, the currently active user is inferred.
+		/// </param>
+		/// <returns>
+		/// A <see cref="ValveCfgReader"/> for the user's local Steam configuration file.
+		/// </returns>
+		/// <exception cref="FileNotFoundException">
+		/// Thrown when the user configuration file cannot be found.
+		/// </exception>
 		public static ValveCfgReader GetUserConfig(long? userId = null)
 		{
 			string steamPath = GetSteamPath();
@@ -83,6 +142,19 @@ namespace StrikeLink.Services
 			return new ValveCfgReader(localUserConfig);
 		}
 
+		/// <summary>
+		/// Gets the configured launch options for a Steam game.
+		/// </summary>
+		/// <param name="gameId">
+		/// The Steam application ID of the game.
+		/// </param>
+		/// <returns>
+		/// An array of individual launch options, each prefixed with a dash.
+		/// Returns an empty array if no launch options are configured.
+		/// </returns>
+		/// <exception cref="KeyNotFoundException">
+		/// Thrown when the game entry or launch options cannot be found in the user configuration.
+		/// </exception>
 		public static string[] GetGameLaunchOptions(int gameId)
 		{
 			ValveCfgReader reader = GetUserConfig();
@@ -104,6 +176,18 @@ namespace StrikeLink.Services
 			return splitOptions.Select(option => $"-{option}").ToArray();
 		}
 
+		/// <summary>
+		/// Attempts to determine the currently logged-in Steam user ID by reading the Steam connection log.
+		/// </summary>
+		/// <returns>
+		/// The Steam ID of the currently active user.
+		/// </returns>
+		/// <exception cref="FileNotFoundException">
+		/// Thrown when the Steam connection log cannot be found.
+		/// </exception>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown when no valid Steam ID can be extracted from the log file.
+		/// </exception>
 		public static long GetCurrentUserId()
 		{
 			string steamPath = GetSteamPath();

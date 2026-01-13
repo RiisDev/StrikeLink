@@ -4,7 +4,7 @@
 	{
 		private readonly IGsiParser[] _parsers = parsers.ToArray();
 
-		public IEnumerable<IGsiPayload> Dispatch(JsonDocument document)
+		internal IEnumerable<IGsiPayload> Dispatch(JsonDocument document)
 		{
 			JsonElement root = document.RootElement;
 

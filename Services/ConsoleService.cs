@@ -5,45 +5,158 @@ using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services
 {
+	/// <summary>
+	/// Provides access to the game console output and emits high-level events
+	/// for game state changes, chat messages, server activity, and addon progress.
+	/// </summary>
 	public partial class ConsoleService : IDisposable
 	{
+		/// <summary>
+		/// Represents the current UI state of the game.
+		/// </summary>
 		public enum GameUiState
 		{
+			/// <summary>
+			/// The game is currently loading.
+			/// </summary>
 			LoadingScreen,
+
+			/// <summary>
+			/// The player is actively in-game.
+			/// </summary>
 			InGame,
+
+			/// <summary>
+			/// The pause menu is open.
+			/// </summary>
 			PauseMenu,
+
+			/// <summary>
+			/// The main menu is displayed.
+			/// </summary>
 			MainMenu,
+
+			/// <summary>
+			/// The UI state could not be determined.
+			/// </summary>
 			Invalid
 		}
 
+		/// <summary>
+		/// Represents a unit of data size.
+		/// </summary>
 		public enum Size
 		{
+			/// <summary>
+			/// Bytes.
+			/// </summary>
 			Byte,
+
+			/// <summary>
+			/// Kilobytes.
+			/// </summary>
 			Kilobyte,
+
+			/// <summary>
+			/// Megabytes.
+			/// </summary>
 			Megabyte,
+
+			/// <summary>
+			/// Gigabytes.
+			/// </summary>
 			Gigabyte
 		}
 
+		/// <summary>
+		/// Represents a transition between two game UI states.
+		/// </summary>
+		/// <param name="OldState">
+		/// The previous UI state.
+		/// </param>
+		/// <param name="NewState">
+		/// The new UI state.
+		/// </param>
 		public record StateChanged(GameUiState OldState, GameUiState NewState);
 
+		/// <summary>
+		/// Represents a progress value with an associated size unit.
+		/// </summary>
+		/// <param name="Downloaded">
+		/// The amount of data transferred.
+		/// </param>
+		/// <param name="SizeType">
+		/// The unit of measurement for <paramref name="Downloaded"/>.
+		/// </param>
 		public record Progress(double Downloaded, Size SizeType);
+
+		/// <summary>
+		/// Represents download progress for a specific addon.
+		/// </summary>
+		/// <param name="AddonId">
+		/// The unique identifier of the addon.
+		/// </param>
+		/// <param name="Downloaded">
+		/// The amount of data downloaded so far. <see cref="Progress"/>
+		/// </param>
+		/// <param name="Total">
+		/// The total size of the addon. <see cref="Progress"/>
+		/// </param>
 		public record AddonProgress(long AddonId, Progress Downloaded, Progress Total);
 
-		// Events
+		/// <summary>
+		/// Occurs when a new console log line is received.
+		/// </summary>
 		public event Action<string>? OnLogReceived;
+
+		/// <summary>
+		/// Occurs when a player connects to the server.
+		/// </summary>
 		public event Action<string>? OnPlayerConnected;
+
+		/// <summary>
+		/// Occurs when the local player joins a map.
+		/// </summary>
 		public event Action<string>? OnMapJoined;
 
+		/// <summary>
+		/// Occurs when a global chat message is received.
+		/// </summary>
 		public event Action<ChatMessage>? OnGlobalChatMessageReceived;
+
+		/// <summary>
+		/// Occurs when a team chat message is received.
+		/// </summary>
 		public event Action<ChatMessage>? OnTeamChatMessageReceived;
 
+		/// <summary>
+		/// Occurs when the game UI state changes.
+		/// </summary>
 		public event Action<StateChanged>? OnUiStateChanged;
 
+		/// <summary>
+		/// Occurs when addon download progress is updated.
+		/// </summary>
 		public event Action<AddonProgress>? OnAddonProgress;
 
+		/// <summary>
+		/// Occurs when an addon has finished downloading.
+		/// </summary>
 		public event Action? OnAddonFinished;
+
+		/// <summary>
+		/// Occurs when the client begins joining a server.
+		/// </summary>
 		public event Action? OnServerJoining;
+
+		/// <summary>
+		/// Occurs when the client successfully connects to a server.
+		/// </summary>
 		public event Action? OnServerConnected;
+
+		/// <summary>
+		/// Occurs when the client disconnects from a server.
+		/// </summary>
 		public event Action? OnServerDisconnected;
 
 		// Fields
@@ -56,7 +169,16 @@ namespace StrikeLink.Services
 		private int _lastLineIndex;
 		private string? _lastLineText;
 		private bool _firstRun = true;
-		
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ConsoleService"/> class.
+		/// </summary>
+		/// <exception cref="DirectoryNotFoundException">
+		/// Thrown when the Counter-Strike 2 installation directory cannot be located.
+		/// </exception>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown when the game was not launched with the <c>-condebug</c> launch option.
+		/// </exception>
 		public ConsoleService()
 		{
 			if (!SteamService.TryGetGamePath(730, out string? counterStrikePath) || counterStrikePath.IsNullOrEmpty())
@@ -68,6 +190,7 @@ namespace StrikeLink.Services
 			_consoleLogPath = Path.Combine(counterStrikePath, "game", "csgo", "console.log");
 			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
 		}
+
 		/*
 		 *
 		 * Note for future self:
@@ -193,6 +316,12 @@ namespace StrikeLink.Services
 			else OnGlobalChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 		}
 
+		/// <summary>
+		/// Starts monitoring the game console log and begins emitting console events.
+		/// </summary>
+		/// <remarks>
+		/// This method must be called before any console-related events will fire.
+		/// </remarks>
 		public void StartListening()
 		{
 			_ = Task.Run(async () =>
@@ -255,7 +384,12 @@ namespace StrikeLink.Services
 			return string.Empty;
 		}
 
-
+		/// <summary>
+		/// Releases all resources used by the <see cref="ChatService"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);

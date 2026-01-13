@@ -5,6 +5,13 @@ using System.Globalization;
 
 namespace StrikeLink.ChatBot
 {
+	/// <summary>
+	/// Provides high-level chat orchestration and message delivery services.
+	/// </summary>
+	/// <remarks>
+	/// This service manages the lifecycle of chat interactions and delegates
+	/// message handling to underlying infrastructure components.
+	/// </remarks>
 	public class ChatService : IDisposable
 	{
 		private readonly string _chatCfgLocation;
@@ -13,7 +20,16 @@ namespace StrikeLink.ChatBot
 
 		private readonly ConcurrentQueue<(string Message, DateTime Timestamp)> _sentMessages = [];
 		private static readonly TimeSpan SentMessageTtl = TimeSpan.FromSeconds(2);
-		
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ChatService"/> class.
+		/// </summary>
+		/// <param name="config">
+		/// The configuration object containing chat service settings and dependencies, <see cref="Config"/>
+		/// </param>
+		/// <exception cref="ArgumentNullException">
+		/// Thrown when <paramref name="config"/> is <c>null</c>.
+		/// </exception>
 		public ChatService(Config config)
 		{
 			_config = config;
@@ -54,6 +70,18 @@ namespace StrikeLink.ChatBot
 			}
 		}
 
+		/// <summary>
+		/// Sends a chat message asynchronously.
+		/// </summary>
+		/// <param name="message">
+		/// The chat message payload to be sent <see cref="NewChatMessage"/>
+		/// </param>
+		/// <returns>
+		/// A task that represents the asynchronous send operation.
+		/// </returns>
+		/// <exception cref="ArgumentNullException">
+		/// Thrown when <paramref name="message"/> is <c>null</c>.
+		/// </exception>
 		public async Task SendChatAsync(NewChatMessage message)
 		{
 			bool sent = false;
@@ -170,6 +198,12 @@ namespace StrikeLink.ChatBot
 			return false;
 		}
 
+		/// <summary>
+		/// Releases all resources used by the <see cref="ChatService"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);

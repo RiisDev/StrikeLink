@@ -1,7 +1,27 @@
 ﻿namespace StrikeLink.Services.Config
 {
+	/// <summary>
+	/// Provides methods for serializing <see cref="ConfigDocument"/> instances
+	/// into Valve configuration file format.
+	/// </summary>
 	public static class ValveCfgWriter
 	{
+		/// <summary>
+		/// Serializes a configuration document into its textual representation.
+		/// </summary>
+		/// <param name="document">
+		/// The configuration document to write.
+		/// </param>
+		/// <param name="options">
+		/// Optional writer options controlling formatting behavior.
+		/// If <c>null</c>, <see cref="ConfigWriterOptions.Default"/> is used.
+		/// </param>
+		/// <returns>
+		/// A string containing the serialized configuration document.
+		/// </returns>
+		/// <exception cref="ArgumentNullException">
+		/// Thrown when <paramref name="document"/> is <c>null</c>.
+		/// </exception>
 		public static string Write(ConfigDocument document, ConfigWriterOptions? options = null)
 		{
 			ArgumentNullException.ThrowIfNull(document);
@@ -73,11 +93,31 @@
 		}
 	}
 
+	/// <summary>
+	/// Represents configuration options for writing Valve configuration documents.
+	/// </summary>
 	public sealed class ConfigWriterOptions
 	{
+		/// <summary>
+		/// Gets the default writer options.
+		/// </summary>
 		public static ConfigWriterOptions Default { get; } = new();
 
+		/// <summary>
+		/// Gets the number of spaces used for indentation.
+		/// </summary>
+		/// <remarks>
+		/// The default value is <c>4</c>.
+		/// </remarks>
 		public int IndentSize { get; init; } = 4;
+
+		/// <summary>
+		/// Gets a value indicating whether a trailing newline is written at the end of the document.
+		/// </summary>
+		/// <remarks>
+		/// The default value is <c>true</c>.
+		/// </remarks>
 		public bool WriteTrailingNewline { get; init; } = true;
 	}
+
 }

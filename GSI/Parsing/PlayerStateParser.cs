@@ -1,4 +1,5 @@
 ﻿using StrikeLink.GSI.ObjectStates;
+using System.ComponentModel;
 using System.Globalization;
 using Activity = StrikeLink.GSI.ObjectStates.Activity;
 
@@ -6,9 +7,10 @@ namespace StrikeLink.GSI.Parsing
 {
 	internal sealed class PlayerStateParser : IGsiParser
 	{
-		// When spectating it doesn't have this data
+		[EditorBrowsable(EditorBrowsableState.Never)] // To fix public facing intellisense
 		public bool CanParse(JsonElement root) => root.TryGetProperty("player", out JsonElement playerElement) && playerElement.TryGetProperty("steamid", out _);
 
+		[EditorBrowsable(EditorBrowsableState.Never)]
 		public IGsiPayload Parse(JsonElement root)
 		{
 			JsonElement player = root.GetProperty("player");

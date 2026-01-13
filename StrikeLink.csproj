@@ -4,11 +4,11 @@
 	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
-	<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<Title>StrikeLink</Title>
 	<RepositoryUrl>https://github.com/RiisDev/StrikeLink</RepositoryUrl>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
-	<PackageTags>counter strike;counter strike 2;cs2;steam;valve;gsi</PackageTags>
+	<PackageTags>cs2;counter-strike;counter-strike-2;valve;steam;steam-client;game-integration;game-state;chat;console;event-driven;modding;tooling;dotnet;net8;net9;net10;cross-platform;vcfg;vdf;acf;cfg</PackageTags>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	  <IncludeSymbols>False</IncludeSymbols>
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -17,56 +17,70 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<WarningLevel>9999</WarningLevel>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<WarningLevel>9999</WarningLevel>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	<WarningLevel>9999</WarningLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<WarningLevel>9999</WarningLevel>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<WarningLevel>9999</WarningLevel>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|AnyCPU'">
-	<DebugType>embedded</DebugType>
+	<DebugType>none</DebugType>
 	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+	<WarningLevel>9999</WarningLevel>
   </PropertyGroup>
 
 	<!--Removes tests files on compile from library.-->
 	<ItemGroup>
-		<Compile Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
-		<None Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
-		<Content Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
-		<EmbeddedResource Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES" />
+		<Compile Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES;docs\**" />
+		<None Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES;docs\**" />
+		<Content Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES;docs\**" />
+		<EmbeddedResource Remove="StrikeLink.Tests\**;StrikeLink.Test.Suite\**;CON_EXAMPLES;docs\**" />
 	</ItemGroup>
 
 	<!--Misc removaland includes-->
   <ItemGroup>
 		  <None Include="CON_EXAMPLES\**" />
 		  <None Remove="CON_EXAMPLES\**" />
+		  <None Include="docs\**" />
+		  <None Remove="docs\**" />
+		  <None Include="README.md">
+		    <Pack>True</Pack>
+		    <PackagePath>\</PackagePath>
+		  </None>
 		<None Include=".editorconfig" />
 		<None Remove=".gitattributes" />
 		<None Remove=".gitignore" />
 		<EditorConfigFiles Remove=".editorconfig" />
 		
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
   </ItemGroup>
 
 	<!--This removes the full src directory on errors.-->
@@ -74,5 +88,27 @@
 		<DeterministicSourcePaths>true</DeterministicSourcePaths>
 		<PathMap>$(MSBuildThisFileDirectory)=./</PathMap>
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<Authors>IrisDev</Authors>
+		<PackageReleaseNotes>First initial public release</PackageReleaseNotes>
+		<PackageProjectUrl>https://github.com/RiisDev/StrikeLink</PackageProjectUrl>
+		<Copyright>IrisDev</Copyright>
+		<Description>StrikeLInk is a modern .NET library for Counter-Strike 2 and Valve ecosystem integration.
+It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
+		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release' And '$(TargetFramework)'=='net8.0'">
+		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0"
+		      Command="where xmldoc2md"
+		      IgnoreExitCode="true">
+			<Output TaskParameter="ExitCode" PropertyName="Xmldoc2mdExists" />
+		</Exec>
+
+		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0"
+		      Command="xmldoc2md StrikeLink.dll -o &quot;../../../docs&quot; --structure tree"
+		      Condition="'$(Xmldoc2mdExists)' == '0'" />
+	</Target>
+
+
 </Project>
