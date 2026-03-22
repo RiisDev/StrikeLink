@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+	  <TargetFrameworks>net8.0;net9.0;net10.0;net8.0-windows;net9.0-windows;net10.0-windows</TargetFrameworks>
 	<ImplicitUsings>enable</ImplicitUsings>
 	<Nullable>enable</Nullable>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
@@ -14,42 +14,8 @@
 	<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	  <AnalysisLevel>preview-all</AnalysisLevel>
 	  <LangVersion>preview</LangVersion>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<WarningLevel>9999</WarningLevel>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<WarningLevel>9999</WarningLevel>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-	<WarningLevel>9999</WarningLevel>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<WarningLevel>9999</WarningLevel>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<WarningLevel>9999</WarningLevel>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|AnyCPU'">
-	<DebugType>none</DebugType>
-	<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-	<WarningLevel>9999</WarningLevel>
+	  <Platforms>AnyCPU</Platforms>
+	  <Configurations>Debug;Release;Windows</Configurations>
   </PropertyGroup>
 
 	<!--Removes tests files on compile from library.-->
@@ -70,7 +36,6 @@
 		    <Pack>True</Pack>
 		    <PackagePath>\</PackagePath>
 		  </None>
-		<None Include=".editorconfig" />
 		<None Remove=".gitattributes" />
 		<None Remove=".gitignore" />
 		<EditorConfigFiles Remove=".editorconfig" />
@@ -99,16 +64,15 @@ It provides event-driven access to in-game chat, game state updates, Steam clien
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release' And '$(TargetFramework)'=='net8.0'">
-		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0"
-		      Command="where xmldoc2md"
-		      IgnoreExitCode="true">
+		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0" Command="where xmldoc2md" IgnoreExitCode="true">
 			<Output TaskParameter="ExitCode" PropertyName="Xmldoc2mdExists" />
 		</Exec>
 
-		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0"
-		      Command="xmldoc2md StrikeLink.dll -o &quot;../../../docs&quot; --structure tree"
-		      Condition="'$(Xmldoc2mdExists)' == '0'" />
+		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0" Command="xmldoc2md StrikeLink.dll -o &quot;../../../docs&quot; --structure tree" Condition="'$(Xmldoc2mdExists)' == '0'" />
 	</Target>
 
-
+	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<PackageReference Include="System.Management" Version="10.0.5" />
+		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />
+	</ItemGroup>
 </Project>
