@@ -84,8 +84,6 @@
 
 ## StrikeLink.Services.WebService
 
-[ChromiumCookieDecryptor](./strikelink/services/webservice/chromiumcookiedecryptor.md)
-
 [CoPlayService](./strikelink/services/webservice/coplayservice.md)
 
 [CoPlaySession](./strikelink/services/webservice/coplaysession.md)
