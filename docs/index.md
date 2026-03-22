@@ -81,3 +81,15 @@
 [ValveCfgReader](./strikelink/services/config/valvecfgreader.md)
 
 [ValveCfgWriter](./strikelink/services/config/valvecfgwriter.md)
+
+## StrikeLink.Services.WebService
+
+[ChromiumCookieDecryptor](./strikelink/services/webservice/chromiumcookiedecryptor.md)
+
+[CoPlayService](./strikelink/services/webservice/coplayservice.md)
+
+[CoPlaySession](./strikelink/services/webservice/coplaysession.md)
+
+[LoginSecureService](./strikelink/services/webservice/loginsecureservice.md)
+
+[SteamPlayer](./strikelink/services/webservice/steamplayer.md)

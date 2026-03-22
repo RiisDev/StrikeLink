@@ -3,8 +3,8 @@
     <BuildType Name="Debug" />
     <BuildType Name="Release" />
     <BuildType Name="Windows" />
-    <Platform Name="Any CPU" />
   </Configurations>
+  <Project Path="StrikeLink.csproj" />
   <Project Path="StrikeLink.Test.Suite/StrikeLinkTestSuite.csproj">
     <BuildType Solution="Windows|*" Project="Release" />
   </Project>

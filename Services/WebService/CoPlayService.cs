@@ -1,4 +1,5 @@
 ﻿
+using System.Net;
 using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services.WebService
@@ -31,24 +32,49 @@ namespace StrikeLink.Services.WebService
 		IReadOnlyList<SteamPlayer> Players
 	);
 
+	/// <summary>
+	/// Provides methods for retrieving and parsing Steam Co-Play session data for a specific user.
+	/// </summary>
+	/// <remarks>This service manages HTTP communication with the Steam Community website to obtain co-play session
+	/// information. It requires a valid Steam login token for authentication. The class is disposable and should be
+	/// disposed when no longer needed to release network resources.</remarks>
 	public partial class CoPlayService : IDisposable
 	{
 		private readonly HttpClient _httpClient;
+		private readonly HttpClientHandler _httpClientHandler;
 		private readonly string _userId;
 
+		/// <summary>
+		/// Initializes a new instance of the CoPlayService class using the specified Steam login secure token.
+		/// </summary>
+		/// <remarks>The provided login secure token is used to set authentication cookies for HTTP requests. The user
+		/// ID is extracted from the portion of the token before the '|' character.</remarks>
+		/// <param name="loginSecure">The Steam login secure token used to authenticate requests. Cannot be null or empty. Must contain a '|' character
+		/// to separate the user ID.</param>
 		public CoPlayService(string loginSecure)
 		{
-			_userId = loginSecure[..loginSecure.IndexOf('|', StringComparison.InvariantCulture)];
+			ArgumentException.ThrowIfNullOrEmpty(loginSecure);
 
-			_httpClient = new HttpClient(new HttpClientHandler()
+			_userId = loginSecure[..loginSecure.IndexOf('|', StringComparison.InvariantCulture)];
+			_httpClientHandler = new HttpClientHandler()
 			{
 				AllowAutoRedirect = true,
-				UseCookies = true
-			});
+				UseCookies = true,
+				AutomaticDecompression = DecompressionMethods.All
+			};
+			_httpClient = new HttpClient(_httpClientHandler);
 
 			_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", $"steamLoginSecure={loginSecure}");
 		}
 
+		/// <summary>
+		/// Retrieves a list of co-play sessions for the current Steam user.
+		/// </summary>
+		/// <remarks>This method sends an HTTP request to the Steam Community service to obtain co-play session data
+		/// for the specified user. The operation is performed asynchronously and requires network connectivity. An exception
+		/// is thrown if the HTTP request fails.</remarks>
+		/// <returns>A task that represents the asynchronous operation. The task result contains a list of <see cref="CoPlaySession"/>
+		/// objects representing the user's co-play sessions. The list is empty if no co-play data is available.</returns>
 		public async Task<List<CoPlaySession>> GetCoplayData()
 		{
 			HttpRequestMessage request = new(HttpMethod.Get, $"https://steamcommunity.com/profiles/{_userId}/friends/coplay?ajax=1");
@@ -58,7 +84,7 @@ namespace StrikeLink.Services.WebService
 			return Parse(responseBody);
 		}
 
-		internal List<CoPlaySession> Parse(string html)
+		internal static List<CoPlaySession> Parse(string html)
 		{
 			List<CoPlaySession> sessions = [];
 
@@ -103,10 +129,12 @@ namespace StrikeLink.Services.WebService
 			return match.Groups[group].Value.Trim();
 		}
 
+		/// <inheritdoc />
 		public void Dispose()
 		{
 			GC.SuppressFinalize(this);
 			_httpClient.Dispose();
+			_httpClientHandler.Dispose();
 		}
 	}
 }

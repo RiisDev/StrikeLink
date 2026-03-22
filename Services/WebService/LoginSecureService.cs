@@ -5,9 +5,21 @@ namespace StrikeLink.Services.WebService
 {
 	public class LoginSecureService : IDisposable
 	{
-		public string LoginSecureToken;
+		/// <summary>
+		/// Gets or sets the secure token used for authentication during login operations.
+		/// </summary>
+		public string LoginSecureToken { get; private set; }
 		private readonly string _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
+		/// <summary>
+		/// Initializes a new instance of the LoginSecureService class and retrieves a secure login token for the current
+		/// operating system.
+		/// </summary>
+		/// <remarks>On Windows, the constructor requires the process to be running with administrator privileges to
+		/// retrieve the secure login token. On Linux, no special privileges are required. The constructor will throw an
+		/// exception if called on an unsupported operating system.</remarks>
+		/// <exception cref="InvalidOperationException">Thrown if the current process does not have administrator privileges on Windows, or if the operating system is not
+		/// supported.</exception>
 		public LoginSecureService()
 		{
 			if (OperatingSystem.IsWindows())
@@ -23,18 +35,52 @@ namespace StrikeLink.Services.WebService
 				return;
 			}
 
-			LoginSecureToken = "";
-		}
+			if (OperatingSystem.IsLinux())
+			{
+				LoginSecureToken = GetLoginSecureLinux();
+				return;
+			}
 
+			throw new InvalidOperationException("Unknown operating system found, cannot grab token.");
+		}
+		
+		/// <inheritdoc />
 		public void Dispose()
 		{
-			GC.SuppressFinalize(this);
 			try { Directory.Delete(_tempPath, true); } catch {/**/}
+			GC.SuppressFinalize(this);
+		}
+
+		private string GetLoginSecureLinux()
+		{
+			if (!OperatingSystem.IsLinux()) throw new InvalidOperationException("How did you possibly see this normally.");
+
+			string homeDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
+			string htmlCache = Path.Combine(homeDirectory, ".local", "share", "Steam", "config", "htmlcache");
+
+			if (!Directory.Exists(htmlCache))
+				throw new InvalidOperationException("Failed to find steam html cache");
+
+			Directory.CreateDirectory(_tempPath);
+
+			string cookiesFile = Path.Combine(htmlCache, "Default", "Cookies");
+			string localStateFile = Path.Combine(htmlCache, "Local State");
+			
+			using SqliteReader reader = SqliteReader.Open(cookiesFile);
+			using ChromiumCookieDecryptor decryptor = ChromiumCookieDecryptor.CreateFromLocalState(localStateFile);
+
+			Dictionary<string, byte[]> encrypted = reader.GetEncryptedCookies(new Uri("https://steamcommunity.com"));
+			Dictionary<string, string> plaintext = decryptor.DecryptAll(encrypted);
+
+			string? loginSecure = plaintext.Values.FirstOrDefault(x => x.Contains('|', StringComparison.InvariantCulture));
+
+			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
 		}
 
 		private string GetLoginSecureWindows()
 		{
-			if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("How did you possibly see this normally."); ;
+			if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("How did you possibly see this normally."); 
 
 #if WINDOWS
 
