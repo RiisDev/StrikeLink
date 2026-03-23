@@ -63,21 +63,21 @@ public string SteamMiniId { get; set; }
 The URL to the user's Steam profile. Cannot be null.
 
 ```csharp
-public string ProfileUrl { get; set; }
+public Uri ProfileUrl { get; set; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+Uri<br>
 
 ## Constructors
 
-### **SteamPlayer(String, String, String, String)**
+### **SteamPlayer(String, String, String, Uri)**
 
 Represents a Steam user with display name, unique Steam ID, and profile URL.
 
 ```csharp
-public SteamPlayer(string DisplayName, string SteamId, string SteamMiniId, string ProfileUrl)
+public SteamPlayer(string DisplayName, string SteamId, string SteamMiniId, Uri ProfileUrl)
 ```
 
 #### Parameters
@@ -90,7 +90,7 @@ The unique Steam identifier for the user. Cannot be null.
 
 `SteamMiniId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-`ProfileUrl` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`ProfileUrl` Uri<br>
 The URL to the user's Steam profile. Cannot be null.
 
 ### **SteamPlayer(SteamPlayer)**
@@ -177,10 +177,10 @@ public SteamPlayer <Clone>$()
 
 [SteamPlayer](./strikelink/services/webservice/steamplayer.md)<br>
 
-### **Deconstruct(String&, String&, String&, String&)**
+### **Deconstruct(String&, String&, String&, Uri&)**
 
 ```csharp
-public void Deconstruct(String& DisplayName, String& SteamId, String& SteamMiniId, String& ProfileUrl)
+public void Deconstruct(String& DisplayName, String& SteamId, String& SteamMiniId, Uri& ProfileUrl)
 ```
 
 #### Parameters
@@ -191,4 +191,4 @@ public void Deconstruct(String& DisplayName, String& SteamId, String& SteamMiniI
 
 `SteamMiniId` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
 
-`ProfileUrl` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+`ProfileUrl` Uri&<br>
