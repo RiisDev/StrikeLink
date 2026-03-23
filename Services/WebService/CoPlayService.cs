@@ -1,5 +1,4 @@
-﻿
-using System.Net;
+﻿using System.Net;
 using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services.WebService
@@ -15,7 +14,7 @@ namespace StrikeLink.Services.WebService
 		string DisplayName,
 		string SteamId,
 		string SteamMiniId,
-		string ProfileUrl
+		Uri ProfileUrl
 	);
 
 	/// <summary>
@@ -79,8 +78,8 @@ namespace StrikeLink.Services.WebService
 		/// objects representing the user's co-play sessions. The list is empty if no co-play data is available.</returns>
 		public async Task<List<CoPlaySession>> GetCoplayData()
 		{
-			HttpRequestMessage request = new(HttpMethod.Get, $"https://steamcommunity.com/profiles/{_userId}/friends/coplay?ajax=1");
-			HttpResponseMessage response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+			using HttpRequestMessage request = new(HttpMethod.Get, $"https://steamcommunity.com/profiles/{_userId}/friends/coplay?ajax=1");
+			using HttpResponseMessage response = await _httpClient.SendAsync(request).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
 			string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			return Parse(responseBody);
@@ -109,7 +108,7 @@ namespace StrikeLink.Services.WebService
 					let displayName = GetValue(GetSteamDisplayNameRegex().Match(playerCard)) 
 					let steamUrl = GetValue(GetSteamUrlRegex().Match(playerCard)) 
 					let steamMini = GetValue(GetSteamMiniIdRegex().Match(playerCard))
-					select new SteamPlayer(displayName, steamId, steamMini, steamUrl)
+					select new SteamPlayer(displayName, steamId, steamMini, new Uri(steamUrl, UriKind.RelativeOrAbsolute))
 				);
 
 				sessions.Add(new CoPlaySession(gameName, playedOn, duration, playersData));
