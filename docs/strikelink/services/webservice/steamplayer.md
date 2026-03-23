@@ -48,6 +48,16 @@ public string SteamId { get; set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
+### **SteamMiniId**
+
+```csharp
+public string SteamMiniId { get; set; }
+```
+
+#### Property Value
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
 ### **ProfileUrl**
 
 The URL to the user's Steam profile. Cannot be null.
@@ -62,12 +72,12 @@ public string ProfileUrl { get; set; }
 
 ## Constructors
 
-### **SteamPlayer(String, String, String)**
+### **SteamPlayer(String, String, String, String)**
 
 Represents a Steam user with display name, unique Steam ID, and profile URL.
 
 ```csharp
-public SteamPlayer(string DisplayName, string SteamId, string ProfileUrl)
+public SteamPlayer(string DisplayName, string SteamId, string SteamMiniId, string ProfileUrl)
 ```
 
 #### Parameters
@@ -77,6 +87,8 @@ The display name of the Steam user as shown on their profile. Cannot be null.
 
 `SteamId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The unique Steam identifier for the user. Cannot be null.
+
+`SteamMiniId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 `ProfileUrl` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The URL to the user's Steam profile. Cannot be null.
@@ -165,10 +177,10 @@ public SteamPlayer <Clone>$()
 
 [SteamPlayer](./strikelink/services/webservice/steamplayer.md)<br>
 
-### **Deconstruct(String&, String&, String&)**
+### **Deconstruct(String&, String&, String&, String&)**
 
 ```csharp
-public void Deconstruct(String& DisplayName, String& SteamId, String& ProfileUrl)
+public void Deconstruct(String& DisplayName, String& SteamId, String& SteamMiniId, String& ProfileUrl)
 ```
 
 #### Parameters
@@ -176,5 +188,7 @@ public void Deconstruct(String& DisplayName, String& SteamId, String& ProfileUrl
 `DisplayName` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
 
 `SteamId` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
+
+`SteamMiniId` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
 
 `ProfileUrl` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>

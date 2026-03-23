@@ -1,23 +1,10 @@
-﻿using System.Runtime.Versioning;
-
-
-#if WINDOWS
-using System.Management;
-#endif
-
-namespace StrikeLink.Services.WebService
+﻿namespace StrikeLink.Services.WebService
 {
-	[SupportedOSPlatform("windows")]
 	internal class ShadowCopyService
-	{		
-#if WINDOWS
-		private static string GetDriveLetter(string filePath)
-		{
-			string volume = Path.GetPathRoot(filePath) ?? throw new InvalidOperationException("Could not determine volume root.");
-			return volume;
-		}
+	{
 		internal static void CopyFilesViaShadowCopy(IEnumerable<string> filePaths, string saveLocation)
 		{
+#if WINDOWS
 			Dictionary<string, List<string>> filesByVolume = filePaths.GroupBy(GetDriveLetter).ToDictionary(g => g.Key, g => g.ToList());
 
 			EnsureServicesRunning();
@@ -59,14 +46,26 @@ namespace StrikeLink.Services.WebService
 						DeleteShadowCopy(shadowId);
 				}
 			}
+#endif
 		}
+#if WINDOWS
+		private static string GetDriveLetter(string filePath)
+		{
+			string volume = Path.GetPathRoot(filePath) ?? throw new InvalidOperationException("Could not determine volume root.");
+			return volume;
+		}
+
 		private static string GetShadowPath(string shadowId, string filePath)
 		{
-			using ManagementObjectSearcher searcher = new($"SELECT * FROM Win32_ShadowCopy WHERE ID = '{shadowId}'");
-			ManagementObjectCollection shadows = searcher.Get();
+			using System.Management.ManagementObjectSearcher searcher = new($"SELECT * FROM Win32_ShadowCopy WHERE ID = '{shadowId}'");
+			System.Management.ManagementObjectCollection shadows = searcher.Get();
 
-			ManagementObject? shadow = null;
-			foreach (ManagementObject obj in shadows) { shadow = obj; }
+			System.Management.ManagementObject? shadow = null;
+			foreach (System.Management.ManagementBaseObject obj in shadows)
+			{
+				if (obj is not System.Management.ManagementObject shadowObj) continue;
+				shadow = shadowObj;
+			}
 
 			if (shadow is null) {return "";}
 
@@ -79,13 +78,13 @@ namespace StrikeLink.Services.WebService
 
 		private static string CreateShadowCopy(string drive)
 		{
-			using ManagementClass shadowCopyClass = new(@"\\.\root\cimv2:Win32_ShadowCopy");
+			using System.Management.ManagementClass shadowCopyClass = new(@"\\.\root\cimv2:Win32_ShadowCopy");
 
-			ManagementBaseObject inParams = shadowCopyClass.GetMethodParameters("Create");
+			System.Management.ManagementBaseObject inParams = shadowCopyClass.GetMethodParameters("Create");
 			inParams["Volume"] = drive;
 			inParams["Context"] = "ClientAccessible";
 
-			ManagementBaseObject result = shadowCopyClass.InvokeMethod("Create", inParams, null);
+			System.Management.ManagementBaseObject result = shadowCopyClass.InvokeMethod("Create", inParams, null);
 
 			uint returnValue = (uint)result["ReturnValue"];
 			string shadowId = result["ShadowID"]?.ToString() ?? "Unknown";
@@ -97,12 +96,14 @@ namespace StrikeLink.Services.WebService
 
 		private static void DeleteShadowCopy(string shadowId)
 		{
-			using ManagementObjectSearcher searcher = new($"SELECT * FROM Win32_ShadowCopy WHERE ID = '{shadowId}'");
-			ManagementObjectCollection shadows = searcher.Get();
+			using System.Management.ManagementObjectSearcher searcher = new($"SELECT * FROM Win32_ShadowCopy WHERE ID = '{shadowId}'");
+			System.Management.ManagementObjectCollection shadows = searcher.Get();
 
-			foreach (ManagementObject shadow in shadows)
+			foreach (System.Management.ManagementBaseObject shadow in shadows)
 			{
-				shadow.Delete();
+				if (shadow is not System.Management.ManagementObject shadowObj) continue;
+
+				shadowObj.Delete();
 				Log($"Deleted Shadow ID: {shadowId}");
 			}
 		}
@@ -118,7 +119,7 @@ namespace StrikeLink.Services.WebService
 		{
 			foreach (string serviceName in RequiredServices)
 			{
-				using ManagementObject service = new($"Win32_Service.Name='{serviceName}'");
+				using System.Management.ManagementObject service = new($"Win32_Service.Name='{serviceName}'");
 				service.Get();
 
 				string startMode = (string)service["StartMode"];
@@ -128,14 +129,14 @@ namespace StrikeLink.Services.WebService
 
 				if (startMode.Equals("Disabled", StringComparison.OrdinalIgnoreCase))
 				{
-					using ManagementBaseObject changeParams = service.GetMethodParameters("ChangeStartMode");
+					using System.Management.ManagementBaseObject changeParams = service.GetMethodParameters("ChangeStartMode");
 					changeParams["StartMode"] = "Manual";
 					service.InvokeMethod("ChangeStartMode", changeParams, null);
 				}
 
 				if (state.Equals("Running", StringComparison.OrdinalIgnoreCase)) continue;
 				
-				using ManagementBaseObject startResult = service.InvokeMethod("StartService", null, null);
+				using System.Management.ManagementBaseObject startResult = service.InvokeMethod("StartService", null, null);
 				uint startCode = (uint)startResult["ReturnValue"];
 
 				if (startCode != 0)

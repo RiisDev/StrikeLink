@@ -71,6 +71,10 @@ It provides event-driven access to in-game chat, game state updates, Steam clien
 		<Exec WorkingDirectory="$(ProjectDir)bin\Release\net8.0" Command="xmldoc2md StrikeLink.dll -o &quot;../../../docs&quot; --structure tree" Condition="'$(Xmldoc2mdExists)' == '0'" />
 	</Target>
 
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<PackageReference Include="System.Management" Version="10.0.5" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />

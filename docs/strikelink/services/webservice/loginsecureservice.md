@@ -2,6 +2,8 @@
 
 Namespace: StrikeLink.Services.WebService
 
+Provides functionality to retrieve a secure login token for authentication on supported operating systems.
+
 ```csharp
 public class LoginSecureService : System.IDisposable
 ```
@@ -9,6 +11,11 @@ public class LoginSecureService : System.IDisposable
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [LoginSecureService](./strikelink/services/webservice/loginsecureservice.md)<br>
 Implements [IDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable)<br>
 Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+
+**Remarks:**
+
+On Windows, administrator privileges are required to retrieve the secure login token. On Linux, no
+ special privileges are needed. The service is not supported on other operating systems.
 
 ## Properties
 

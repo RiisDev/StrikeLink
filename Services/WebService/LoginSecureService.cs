@@ -1,8 +1,12 @@
-﻿
-using System.Security.Principal;
+﻿using System.Security.Principal;
 
 namespace StrikeLink.Services.WebService
 {
+	/// <summary>
+	/// Provides functionality to retrieve a secure login token for authentication on supported operating systems.
+	/// </summary>
+	/// <remarks>On Windows, administrator privileges are required to retrieve the secure login token. On Linux, no
+	/// special privileges are needed. The service is not supported on other operating systems.</remarks>
 	public class LoginSecureService : IDisposable
 	{
 		/// <summary>
@@ -80,9 +84,8 @@ namespace StrikeLink.Services.WebService
 
 		private string GetLoginSecureWindows()
 		{
-			if (!OperatingSystem.IsWindows()) throw new InvalidOperationException("How did you possibly see this normally."); 
-
-#if WINDOWS
+			if (!OperatingSystem.IsWindows()) 
+				throw new InvalidOperationException("How did you possibly see this normally."); 
 
 			Directory.CreateDirectory(_tempPath);
 
@@ -102,9 +105,6 @@ namespace StrikeLink.Services.WebService
 			string? loginSecure = plaintext.Values.FirstOrDefault(x => x.Contains('|', StringComparison.InvariantCulture));
 			
 			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
-#else
-			throw new InvalidOperationException("How did you possibly see this normally.");
-#endif
 		}
 	}
 }

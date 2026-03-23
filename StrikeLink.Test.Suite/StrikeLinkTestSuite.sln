@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11612.150
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StrikeLinkTestSuite", "StrikeLinkTestSuite.csproj", "{16D0E8E4-3770-683B-5029-91D261B2B16B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Windows|Any CPU = Windows|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Windows|Any CPU.ActiveCfg = Release|Any CPU
+		{16D0E8E4-3770-683B-5029-91D261B2B16B}.Windows|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9453581E-72C6-42F3-B947-E22609148A72}
+	EndGlobalSection
+EndGlobal

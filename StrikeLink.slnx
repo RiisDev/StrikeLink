@@ -5,7 +5,4 @@
     <BuildType Name="Windows" />
   </Configurations>
   <Project Path="StrikeLink.csproj" />
-  <Project Path="StrikeLink.Test.Suite/StrikeLinkTestSuite.csproj">
-    <BuildType Solution="Windows|*" Project="Release" />
-  </Project>
 </Solution>

@@ -9,10 +9,12 @@ namespace StrikeLink.Services.WebService
 	/// </summary>
 	/// <param name="DisplayName">The display name of the Steam user as shown on their profile. Cannot be null.</param>
 	/// <param name="SteamId">The unique Steam identifier for the user. Cannot be null.</param>
+	/// <param name="SteamId">The unique Steam Mini identifier for the user. Cannot be null.</param>
 	/// <param name="ProfileUrl">The URL to the user's Steam profile. Cannot be null.</param>
 	public record SteamPlayer(
 		string DisplayName,
 		string SteamId,
+		string SteamMiniId,
 		string ProfileUrl
 	);
 
@@ -101,7 +103,14 @@ namespace StrikeLink.Services.WebService
 				IEnumerable<string> players = sessionHtml.Split("data-panel").Skip(1);
 
 				List<SteamPlayer> playersData = [];
-				playersData.AddRange(from playerCard in players let steamId = GetValue(GetSteamIdRegex().Match(playerCard)) let displayName = GetValue(GetSteamDisplayNameRegex().Match(playerCard)) let steamUrl = GetValue(GetSteamUrlRegex().Match(playerCard)) select new SteamPlayer(displayName, steamId, steamUrl));
+				playersData.AddRange(
+					from playerCard in players 
+					let steamId = GetValue(GetSteamIdRegex().Match(playerCard))
+					let displayName = GetValue(GetSteamDisplayNameRegex().Match(playerCard)) 
+					let steamUrl = GetValue(GetSteamUrlRegex().Match(playerCard)) 
+					let steamMini = GetValue(GetSteamMiniIdRegex().Match(playerCard))
+					select new SteamPlayer(displayName, steamId, steamMini, steamUrl)
+				);
 
 				sessions.Add(new CoPlaySession(gameName, playedOn, duration, playersData));
 			}
@@ -112,11 +121,14 @@ namespace StrikeLink.Services.WebService
 		[GeneratedRegex("<h4>(.*)<\\/h4>", RegexOptions.Compiled)]
 		private static partial Regex GameNameRegex();
 
-		[GeneratedRegex("Played on (.+).+for (.+).+<br", RegexOptions.Compiled)]
+		[GeneratedRegex("Played (?:on )?(.+?)\\s+for (.+?)\\s*<br", RegexOptions.Compiled)]
 		private static partial Regex GetPlayRegex();
 
 		[GeneratedRegex("data-steamid=\"(\\d+)\"", RegexOptions.Compiled)]
 		private static partial Regex GetSteamIdRegex();
+
+		[GeneratedRegex("data-miniprofile=\"(\\d+)\"", RegexOptions.Compiled)]
+		private static partial Regex GetSteamMiniIdRegex();
 
 		[GeneratedRegex("friend_block_content\">(.+)<br>", RegexOptions.Compiled)]
 		private static partial Regex GetSteamDisplayNameRegex();
