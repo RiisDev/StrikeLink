@@ -57,6 +57,22 @@ public void Dispose()
 
 This method suppresses finalization and disposes managed resources.
 
+### **Dispose(Boolean)**
+
+Releases all resources used by the [ChatService](./strikelink/chatbot/chatservice.md).
+
+```csharp
+protected void Dispose(bool disposing)
+```
+
+#### Parameters
+
+`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+**Remarks:**
+
+This method suppresses finalization and disposes managed resources.
+
 ## Events
 
 ### **OnLogReceived**

@@ -73,3 +73,22 @@ public void Dispose()
 **Remarks:**
 
 This method suppresses finalization and disposes managed resources.
+
+### **Dispose(Boolean)**
+
+Releases the unmanaged resources used by the object and optionally releases the managed resources.
+
+```csharp
+protected void Dispose(bool disposing)
+```
+
+#### Parameters
+
+`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+true to release both managed and unmanaged resources; false to release only unmanaged resources.
+
+**Remarks:**
+
+This method is called by public Dispose methods and the finalizer. When disposing is true, this
+ method disposes all managed resources referenced by the object. Override this method to release additional
+ resources.

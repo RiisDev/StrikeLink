@@ -2,6 +2,8 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Represents aggregated statistics related to trading kills and deaths in a trading scenario.
+
 ```csharp
 public sealed class TradingStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.TradingStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
@@ -14,6 +16,8 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 
 ### **TradeKills**
 
+The total number of kills achieved through trades.
+
 ```csharp
 public int TradeKills { get; set; }
 ```
@@ -24,6 +28,8 @@ public int TradeKills { get; set; }
 
 ### **TradedDeaths**
 
+The total number of deaths that occurred as a result of being traded.
+
 ```csharp
 public int TradedDeaths { get; set; }
 ```
@@ -33,6 +39,8 @@ public int TradedDeaths { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **TradeKillRate**
+
+The ratio of trade kills to total opportunities, expressed as a double. Must be between 0.0 and 1.0.
 
 ```csharp
 public double TradeKillRate { get; set; }
@@ -46,6 +54,8 @@ public double TradeKillRate { get; set; }
 
 ### **TradingStats(Int32, Int32, Double)**
 
+Represents aggregated statistics related to trading kills and deaths in a trading scenario.
+
 ```csharp
 public TradingStats(int TradeKills, int TradedDeaths, double TradeKillRate)
 ```
@@ -53,10 +63,13 @@ public TradingStats(int TradeKills, int TradedDeaths, double TradeKillRate)
 #### Parameters
 
 `TradeKills` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of kills achieved through trades.
 
 `TradedDeaths` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of deaths that occurred as a result of being traded.
 
 `TradeKillRate` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+The ratio of trade kills to total opportunities, expressed as a double. Must be between 0.0 and 1.0.
 
 ## Methods
 

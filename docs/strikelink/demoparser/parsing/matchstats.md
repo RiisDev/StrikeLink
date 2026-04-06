@@ -2,6 +2,9 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
+ identifying information.
+
 ```csharp
 public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
@@ -10,9 +13,15 @@ Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) 
 Implements [IEquatable&lt;MatchStats&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
 Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
+**Remarks:**
+
+Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo
+
 ## Properties
 
 ### **Duration**
+
+The total duration of the match.
 
 ```csharp
 public TimeSpan Duration { get; set; }
@@ -24,6 +33,8 @@ public TimeSpan Duration { get; set; }
 
 ### **TerroristScore**
 
+The final score achieved by the Terrorist team.
+
 ```csharp
 public int TerroristScore { get; set; }
 ```
@@ -33,6 +44,8 @@ public int TerroristScore { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **CounterTerroristScore**
+
+The final score achieved by the Counter-Terrorist team.
 
 ```csharp
 public int CounterTerroristScore { get; set; }
@@ -44,6 +57,8 @@ public int CounterTerroristScore { get; set; }
 
 ### **Outcome**
 
+The outcome of the match, indicating which team won or if the match was drawn.
+
 ```csharp
 public MatchOutcome Outcome { get; set; }
 ```
@@ -53,6 +68,8 @@ public MatchOutcome Outcome { get; set; }
 [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)<br>
 
 ### **ServerLocation**
+
+The geographic location of the server where the match was played, or null if not available.
 
 ```csharp
 public string ServerLocation { get; set; }
@@ -64,6 +81,8 @@ public string ServerLocation { get; set; }
 
 ### **ServerAddress**
 
+The network address of the server, or null if not available.
+
 ```csharp
 public string ServerAddress { get; set; }
 ```
@@ -73,6 +92,8 @@ public string ServerAddress { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **ServerPort**
+
+The port number used by the server, or null if not available.
 
 ```csharp
 public Nullable<int> ServerPort { get; set; }
@@ -84,6 +105,8 @@ public Nullable<int> ServerPort { get; set; }
 
 ### **GameType**
 
+The type or mode of the game played, or null if not specified.
+
 ```csharp
 public string GameType { get; set; }
 ```
@@ -93,6 +116,8 @@ public string GameType { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **MaxPlayers**
+
+The maximum number of players allowed on the server during the match, or null if not specified.
 
 ```csharp
 public Nullable<int> MaxPlayers { get; set; }
@@ -104,6 +129,8 @@ public Nullable<int> MaxPlayers { get; set; }
 
 ### **Date**
 
+The date and time when the match occurred, or null if not available.
+
 ```csharp
 public Nullable<DateTimeOffset> Date { get; set; }
 ```
@@ -113,6 +140,8 @@ public Nullable<DateTimeOffset> Date { get; set; }
 [Nullable&lt;DateTimeOffset&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **Map**
+
+The name of the map on which the match was played, or null if not specified.
 
 ```csharp
 public string Map { get; set; }
@@ -124,6 +153,8 @@ public string Map { get; set; }
 
 ### **MatchShareCode**
 
+A shareable code that uniquely identifies the match, or null if not available.
+
 ```csharp
 public string MatchShareCode { get; set; }
 ```
@@ -133,6 +164,8 @@ public string MatchShareCode { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **ServerName**
+
+The display name of the server, or null if not specified.
 
 ```csharp
 public string ServerName { get; set; }
@@ -144,6 +177,8 @@ public string ServerName { get; set; }
 
 ### **DemoClientName**
 
+The name of the client used to record the match demo, or null if not available.
+
 ```csharp
 public string DemoClientName { get; set; }
 ```
@@ -154,6 +189,8 @@ public string DemoClientName { get; set; }
 
 ### **NetworkProtocol**
 
+The network protocol version used by the server, or null if not specified.
+
 ```csharp
 public Nullable<int> NetworkProtocol { get; set; }
 ```
@@ -163,6 +200,8 @@ public Nullable<int> NetworkProtocol { get; set; }
 [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **FocusSteamId**
+
+The Steam ID of the player in focus for this match, or null if not specified.
 
 ```csharp
 public Nullable<ulong> FocusSteamId { get; set; }
@@ -176,6 +215,9 @@ public Nullable<ulong> FocusSteamId { get; set; }
 
 ### **MatchStats(TimeSpan, Int32, Int32, MatchOutcome, String, String, Nullable&lt;Int32&gt;, String, Nullable&lt;Int32&gt;, Nullable&lt;DateTimeOffset&gt;, String, String, String, String, Nullable&lt;Int32&gt;, Nullable&lt;UInt64&gt;)**
 
+Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
+ identifying information.
+
 ```csharp
 public MatchStats(TimeSpan Duration, int TerroristScore, int CounterTerroristScore, MatchOutcome Outcome, string ServerLocation, string ServerAddress, Nullable<int> ServerPort, string GameType, Nullable<int> MaxPlayers, Nullable<DateTimeOffset> Date, string Map, string MatchShareCode, string ServerName, string DemoClientName, Nullable<int> NetworkProtocol, Nullable<ulong> FocusSteamId)
 ```
@@ -183,36 +225,56 @@ public MatchStats(TimeSpan Duration, int TerroristScore, int CounterTerroristSco
 #### Parameters
 
 `Duration` [TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/system.timespan)<br>
+The total duration of the match.
 
 `TerroristScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The final score achieved by the Terrorist team.
 
 `CounterTerroristScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The final score achieved by the Counter-Terrorist team.
 
 `Outcome` [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)<br>
+The outcome of the match, indicating which team won or if the match was drawn.
 
 `ServerLocation` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The geographic location of the server where the match was played, or null if not available.
 
 `ServerAddress` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The network address of the server, or null if not available.
 
 `ServerPort` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The port number used by the server, or null if not available.
 
 `GameType` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The type or mode of the game played, or null if not specified.
 
 `MaxPlayers` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The maximum number of players allowed on the server during the match, or null if not specified.
 
 `Date` [Nullable&lt;DateTimeOffset&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The date and time when the match occurred, or null if not available.
 
 `Map` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The name of the map on which the match was played, or null if not specified.
 
 `MatchShareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+A shareable code that uniquely identifies the match, or null if not available.
 
 `ServerName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The display name of the server, or null if not specified.
 
 `DemoClientName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The name of the client used to record the match demo, or null if not available.
 
 `NetworkProtocol` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The network protocol version used by the server, or null if not specified.
 
 `FocusSteamId` [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The Steam ID of the player in focus for this match, or null if not specified.
+
+**Remarks:**
+
+Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo
 
 ## Methods
 

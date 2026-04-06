@@ -34,7 +34,7 @@ public VirtualKey Keybind { get; set; }
 
 #### Property Value
 
-[VirtualKey](./strikelink/extensions/win32/virtualkey.md)<br>
+[VirtualKey](./strikelink/extensions/nativemethods/virtualkey.md)<br>
 
 ### **IgnoreLocalUser**
 
@@ -84,7 +84,7 @@ public Config(VirtualKey Keybind, bool IgnoreLocalUser, Action<ChatMessage> OnGl
 
 #### Parameters
 
-`Keybind` [VirtualKey](./strikelink/extensions/win32/virtualkey.md)<br>
+`Keybind` [VirtualKey](./strikelink/extensions/nativemethods/virtualkey.md)<br>
 The virtual key used to activate chat input.
 
 `IgnoreLocalUser` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
@@ -188,7 +188,7 @@ public void Deconstruct(VirtualKey& Keybind, Boolean& IgnoreLocalUser, Action`1&
 
 #### Parameters
 
-`Keybind` [VirtualKey&](./strikelink/extensions/win32/virtualkey&.md)<br>
+`Keybind` [VirtualKey&](./strikelink/extensions/nativemethods/virtualkey&.md)<br>
 
 `IgnoreLocalUser` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
 

@@ -2,6 +2,9 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Represents statistical data for clutch scenarios, including total attempts, wins, and a breakdown of wins by the
+ number of opponents.
+
 ```csharp
 public sealed class ClutchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.ClutchStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
@@ -14,6 +17,8 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 
 ### **Attempts**
 
+The total number of clutch attempts recorded.
+
 ```csharp
 public int Attempts { get; set; }
 ```
@@ -24,6 +29,8 @@ public int Attempts { get; set; }
 
 ### **Wins**
 
+The total number of successful clutch wins.
+
 ```csharp
 public int Wins { get; set; }
 ```
@@ -33,6 +40,8 @@ public int Wins { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **WinsByOpponentCount**
+
+A read-only dictionary mapping the number of opponents faced to the number of wins achieved against that count.
 
 ```csharp
 public IReadOnlyDictionary<int, int> WinsByOpponentCount { get; set; }
@@ -46,6 +55,9 @@ public IReadOnlyDictionary<int, int> WinsByOpponentCount { get; set; }
 
 ### **ClutchStats(Int32, Int32, IReadOnlyDictionary&lt;Int32, Int32&gt;)**
 
+Represents statistical data for clutch scenarios, including total attempts, wins, and a breakdown of wins by the
+ number of opponents.
+
 ```csharp
 public ClutchStats(int Attempts, int Wins, IReadOnlyDictionary<int, int> WinsByOpponentCount)
 ```
@@ -53,10 +65,13 @@ public ClutchStats(int Attempts, int Wins, IReadOnlyDictionary<int, int> WinsByO
 #### Parameters
 
 `Attempts` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of clutch attempts recorded.
 
 `Wins` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of successful clutch wins.
 
 `WinsByOpponentCount` [IReadOnlyDictionary&lt;Int32, Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2)<br>
+A read-only dictionary mapping the number of opponents faced to the number of wins achieved against that count.
 
 ## Methods
 

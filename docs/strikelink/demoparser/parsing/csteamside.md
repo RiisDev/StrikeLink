@@ -2,6 +2,8 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Different playable sides within a Counter Strike match.
+
 ```csharp
 public enum CsTeamSide
 ```
@@ -13,7 +15,7 @@ Implements [IComparable](https://docs.microsoft.com/en-us/dotnet/api/system.icom
 
 | Name | Value | Description |
 | --- | --: | --- |
-| Unknown | 0 |  |
-| Spectator | 1 |  |
-| Terrorists | 2 |  |
-| CounterTerrorists | 3 |  |
+| Unknown | 0 | Used when parsing fails or a user disconnects. |
+| Spectator | 1 | Spectator Team. |
+| Terrorists | 2 | Terrorists Team. |
+| CounterTerrorists | 3 | CounterTerrorists Team. |

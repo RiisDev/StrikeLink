@@ -61,3 +61,22 @@ On Windows, the constructor requires the process to be running with administrato
 ```csharp
 public void Dispose()
 ```
+
+### **Dispose(Boolean)**
+
+Releases the unmanaged resources used by the object and, optionally, releases the managed resources.
+
+```csharp
+protected void Dispose(bool disposing)
+```
+
+#### Parameters
+
+`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+true to release both managed and unmanaged resources; false to release only unmanaged resources.
+
+**Remarks:**
+
+This method is called by public Dispose methods and the finalizer. When disposing is true, this
+ method disposes all managed and unmanaged resources; when false, only unmanaged resources are released. Override
+ this method to release resources specific to the derived class.

@@ -2,6 +2,9 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Represents a damage event that occurred during a round, including information about the attacker, victim, weapon
+ used, and damage details.
+
 ```csharp
 public sealed class RoundDamageEvent : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundDamageEvent, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
@@ -14,6 +17,8 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 
 ### **Tick**
 
+The game tick at which the damage event occurred.
+
 ```csharp
 public int Tick { get; set; }
 ```
@@ -23,6 +28,8 @@ public int Tick { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **AttackerSteamId**
+
+The Steam ID of the attacker, or null if the attacker is not identified.
 
 ```csharp
 public Nullable<ulong> AttackerSteamId { get; set; }
@@ -34,6 +41,8 @@ public Nullable<ulong> AttackerSteamId { get; set; }
 
 ### **AttackerName**
 
+The display name of the attacker, or null if the attacker is not identified.
+
 ```csharp
 public string AttackerName { get; set; }
 ```
@@ -43,6 +52,8 @@ public string AttackerName { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **VictimSteamId**
+
+The Steam ID of the victim, or null if the victim is not identified.
 
 ```csharp
 public Nullable<ulong> VictimSteamId { get; set; }
@@ -54,6 +65,8 @@ public Nullable<ulong> VictimSteamId { get; set; }
 
 ### **VictimName**
 
+The display name of the victim, or null if the victim is not identified.
+
 ```csharp
 public string VictimName { get; set; }
 ```
@@ -63,6 +76,8 @@ public string VictimName { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **Weapon**
+
+The name of the weapon used to inflict the damage.
 
 ```csharp
 public string Weapon { get; set; }
@@ -74,6 +89,8 @@ public string Weapon { get; set; }
 
 ### **Damage**
 
+The total amount of damage dealt in the event.
+
 ```csharp
 public int Damage { get; set; }
 ```
@@ -83,6 +100,8 @@ public int Damage { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **HealthDamage**
+
+The amount of health damage inflicted on the victim.
 
 ```csharp
 public int HealthDamage { get; set; }
@@ -94,6 +113,8 @@ public int HealthDamage { get; set; }
 
 ### **ArmorDamage**
 
+The amount of armor damage inflicted on the victim.
+
 ```csharp
 public int ArmorDamage { get; set; }
 ```
@@ -103,6 +124,8 @@ public int ArmorDamage { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **IsFriendlyFire**
+
+true if the damage was caused by a teammate; otherwise, false.
 
 ```csharp
 public bool IsFriendlyFire { get; set; }
@@ -116,6 +139,9 @@ public bool IsFriendlyFire { get; set; }
 
 ### **RoundDamageEvent(Int32, Nullable&lt;UInt64&gt;, String, Nullable&lt;UInt64&gt;, String, String, Int32, Int32, Int32, Boolean)**
 
+Represents a damage event that occurred during a round, including information about the attacker, victim, weapon
+ used, and damage details.
+
 ```csharp
 public RoundDamageEvent(int Tick, Nullable<ulong> AttackerSteamId, string AttackerName, Nullable<ulong> VictimSteamId, string VictimName, string Weapon, int Damage, int HealthDamage, int ArmorDamage, bool IsFriendlyFire)
 ```
@@ -123,24 +149,34 @@ public RoundDamageEvent(int Tick, Nullable<ulong> AttackerSteamId, string Attack
 #### Parameters
 
 `Tick` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The game tick at which the damage event occurred.
 
 `AttackerSteamId` [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The Steam ID of the attacker, or null if the attacker is not identified.
 
 `AttackerName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The display name of the attacker, or null if the attacker is not identified.
 
 `VictimSteamId` [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The Steam ID of the victim, or null if the victim is not identified.
 
 `VictimName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The display name of the victim, or null if the victim is not identified.
 
 `Weapon` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The name of the weapon used to inflict the damage.
 
 `Damage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total amount of damage dealt in the event.
 
 `HealthDamage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The amount of health damage inflicted on the victim.
 
 `ArmorDamage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The amount of armor damage inflicted on the victim.
 
 `IsFriendlyFire` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+true if the damage was caused by a teammate; otherwise, false.
 
 ## Methods
 

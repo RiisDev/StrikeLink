@@ -2,6 +2,9 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Represents statistical data for a specific weapon, including kills, deaths, assists, damage, shots fired, hits, and
+ accuracy.
+
 ```csharp
 public sealed class WeaponStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.WeaponStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
@@ -14,6 +17,8 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 
 ### **Weapon**
 
+The name of the weapon for which the statistics are recorded. Cannot be null or empty.
+
 ```csharp
 public string Weapon { get; set; }
 ```
@@ -23,6 +28,8 @@ public string Weapon { get; set; }
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **Kills**
+
+The total number of kills achieved with the weapon. Must be zero or greater.
 
 ```csharp
 public int Kills { get; set; }
@@ -34,6 +41,8 @@ public int Kills { get; set; }
 
 ### **Deaths**
 
+The total number of deaths incurred while using the weapon. Must be zero or greater.
+
 ```csharp
 public int Deaths { get; set; }
 ```
@@ -43,6 +52,8 @@ public int Deaths { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Assists**
+
+The total number of assists made with the weapon. Must be zero or greater.
 
 ```csharp
 public int Assists { get; set; }
@@ -54,6 +65,8 @@ public int Assists { get; set; }
 
 ### **Damage**
 
+The total amount of damage dealt using the weapon. Must be zero or greater.
+
 ```csharp
 public int Damage { get; set; }
 ```
@@ -63,6 +76,8 @@ public int Damage { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Shots**
+
+The total number of shots fired with the weapon. Must be zero or greater.
 
 ```csharp
 public int Shots { get; set; }
@@ -74,6 +89,8 @@ public int Shots { get; set; }
 
 ### **Hits**
 
+The total number of successful hits made with the weapon. Must be zero or greater.
+
 ```csharp
 public int Hits { get; set; }
 ```
@@ -83,6 +100,8 @@ public int Hits { get; set; }
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Accuracy**
+
+The accuracy percentage for the weapon, calculated as the ratio of hits to shots. Must be between 0.0 and 100.0.
 
 ```csharp
 public double Accuracy { get; set; }
@@ -96,6 +115,9 @@ public double Accuracy { get; set; }
 
 ### **WeaponStats(String, Int32, Int32, Int32, Int32, Int32, Int32, Double)**
 
+Represents statistical data for a specific weapon, including kills, deaths, assists, damage, shots fired, hits, and
+ accuracy.
+
 ```csharp
 public WeaponStats(string Weapon, int Kills, int Deaths, int Assists, int Damage, int Shots, int Hits, double Accuracy)
 ```
@@ -103,20 +125,28 @@ public WeaponStats(string Weapon, int Kills, int Deaths, int Assists, int Damage
 #### Parameters
 
 `Weapon` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The name of the weapon for which the statistics are recorded. Cannot be null or empty.
 
 `Kills` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of kills achieved with the weapon. Must be zero or greater.
 
 `Deaths` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of deaths incurred while using the weapon. Must be zero or greater.
 
 `Assists` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of assists made with the weapon. Must be zero or greater.
 
 `Damage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total amount of damage dealt using the weapon. Must be zero or greater.
 
 `Shots` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of shots fired with the weapon. Must be zero or greater.
 
 `Hits` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total number of successful hits made with the weapon. Must be zero or greater.
 
 `Accuracy` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+The accuracy percentage for the weapon, calculated as the ratio of hits to shots. Must be between 0.0 and 100.0.
 
 ## Methods
 

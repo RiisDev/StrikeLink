@@ -22,23 +22,21 @@
 
 [ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)
 
-[Cs2DemoParseOptions](./strikelink/demoparser/parsing/cs2demoparseoptions.md)
+[Cs2DemoParser](./strikelink/demoparser/parsing/cs2demoparser.md)
 
 [Cs2DemoParseResult](./strikelink/demoparser/parsing/cs2demoparseresult.md)
 
-[CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
+[CsRankNames](./strikelink/demoparser/parsing/csranknames.md)
 
-[DemoParser](./strikelink/demoparser/parsing/demoparser.md)
+[CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
 
 [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)
 
 [MatchStats](./strikelink/demoparser/parsing/matchstats.md)
 
-[ModelHelpers](./strikelink/demoparser/parsing/modelhelpers.md)
-
 [MultiKillSummary](./strikelink/demoparser/parsing/multikillsummary.md)
 
-[PlayerEconomySnapshot](./strikelink/demoparser/parsing/playereconomysnapshot.md)
+[PlayerImpactStats](./strikelink/demoparser/parsing/playerimpactstats.md)
 
 [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)
 
@@ -46,13 +44,15 @@
 
 [RoundDamageEvent](./strikelink/demoparser/parsing/rounddamageevent.md)
 
+[RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)
+
 [RoundKillEvent](./strikelink/demoparser/parsing/roundkillevent.md)
 
 [RoundStats](./strikelink/demoparser/parsing/roundstats.md)
 
-[TeamDamageStats](./strikelink/demoparser/parsing/teamdamagestats.md)
+[SideSplitMetrics](./strikelink/demoparser/parsing/sidesplitmetrics.md)
 
-[TeamEconomySnapshot](./strikelink/demoparser/parsing/teameconomysnapshot.md)
+[TeamDamageStats](./strikelink/demoparser/parsing/teamdamagestats.md)
 
 [TradingStats](./strikelink/demoparser/parsing/tradingstats.md)
 
@@ -62,7 +62,7 @@
 
 ## StrikeLink.Extensions
 
-[Win32](./strikelink/extensions/win32.md)
+[NativeMethods](./strikelink/extensions/nativemethods.md)
 
 ## StrikeLink.GSI
 

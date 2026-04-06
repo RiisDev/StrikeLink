@@ -2,6 +2,8 @@
 
 Namespace: StrikeLink.DemoParser.Parsing
 
+Specifies the possible outcomes of a match.
+
 ```csharp
 public enum MatchOutcome
 ```
@@ -13,6 +15,6 @@ Implements [IComparable](https://docs.microsoft.com/en-us/dotnet/api/system.icom
 
 | Name | Value | Description |
 | --- | --: | --- |
-| Unknown | 0 |  |
-| Victory | 1 |  |
-| Defeat | 2 |  |
+| Unknown | 0 | Used when parsing fails, or the match ends to a fore-fit / vac-live. |
+| Victory | 1 | Used when the match is a victory based on base user. |
+| Defeat | 2 | Used when the match is a defeat based on base user. |

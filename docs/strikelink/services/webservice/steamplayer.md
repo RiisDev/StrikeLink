@@ -50,6 +50,8 @@ public string SteamId { get; set; }
 
 ### **SteamMiniId**
 
+The unique Steam Mini identifier for the user. Cannot be null.
+
 ```csharp
 public string SteamMiniId { get; set; }
 ```
@@ -89,6 +91,7 @@ The display name of the Steam user as shown on their profile. Cannot be null.
 The unique Steam identifier for the user. Cannot be null.
 
 `SteamMiniId` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The unique Steam Mini identifier for the user. Cannot be null.
 
 `ProfileUrl` Uri<br>
 The URL to the user's Steam profile. Cannot be null.

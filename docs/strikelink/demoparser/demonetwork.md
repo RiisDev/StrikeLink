@@ -45,6 +45,8 @@ This class encapsulates HTTP communication with the Steam Web API to obtain matc
 
 ### **GetMatchShareCode()**
 
+Retrieves the most recent valid match share code available for the authenticated user.
+
 ```csharp
 public Task<string> GetMatchShareCode()
 ```
@@ -52,6 +54,13 @@ public Task<string> GetMatchShareCode()
 #### Returns
 
 [Task&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+A string containing the latest valid match share code, or null if no valid code is found.
+
+**Remarks:**
+
+This method iteratively queries for the next available match share code until a valid code is
+ found. The returned share code can be used to access match details or share match information with
+ others.
 
 ### **Dispose()**
 

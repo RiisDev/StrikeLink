@@ -66,3 +66,22 @@ This method sends an HTTP request to the Steam Community service to obtain co-pl
 ```csharp
 public void Dispose()
 ```
+
+### **Dispose(Boolean)**
+
+Releases the unmanaged resources used by the class and optionally releases the managed resources.
+
+```csharp
+protected void Dispose(bool disposing)
+```
+
+#### Parameters
+
+`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+true to release both managed and unmanaged resources; false to release only unmanaged resources.
+
+**Remarks:**
+
+This method is called by public Dispose methods and can be overridden to release additional
+ resources. When disposing is true, managed resources can be disposed; when false, only unmanaged resources should
+ be released.
