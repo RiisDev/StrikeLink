@@ -470,10 +470,11 @@ namespace StrikeLink.DemoParser.Parsing
 			if (!envelope.TryGetInt32(1, out int userMessageType) || !envelope.TryGetBytes(2, out byte[]? payload) || payload is null)
 				return;
 
+			ProtoMessage decodedPayload = ProtoMessage.Parse(payload);
 			switch (userMessageType)
 			{
 				case MessageTypeIds.CsUmServerRankUpdate:
-					ApplyServerRankUpdate(state, ProtoMessage.Parse(payload));
+					ApplyServerRankUpdate(state, decodedPayload);
 					break;
 
 				case MessageTypeIds.CsUmXRankUpd:
@@ -630,6 +631,10 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private List<string> TrackedEventSamples { get; } = [];
 
+			private int RoundMvpEventsSeen { get; set; }
+
+			private int RoundMvpResolved { get; set; }
+
 			public int GameEventMessagesSeen { get; set; }
 
 			private Dictionary<int, PlayerAccumulator> PlayersByUserId { get; } = [];
@@ -711,12 +716,12 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private void ObserveTrackedEventSample(string eventName, IReadOnlyDictionary<string, GameEventValue> data)
 			{
-				if (TrackedEventSamples.Count >= 12)
+				if (TrackedEventSamples.Count >= 18)
 				{
 					return;
 				}
 
-				if (eventName is not ("player_death" or "player_hurt" or "bullet_damage" or "weapon_fire" or "player_spawn" or "player_team" or "round_end" or "round_start" or "round_officially_ended"))
+				if (eventName is not ("player_death" or "player_hurt" or "bullet_damage" or "weapon_fire" or "player_spawn" or "player_team" or "round_mvp" or "player_disconnect" or "round_end" or "round_start" or "round_officially_ended"))
 				{
 					return;
 				}
@@ -802,6 +807,10 @@ namespace StrikeLink.DemoParser.Parsing
 						HandlePlayerTeam(data);
 						break;
 
+					case "player_disconnect":
+						HandlePlayerDisconnect(data);
+						break;
+
 					case "begin_new_match":
 						break;
 
@@ -869,6 +878,14 @@ namespace StrikeLink.DemoParser.Parsing
 						IncrementUtilityCount(data, WeaponKind.Molotov);
 						break;
 
+					case "round_mvp":
+						HandleRoundMvp(data);
+						break;
+
+					case "bomb_exploded":
+						HandleBombExploded();
+						break;
+
 					case "bomb_planted":
 						if (EnsureTrackedRound())
 						{
@@ -876,6 +893,7 @@ namespace StrikeLink.DemoParser.Parsing
 							if (player is not null)
 							{
 								player.BombPlants++;
+								CurrentRound!.PlanterUserId = player.UserId;
 							}
 						}
 						break;
@@ -887,6 +905,7 @@ namespace StrikeLink.DemoParser.Parsing
 							if (player is not null)
 							{
 								player.BombDefuses++;
+								CurrentRound!.DefuserUserId = player.UserId;
 							}
 						}
 						break;
@@ -964,6 +983,13 @@ namespace StrikeLink.DemoParser.Parsing
 
 					AddWarning($"No players or rounds were extracted. Legacy game event messages seen: {GameEventMessagesSeen}. Top packet message ids: {emptyTopMessageTypes}. Top event names: {topEventNames}.");
 				}
+
+				if (RoundMvpEventsSeen > 0)
+				{
+					AddWarning($"MVP event diagnostics: round_mvp seen={RoundMvpEventsSeen}, resolved={RoundMvpResolved}.");
+				}
+
+				ApplyRoundMvpAwards();
 
 				List<PlayerStats> players = PlayersByUserId.Values
 					.Where(static player => !string.IsNullOrWhiteSpace(player.Name))
@@ -1096,6 +1122,8 @@ namespace StrikeLink.DemoParser.Parsing
 					Kills: player.Kills,
 					Deaths: player.Deaths,
 					Assists: player.Assists,
+					UtilityDamage: player.UtilityDamage,
+					MvpCount: player.MvpCount,
 					Rank: new RankSnapshot(player.RankOld, player.Rank, player.RankChange, player.RankWins, player.RankTypeId, player.VisibleSkill),
 					Adr: Math.Round(adr, 2),
 					MultiKills: new MultiKillSummary(
@@ -1136,7 +1164,8 @@ namespace StrikeLink.DemoParser.Parsing
 					Weapons: new ReadOnlyCollection<WeaponStats>(weaponStats),
 					Impact: impact,
 					BombPlants: player.BombPlants,
-					BombDefuses: player.BombDefuses);
+					BombDefuses: player.BombDefuses
+					);
 			}
 
 			private List<RoundImpactSnapshot> BuildRoundImpactSnapshots(PlayerAccumulator player)
@@ -1394,6 +1423,18 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					HalfTimeRoundNumber = Rounds.Count;
 				}
+			}
+
+			private void HandlePlayerDisconnect(IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn") ??
+				                            ResolvePlayer(GetIntValue(data, "userid"));
+				if (player is null)
+				{
+					return;
+				}
+
+				player.IsConnected = false;
 			}
 
 			private void StartRound(int tick, bool isSynthetic = false)
@@ -1801,6 +1842,85 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 
+			private void HandleRoundMvp(IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				RoundMvpEventsSeen++;
+
+				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "player", "playerid", "entindex", "entityid", "index", "slot", "client")
+				                            ?? ResolvePlayerByName(GetStringValue(data, "name") ?? GetStringValue(data, "playername"));
+				if (player is null)
+				{
+					return;
+				}
+
+				RoundMvpResolved++;
+				RoundAccumulator? round = CurrentRound ?? Rounds.LastOrDefault();
+				if (round is not null)
+				{
+					round.ExplicitMvpUserId = player.UserId;
+				}
+			}
+
+			private void HandleBombExploded()
+			{
+				if (CurrentRound is not null)
+				{
+					CurrentRound.BombExploded = true;
+				}
+			}
+
+			private void ApplyRoundMvpAwards()
+			{
+				foreach (PlayerAccumulator player in PlayersByUserId.Values)
+				{
+					player.MvpCount = 0;
+				}
+
+				foreach (RoundAccumulator round in Rounds)
+				{
+					int? mvpUserId = round.ExplicitMvpUserId ?? InferRoundMvpUserId(round);
+					if (mvpUserId is int resolvedUserId && PlayersByUserId.TryGetValue(resolvedUserId, out PlayerAccumulator? player))
+					{
+						player.MvpCount++;
+					}
+				}
+			}
+
+			private int? InferRoundMvpUserId(RoundAccumulator round)
+			{
+				if (round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
+				{
+					return null;
+				}
+
+				if (round.Winner == CsTeamSide.CounterTerrorists && round.DefuserUserId is int defuserUserId)
+				{
+					return defuserUserId;
+				}
+
+				if (round.Winner == CsTeamSide.Terrorists && round.BombExploded && round.PlanterUserId is int planterUserId)
+				{
+					return planterUserId;
+				}
+
+				IEnumerable<PlayerAccumulator> candidates = PlayersByUserId.Values
+					.Where(player => ResolvePlayerRoundSide(player, round) == round.Winner)
+					.Where(player => round.PlayerSideAtStart.ContainsKey(player.UserId)
+						|| round.Participants.Contains(player.UserId)
+						|| round.Alive.ContainsKey(player.UserId));
+
+				PlayerAccumulator? bestPlayer = candidates
+					.OrderByDescending(player => round.KillsByPlayer.GetValueOrDefault(player.UserId))
+					.ThenByDescending(player => round.Damage
+						.Where(damage => damage.AttackerSteamId == player.SteamId && !damage.IsFriendlyFire)
+						.Sum(damage => damage.HealthDamage > 0 ? damage.HealthDamage : damage.Damage))
+					.ThenByDescending(player => round.Alive.GetValueOrDefault(player.UserId))
+					.ThenBy(player => player.UserId)
+					.FirstOrDefault();
+
+				return bestPlayer?.UserId;
+			}
+
 			private void EvaluateClutchCandidates()
 			{
 				if (CurrentRound is null)
@@ -1954,6 +2074,18 @@ namespace StrikeLink.DemoParser.Parsing
 			private PlayerAccumulator? ResolvePlayerBySteamId(ulong steamId)
 				=> steamId != 0 && PlayersBySteamId.TryGetValue(steamId, out PlayerAccumulator? player) ? player : null;
 
+			private PlayerAccumulator? ResolvePlayerByName(string? name)
+			{
+				if (string.IsNullOrWhiteSpace(name))
+				{
+					return null;
+				}
+
+				return PlayersByUserId.Values.FirstOrDefault(player =>
+					!string.IsNullOrWhiteSpace(player.Name)
+					&& string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase));
+			}
+
 			// Try to resolve a player from a game-event field that may be either a
 			// legacy short userid (types 1-7) or a CS2 entity handle (types 8-9).
 			private PlayerAccumulator? ResolvePlayerFromField(IReadOnlyDictionary<string, GameEventValue> data, string key)
@@ -2004,6 +2136,18 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private static int GetIntValue(IReadOnlyDictionary<string, GameEventValue> data, string key)
 				=> data.TryGetValue(key, out GameEventValue value) ? value.AsInt32() : 0;
+
+			private static bool TryGetIntValue(IReadOnlyDictionary<string, GameEventValue> data, string key, out int value)
+			{
+				if (data.TryGetValue(key, out GameEventValue raw))
+				{
+					value = raw.AsInt32();
+					return true;
+				}
+
+				value = 0;
+				return false;
+			}
 
 			private static ulong GetUInt64Value(IReadOnlyDictionary<string, GameEventValue> data, string key)
 				=> data.TryGetValue(key, out GameEventValue value) ? value.AsUInt64() : 0;
@@ -2124,6 +2268,8 @@ namespace StrikeLink.DemoParser.Parsing
 			public int Deaths { get; set; }
 
 			public int Assists { get; set; }
+
+			public int MvpCount { get; set; }
 
 			public int HeadshotKills { get; set; }
 
@@ -2266,6 +2412,14 @@ namespace StrikeLink.DemoParser.Parsing
 			public List<RoundDamageEvent> Damage { get; } = [];
 
 			public List<TradeWindow> PendingTrades { get; } = [];
+
+			public int? ExplicitMvpUserId { get; set; }
+
+			public int? PlanterUserId { get; set; }
+
+			public int? DefuserUserId { get; set; }
+
+			public bool BombExploded { get; set; }
 
 			public List<ClutchCandidate> ClutchCandidates { get; } = [];
 

@@ -144,21 +144,37 @@ namespace StrikeLink.DemoParser.Parsing
 				throw new EndOfStreamException("Unexpected end of packet bitstream.");
 			}
 
-			uint value = 0;
-			for (int bit = 0; bit < count; bit++)
-			{
-				int absoluteBit = _bitPosition + bit;
-				int byteIndex = absoluteBit >> 3;
-				int bitIndex = absoluteBit & 7;
-				int currentBit = (buffer[byteIndex] >> bitIndex) & 1;
-				value |= (uint)currentBit << bit;
-			}
-
+			int byteIndex = _bitPosition >> 3;
+			int bitOffset = _bitPosition & 7;
 			_bitPosition += count;
-			return value;
+
+			// Collect all bytes that span the required bits into a ulong window, then extract.
+			int numBytes = (bitOffset + count + 7) >> 3;
+			ulong window = 0;
+			for (int i = 0; i < numBytes; i++)
+				window |= (ulong)buffer[byteIndex + i] << (i << 3);
+
+			uint mask = count < 32 ? (1u << count) - 1 : uint.MaxValue;
+			return (uint)(window >> bitOffset) & mask;
 		}
 
-		public byte ReadByte() => (byte)ReadBits(8);
+		public byte ReadByte()
+		{
+			if (!HasAtLeastBits(8))
+			{
+				throw new EndOfStreamException("Unexpected end of packet bitstream.");
+			}
+
+			int byteIndex = _bitPosition >> 3;
+			int bitOffset = _bitPosition & 7;
+			_bitPosition += 8;
+
+			if (bitOffset == 0)
+				return buffer[byteIndex];
+
+			// Bit position straddles two bytes — shift the window across the boundary.
+			return (byte)((buffer[byteIndex] >> bitOffset) | (buffer[byteIndex + 1] << (8 - bitOffset)));
+		}
 
 		public uint ReadVarUInt32()
 		{
@@ -419,7 +435,8 @@ namespace StrikeLink.DemoParser.Parsing
 		{
 			int index = 0;
 			int expectedLength = checked((int)ReadVarUInt32(input, ref index));
-			List<byte> output = new(expectedLength);
+			byte[] output = new byte[expectedLength];
+			int outputIndex = 0;
 
 			while (index < input.Length)
 			{
@@ -429,20 +446,21 @@ namespace StrikeLink.DemoParser.Parsing
 				switch (tagType)
 				{
 					case 0:
-						CopyLiteral(input, ref index, output, tag);
+						CopyLiteral(input, ref index, output, ref outputIndex, tag);
 						break;
 
 					case 1:
-						CopyFromHistory(output, 4 + ((tag >> 2) & 0x07), ((tag & 0xE0) << 3) | input[index++]);
+						CopyFromHistory(output, ref outputIndex, 4 + ((tag >> 2) & 0x07), ((tag & 0xE0) << 3) | input[index++]);
 						break;
 
 					case 2:
-						CopyFromHistory(output, 1 + (tag >> 2), input[index++] | (input[index++] << 8));
+						CopyFromHistory(output, ref outputIndex, 1 + (tag >> 2), input[index++] | (input[index++] << 8));
 						break;
 
 					case 3:
 						CopyFromHistory(
 							output,
+							ref outputIndex,
 							1 + (tag >> 2),
 							input[index++] |
 							(input[index++] << 8) |
@@ -455,10 +473,13 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 
-			return output.Count != expectedLength ? throw new InvalidDataException($"Snappy output length mismatch. Expected {expectedLength}, got {output.Count}.") : [.. output];
+			if (outputIndex != expectedLength)
+				throw new InvalidDataException($"Snappy output length mismatch. Expected {expectedLength}, got {outputIndex}.");
+
+			return output;
 		}
 
-		private static void CopyLiteral(byte[] input, ref int index, List<byte> output, byte tag)
+		private static void CopyLiteral(byte[] input, ref int index, byte[] output, ref int outputIndex, byte tag)
 		{
 			int length = tag >> 2;
 			if (length >= 60)
@@ -478,22 +499,23 @@ namespace StrikeLink.DemoParser.Parsing
 				throw new EndOfStreamException("Unexpected end of snappy literal block.");
 			}
 
-			for (int i = 0; i < length; i++)
-			{
-				output.Add(input[index++]);
-			}
+			Buffer.BlockCopy(input, index, output, outputIndex, length);
+			index += length;
+			outputIndex += length;
 		}
 
-		private static void CopyFromHistory(List<byte> output, int length, int offset)
+		private static void CopyFromHistory(byte[] output, ref int outputIndex, int length, int offset)
 		{
-			if (offset <= 0 || offset > output.Count)
+			if (offset <= 0 || offset > outputIndex)
 			{
 				throw new InvalidDataException("Encountered an invalid snappy back-reference.");
 			}
 
+			// Use a byte-at-a-time copy to correctly handle overlapping back-references (offset < length).
 			for (int i = 0; i < length; i++)
 			{
-				output.Add(output[^offset]);
+				output[outputIndex] = output[outputIndex - offset];
+				outputIndex++;
 			}
 		}
 

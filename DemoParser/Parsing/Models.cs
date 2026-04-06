@@ -123,6 +123,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="Kills">The total number of kills achieved by the player.</param>
 	/// <param name="Deaths">The total number of times the player died.</param>
 	/// <param name="Assists">The total number of assists credited to the player.</param>
+	/// <param name="UtilityDamage">The total amount of damage the player dealt with utility.</param>
+	/// <param name="MvpCount">The number of Most Valuable Player (MVP) awards earned by the player.</param>
 	/// <param name="Rank">The player's rank snapshot at the time of the statistics capture.</param>
 	/// <param name="Adr">The average damage dealt per round by the player.</param>
 	/// <param name="MultiKills">A summary of the player's multi-kill rounds.</param>
@@ -151,6 +153,8 @@ namespace StrikeLink.DemoParser.Parsing
 		int Kills,
 		int Deaths,
 		int Assists,
+		int UtilityDamage,
+		int MvpCount,
 		RankSnapshot Rank,
 		double Adr,
 		MultiKillSummary MultiKills,
