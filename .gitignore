@@ -406,3 +406,4 @@ FodyWeavers.xsd
 /docs/site
 /docs/.cache
 .qodo
+StrikeLink.Test.Suite/Program.cs
