@@ -81,75 +81,75 @@ It provides event-driven access to in-game chat, game state updates, Steam clien
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net8.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net9.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net10.0|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net8.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net9.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Windows|net10.0-windows|AnyCPU'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
