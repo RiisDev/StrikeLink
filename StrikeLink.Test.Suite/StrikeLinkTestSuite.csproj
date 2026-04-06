@@ -13,7 +13,11 @@
     <PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />
   </ItemGroup>
 
-  <ItemGroup>
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);WINDOWS</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
     <ProjectReference Include="..\StrikeLink.csproj" />
   </ItemGroup>
 

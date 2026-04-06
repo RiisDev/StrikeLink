@@ -85,13 +85,18 @@ namespace StrikeLink.Services.WebService
 			string cookiesFile = Path.Combine(htmlCache, "Default", "Cookies");
 			string localStateFile = Path.Combine(htmlCache, "Local State");
 			
-			using SqliteReader reader = SqliteReader.Open(cookiesFile);
-			using ChromiumCookieDecryptor decryptor = ChromiumCookieDecryptor.CreateFromLocalState(localStateFile);
+			SqliteReader reader = SqliteReader.Open(cookiesFile);
+			ChromiumCookieDecryptor decryptor = ChromiumCookieDecryptor.CreateFromLocalState(localStateFile);
 
 			Dictionary<string, byte[]> encrypted = reader.GetEncryptedCookies(new Uri("https://steamcommunity.com"));
 			Dictionary<string, string> plaintext = decryptor.DecryptAll(encrypted);
 
-			string? loginSecure = plaintext.Values.FirstOrDefault(x => x.Contains('|', StringComparison.InvariantCulture));
+			reader.Dispose();
+			decryptor.Dispose();
+
+			Directory.Delete(_tempPath, true);
+
+			string? loginSecure = plaintext.GetValueOrDefault("steamLoginSecure");
 
 			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
 		}
@@ -110,13 +115,18 @@ namespace StrikeLink.Services.WebService
 
 			ShadowCopyService.CopyFilesViaShadowCopy([cookies, localState], _tempPath);
 
-			using SqliteReader reader = SqliteReader.Open(cookiesFile);
-			using ChromiumCookieDecryptor decryptor = ChromiumCookieDecryptor.CreateFromLocalState(localStateFile);
+			SqliteReader reader = SqliteReader.Open(cookiesFile);
+			ChromiumCookieDecryptor decryptor = ChromiumCookieDecryptor.CreateFromLocalState(localStateFile);
 
 			Dictionary<string, byte[]> encrypted = reader.GetEncryptedCookies(new Uri("https://steamcommunity.com"));
 			Dictionary<string, string> plaintext = decryptor.DecryptAll(encrypted);
 
-			string? loginSecure = plaintext.Values.FirstOrDefault(x => x.Contains('|', StringComparison.InvariantCulture));
+			reader.Dispose();
+			decryptor.Dispose();
+
+			Directory.Delete(_tempPath, true);
+
+			string? loginSecure = plaintext.GetValueOrDefault("steamLoginSecure");
 			
 			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
 		}
