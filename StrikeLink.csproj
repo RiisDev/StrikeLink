@@ -38,6 +38,7 @@
 		  </None>
 		<None Remove=".gitattributes" />
 		<None Remove=".gitignore" />
+		<None Remove="DemoParser\EmbeddedResources\steam_api64.dll" />
 		<EditorConfigFiles Remove=".editorconfig" />
 		
   </ItemGroup>
@@ -155,5 +156,10 @@ It provides event-driven access to in-game chat, game state updates, Steam clien
 	<ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<PackageReference Include="System.Management" Version="10.0.5" />
 		<PackageReference Include="System.Security.Cryptography.ProtectedData" Version="10.0.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="DemoParser\EmbeddedResources\boiler.exe" />
+	  <EmbeddedResource Include="DemoParser\EmbeddedResources\steam_api64.dll" />
 	</ItemGroup>
 </Project>
