@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents the current state of a round as reported by GSI.
 
 ```csharp
-public class RoundState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.RoundState, StrikeLink, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class RoundState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.RoundState, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundState](./strikelink/gsi/objectstates/roundstate.md)<br>

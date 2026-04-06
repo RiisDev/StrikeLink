@@ -2,6 +2,8 @@
 using StrikeLink.GSI.Parsing;
 using System.Net;
 using System.Net.Sockets;
+#pragma warning disable CA1031
+#pragma warning disable CA1003
 
 // ReSharper disable UseAwaitUsing
 
@@ -15,7 +17,7 @@ namespace StrikeLink.GSI
 	/// This listener is responsible for configuring the GSI file, validating
 	/// network bindings, and managing the lifetime of the underlying socket server.
 	/// </remarks>
-	public class ServerListener : IDisposable, IAsyncDisposable
+	public class GsiListener : IDisposable, IAsyncDisposable
 	{
 		#region ServerLogic
 		// Private Vars
@@ -370,7 +372,7 @@ namespace StrikeLink.GSI
 
 		private static int GetFreePort()
 		{
-			TcpListener listener = new(IPAddress.Loopback, 0);
+			using TcpListener listener = new(IPAddress.Loopback, 0);
 			listener.Start();
 			int port = ((IPEndPoint)listener.LocalEndpoint).Port;
 			listener.Stop();
@@ -378,21 +380,34 @@ namespace StrikeLink.GSI
 		}
 
 		/// <summary>
-		/// Releases all resources used by the <see cref="ServerListener"/>.
+		/// Releases all resources used by the <see cref="GsiListener"/>.
 		/// </summary>
 		/// <remarks>
 		/// This method suppresses finalization and disposes managed resources.
 		/// </remarks>
 		public void Dispose()
 		{
+			Dispose(true);
 			GC.SuppressFinalize(this);
-			_cts.Cancel();
-			_listener.Dispose();
-			_cts.Dispose();
 		}
 
 		/// <summary>
-		/// Releases all resources used by the <see cref="ServerListener"/>.
+		/// Releases all resources used by the <see cref="GsiListener"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing) return;
+			_cts.Cancel();
+			_listener.Dispose();
+			_cts.Dispose();
+
+		}
+
+		/// <summary>
+		/// Releases all resources used by the <see cref="GsiListener"/>.
 		/// </summary>
 		/// <remarks>
 		/// This method suppresses finalization and disposes managed resources.

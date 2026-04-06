@@ -32,6 +32,7 @@ namespace StrikeLink.ChatBot
 		/// </exception>
 		public ChatService(Config config)
 		{
+			ArgumentNullException.ThrowIfNull(config);
 			_config = config;
 			_consoleService = new ConsoleService();
 			CheckCs2UserConfig();
@@ -102,13 +103,13 @@ namespace StrikeLink.ChatBot
 
 			for (int retryCount = 0; retryCount < 5; retryCount++)
 			{
-				if (!Win32.IsPrcoessActivated(csProcess))
+				if (!NativeMethods.IsPrcoessActivated(csProcess))
 				{
 					await Task.Delay(250).ConfigureAwait(false);
 					continue;
 				}
 				
-				Win32.PressKey(_config.Keybind);
+				NativeMethods.PressKey(_config.Keybind);
 				sent = true;
 				Log($"Sent chat message after {retryCount} retries");
 				break;
@@ -134,7 +135,7 @@ namespace StrikeLink.ChatBot
 			if (!localConfigReady)
 				throw new InvalidOperationException("CS2 user keybind configuration not found. Please configure a keybind for Strike Link in CS2 settings.");
 
-			if (localKeybind != Win32.VirtualKeyToChar[_config.Keybind])
+			if (localKeybind != NativeMethods.VirtualKeyToChar[_config.Keybind])
 				throw new InvalidOperationException($"CS2 user keybind configuration does not match the configured keybind '{_config.Keybind}'. Please update your CS2 keybind configuration accordingly.");
 		}
 		
@@ -206,7 +207,21 @@ namespace StrikeLink.ChatBot
 		/// </remarks>
 		public void Dispose()
 		{
+			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Releases the unmanaged resources used by the object and optionally releases the managed resources.
+		/// </summary>
+		/// <remarks>This method is called by public Dispose methods and the finalizer. When disposing is true, this
+		/// method disposes all managed resources referenced by the object. Override this method to release additional
+		/// resources.</remarks>
+		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing) return;
+
 			_consoleService.Dispose();
 		}
 	}

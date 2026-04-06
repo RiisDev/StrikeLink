@@ -8,7 +8,7 @@ namespace StrikeLink.Services.WebService
 	/// </summary>
 	/// <param name="DisplayName">The display name of the Steam user as shown on their profile. Cannot be null.</param>
 	/// <param name="SteamId">The unique Steam identifier for the user. Cannot be null.</param>
-	/// <param name="SteamId">The unique Steam Mini identifier for the user. Cannot be null.</param>
+	/// <param name="SteamMiniId">The unique Steam Mini identifier for the user. Cannot be null.</param>
 	/// <param name="ProfileUrl">The URL to the user's Steam profile. Cannot be null.</param>
 	public record SteamPlayer(
 		string DisplayName,
@@ -143,9 +143,23 @@ namespace StrikeLink.Services.WebService
 		/// <inheritdoc />
 		public void Dispose()
 		{
+			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Releases the unmanaged resources used by the class and optionally releases the managed resources.
+		/// </summary>
+		/// <remarks>This method is called by public Dispose methods and can be overridden to release additional
+		/// resources. When disposing is true, managed resources can be disposed; when false, only unmanaged resources should
+		/// be released.</remarks>
+		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing) return;
 			_httpClient.Dispose();
 			_httpClientHandler.Dispose();
+
 		}
 	}
 }

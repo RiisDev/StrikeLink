@@ -74,7 +74,7 @@ public enum HeldType
 	/// Submachine gun weapon category.
 	/// </summary>
 	SMG,
-
+	
 	/// <summary>
 	/// Pistol weapon category.
 	/// </summary>

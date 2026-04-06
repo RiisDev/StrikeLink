@@ -2,6 +2,10 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+#pragma warning disable CA1031
+#pragma warning disable CA1308
+#pragma warning disable CA1003
+#pragma warning disable CA1034
 
 namespace StrikeLink.Services
 {
@@ -392,10 +396,23 @@ namespace StrikeLink.Services
 		/// </remarks>
 		public void Dispose()
 		{
+			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Releases all resources used by the <see cref="ChatService"/>.
+		/// </summary>
+		/// <remarks>
+		/// This method suppresses finalization and disposes managed resources.
+		/// </remarks>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing) return;
 			_cancellationTokenSource.Cancel();
 			_cancellationTokenSource.Dispose();
 		}
+
 
 		[GeneratedRegex(@"^\[([^\]]+)\]\s+([^:]+):\s+(.+)$", RegexOptions.Singleline)]
 		private static partial Regex ChatRegex();

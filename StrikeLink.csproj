@@ -55,12 +55,17 @@
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Authors>IrisDev</Authors>
-		<PackageReleaseNotes>First initial public release</PackageReleaseNotes>
+		<PackageReleaseNotes>* Fixed linux targetting
+
+See documentation for below
++ New Feature LoginSecureService which will grab the login token of currently logged in steam user
++ New Feature CoPlayService, using LoginSecureService you can get recently played user data </PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/RiisDev/StrikeLink</PackageProjectUrl>
 		<Copyright>IrisDev</Copyright>
 		<Description>StrikeLInk is a modern .NET library for Counter-Strike 2 and Valve ecosystem integration.
 It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
 		<PackageIcon>icon.png</PackageIcon>
+		<Version>1.1.0</Version>
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release' And '$(TargetFramework)'=='net8.0'">

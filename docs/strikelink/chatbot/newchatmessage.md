@@ -5,7 +5,7 @@ Namespace: StrikeLink.ChatBot
 Represents a request to send a new chat message.
 
 ```csharp
-public class NewChatMessage : System.IEquatable`1[[StrikeLink.ChatBot.NewChatMessage, StrikeLink, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class NewChatMessage : System.IEquatable`1[[StrikeLink.ChatBot.NewChatMessage, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [NewChatMessage](./strikelink/chatbot/newchatmessage.md)<br>

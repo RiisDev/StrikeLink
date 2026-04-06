@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services.WebService
 Represents a record of a co-play gaming session, including game details, session timing, and participating players.
 
 ```csharp
-public class CoPlaySession : System.IEquatable`1[[StrikeLink.Services.WebService.CoPlaySession, StrikeLink, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class CoPlaySession : System.IEquatable`1[[StrikeLink.Services.WebService.CoPlaySession, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CoPlaySession](./strikelink/services/webservice/coplaysession.md)<br>

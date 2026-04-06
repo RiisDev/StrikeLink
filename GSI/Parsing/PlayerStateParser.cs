@@ -101,12 +101,14 @@ namespace StrikeLink.GSI.Parsing
 				string name = weaponElement.GetProperty("name").GetString()!;
 				string paintKit = weaponElement.GetProperty("paintkit").GetString()!;
 
-				HeldType type = name switch
-				{
-					"weapon_taser" => HeldType.Zeus,
-					"Submachine Gun" => HeldType.SMG,
-					_ => Enum.Parse<HeldType>(weaponElement.GetProperty("type").GetString()!, ignoreCase: true)
-				};
+				string? rawType = weaponElement.GetProperty("type").GetString();
+
+				HeldType type;
+
+				// Thank you Valve for making that different type then anyone else!
+				if (string.Equals(rawType, "Submachine Gun", StringComparison.OrdinalIgnoreCase)) type = HeldType.SMG;
+				else if (!Enum.TryParse(rawType, ignoreCase: true, out type)) throw new FormatException();
+
 				HeldState state = Enum.Parse<HeldState>(weaponElement.GetProperty("state").GetString()!, ignoreCase: true);
 
 				int? ammoClip = weaponElement.TryGetProperty("ammo_clip", out JsonElement clip) ? clip.GetInt32() : null;

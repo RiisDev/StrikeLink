@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services.WebService
 Represents a Steam user with display name, unique Steam ID, and profile URL.
 
 ```csharp
-public class SteamPlayer : System.IEquatable`1[[StrikeLink.Services.WebService.SteamPlayer, StrikeLink, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class SteamPlayer : System.IEquatable`1[[StrikeLink.Services.WebService.SteamPlayer, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [SteamPlayer](./strikelink/services/webservice/steamplayer.md)<br>

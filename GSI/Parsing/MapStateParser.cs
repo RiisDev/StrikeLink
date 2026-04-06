@@ -26,7 +26,7 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
-		private MapMode ParseMode(string? mode)
+		private static MapMode ParseMode(string? mode)
 		{
 			return mode switch
 			{
@@ -36,9 +36,9 @@ namespace StrikeLink.GSI.Parsing
 			};
 		}
 
-		private MapPhase ParsePhase(string? phase) => phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
+		private static MapPhase ParsePhase(string? phase) => phase == null ? MapPhase.GameOver : Enum.Parse<MapPhase>(phase, ignoreCase: true);
 
-		private Stats ParseStats(JsonElement root)
+		private static Stats ParseStats(JsonElement root)
 		{
 			return new Stats(
 				Score: root.GetProperty("score").GetInt32(),
@@ -48,7 +48,7 @@ namespace StrikeLink.GSI.Parsing
 			);
 		}
 
-		private Dictionary<int, WinState> ParseRoundWins(JsonElement root)
+		private static Dictionary<int, WinState> ParseRoundWins(JsonElement root)
 		{
 			Dictionary<int, WinState> roundWins = [];
 
@@ -68,7 +68,8 @@ namespace StrikeLink.GSI.Parsing
 			{ "t_win_elimination", WinState.CounterTerroristEliminated },
 			{ "ct_win_elimination", WinState.TerroristsEliminated },
 			{ "ct_win_defuse", WinState.BombDefused },
-			{ "t_win_bomb", WinState.BombExploded }
+			{ "t_win_bomb", WinState.BombExploded },
+			{ "unknown", WinState.Surrender },
 		};
 	}
 }

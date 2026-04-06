@@ -19,3 +19,4 @@ Implements [IComparable](https://docs.microsoft.com/en-us/dotnet/api/system.icom
 | TerroristsEliminated | 1 | All Terrorist players were eliminated. |
 | BombDefused | 2 | The bomb was successfully defused. |
 | BombExploded | 3 | The bomb exploded. |
+| Surrender | 4 | A team has surrendered. |

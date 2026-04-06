@@ -81,7 +81,12 @@ public enum WinState
 	/// <summary>
 	/// The bomb exploded.
 	/// </summary>
-	BombExploded
+	BombExploded,
+
+	/// <summary>
+	/// A team has surrendered.
+	/// </summary>
+	Surrender
 }
 
 /// <summary>

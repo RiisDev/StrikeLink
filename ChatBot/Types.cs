@@ -57,4 +57,4 @@ public record ChatMessage(string Username, string Message, bool Dead);
 /// <param name="OnTeamChat">
 /// Optional callback invoked when a team chat message is received.
 /// </param>
-public record Config(Win32.VirtualKey Keybind, bool IgnoreLocalUser = false, Action<ChatMessage>? OnGlobalChat = null, Action<ChatMessage>? OnTeamChat = null);
+public record Config(NativeMethods.VirtualKey Keybind, bool IgnoreLocalUser = false, Action<ChatMessage>? OnGlobalChat = null, Action<ChatMessage>? OnTeamChat = null);

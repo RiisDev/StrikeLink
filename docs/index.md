@@ -12,13 +12,61 @@
 
 [NewChatMessage](./strikelink/chatbot/newchatmessage.md)
 
+## StrikeLink.DemoParser
+
+[DemoAuthorization](./strikelink/demoparser/demoauthorization.md)
+
+[DemoNetwork](./strikelink/demoparser/demonetwork.md)
+
+## StrikeLink.DemoParser.Parsing
+
+[ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)
+
+[Cs2DemoParseOptions](./strikelink/demoparser/parsing/cs2demoparseoptions.md)
+
+[Cs2DemoParseResult](./strikelink/demoparser/parsing/cs2demoparseresult.md)
+
+[CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
+
+[DemoParser](./strikelink/demoparser/parsing/demoparser.md)
+
+[MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)
+
+[MatchStats](./strikelink/demoparser/parsing/matchstats.md)
+
+[ModelHelpers](./strikelink/demoparser/parsing/modelhelpers.md)
+
+[MultiKillSummary](./strikelink/demoparser/parsing/multikillsummary.md)
+
+[PlayerEconomySnapshot](./strikelink/demoparser/parsing/playereconomysnapshot.md)
+
+[PlayerStats](./strikelink/demoparser/parsing/playerstats.md)
+
+[RankSnapshot](./strikelink/demoparser/parsing/ranksnapshot.md)
+
+[RoundDamageEvent](./strikelink/demoparser/parsing/rounddamageevent.md)
+
+[RoundKillEvent](./strikelink/demoparser/parsing/roundkillevent.md)
+
+[RoundStats](./strikelink/demoparser/parsing/roundstats.md)
+
+[TeamDamageStats](./strikelink/demoparser/parsing/teamdamagestats.md)
+
+[TeamEconomySnapshot](./strikelink/demoparser/parsing/teameconomysnapshot.md)
+
+[TradingStats](./strikelink/demoparser/parsing/tradingstats.md)
+
+[UtilityStats](./strikelink/demoparser/parsing/utilitystats.md)
+
+[WeaponStats](./strikelink/demoparser/parsing/weaponstats.md)
+
 ## StrikeLink.Extensions
 
 [Win32](./strikelink/extensions/win32.md)
 
 ## StrikeLink.GSI
 
-[ServerListener](./strikelink/gsi/serverlistener.md)
+[GsiListener](./strikelink/gsi/gsilistener.md)
 
 ## StrikeLink.GSI.ObjectStates
 

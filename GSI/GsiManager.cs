@@ -20,16 +20,12 @@ namespace StrikeLink.GSI
 			{
 				ValveCfgReader existingReader = new(gsiCfg);
 				ConfigNode existingRoot = existingReader.Document.Root;
-				if (existingRoot.TryGetProperty("Strikelink Connection File", out ConfigNode existingConnection))
+				if (existingRoot.TryGetProperty("uri", out ConfigNode uriNode))
 				{
-					bool foundUri = existingConnection.TryGetProperty("uri", out ConfigNode uriNode);
-					if (foundUri)
-					{
-						Uri uri = new(uriNode.GetString());
-						IPAddress existingAddress = IPAddress.Parse(uri.Host);
-						int existingPort = uri.Port;
-						return (existingAddress, existingPort);
-					}
+					Uri uri = new(uriNode.GetString());
+					IPAddress existingAddress = IPAddress.Parse(uri.Host);
+					int existingPort = uri.Port;
+					return (existingAddress, existingPort);
 				}
 			}
 

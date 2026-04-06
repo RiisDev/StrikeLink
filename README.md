@@ -155,3 +155,17 @@ A flexible configuration system built around **`JsonDocument`-style APIs**.
 * Modify values using structured JSON-style access
 * Write configurations back to disk safely
 * Designed for tooling, modding, and automation
+
+--- 
+
+## Ai Disclosure
+
+> This was made as a hobby project that I use personally to make small little programs for fun, all of my software is free and open source via MIT licensing, if you have a problem with AI do not take it up with me.
+
+Some form of AI was used for the following items
+
+* Readme - I'm notoriously bad at writing readmes, but was proof read and modified after initial creation.
+* Incode ///summary Statements - I use the built in CoPilot summary auto complete to get a base summary which is then proof read and modified.
+* /DemoParser/Parsing - I extensively looked into how to do it properly and couldn't figure it out, so it wrote the files located within. (PS valve please update documentation page).
+* /Services/WebService/SqlService - I didn't want to use further nuget packages when all I needed to do was query a DB. 
+* /Services/Config - Same reason as SqlService

@@ -1,4 +1,5 @@
 ﻿using System.Security.Principal;
+#pragma warning disable CA1031
 
 namespace StrikeLink.Services.WebService
 {
@@ -51,8 +52,21 @@ namespace StrikeLink.Services.WebService
 		/// <inheritdoc />
 		public void Dispose()
 		{
-			try { Directory.Delete(_tempPath, true); } catch {/**/}
+			Dispose(true);
 			GC.SuppressFinalize(this);
+		}
+
+		/// <summary>
+		/// Releases the unmanaged resources used by the object and, optionally, releases the managed resources.
+		/// </summary>
+		/// <remarks>This method is called by public Dispose methods and the finalizer. When disposing is true, this
+		/// method disposes all managed and unmanaged resources; when false, only unmanaged resources are released. Override
+		/// this method to release resources specific to the derived class.</remarks>
+		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (!disposing) return;
+			try { Directory.Delete(_tempPath, true); } catch {/**/}
 		}
 
 		private string GetLoginSecureLinux()

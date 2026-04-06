@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents a weapon currently owned by the player.
 
 ```csharp
-public class Weapon : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Weapon, StrikeLink, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]
+public class Weapon : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Weapon, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Weapon](./strikelink/gsi/objectstates/weapon.md)<br>

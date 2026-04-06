@@ -8,7 +8,7 @@
 
 namespace StrikeLink.Extensions
 {
-	public static class Win32
+	public static class NativeMethods
 	{
 		public enum VirtualKey : uint
 		{

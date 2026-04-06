@@ -4,6 +4,7 @@
  *
  */
 using System.Security.Cryptography;
+// ReSharper disable UnusedParameter.Local
 #pragma warning disable CA1031
 
 namespace StrikeLink.Services.WebService
