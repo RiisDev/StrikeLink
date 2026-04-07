@@ -6,7 +6,7 @@ Represents summary statistics and metadata for a completed match, including scor
  identifying information.
 
 ```csharp
-public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>

@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents aggregate player statistics for the current match.
 
 ```csharp
-public class MatchStats : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.MatchStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class MatchStats : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.MatchStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MatchStats](./strikelink/gsi/objectstates/matchstats.md)<br>

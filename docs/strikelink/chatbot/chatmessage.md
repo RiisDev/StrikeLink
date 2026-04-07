@@ -5,7 +5,7 @@ Namespace: StrikeLink.ChatBot
 Represents a chat message received from the chat system.
 
 ```csharp
-public class ChatMessage : System.IEquatable`1[[StrikeLink.ChatBot.ChatMessage, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class ChatMessage : System.IEquatable`1[[StrikeLink.ChatBot.ChatMessage, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ChatMessage](./strikelink/chatbot/chatmessage.md)<br>

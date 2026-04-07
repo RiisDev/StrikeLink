@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a set of metrics that provide overall and side-specific values for a match or scenario.
 
 ```csharp
-public sealed class SideSplitMetrics : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.SideSplitMetrics, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class SideSplitMetrics : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.SideSplitMetrics, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [SideSplitMetrics](./strikelink/demoparser/parsing/sidesplitmetrics.md)<br>

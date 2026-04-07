@@ -77,7 +77,7 @@ namespace StrikeLink.DemoParser
 
 			FileOptions options = deleteFileOnClose ? FileOptions.DeleteOnClose : FileOptions.None;
 			FileStream readStream = new(tempFile, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, options);
-			Console.WriteLine($"TempFile:{tempFile}");
+
 			return new DemoDownloadResult(readStream, Path.GetFileName(tempFile), tempFile, IsBzip2Replay(replayUri));
 		}
 

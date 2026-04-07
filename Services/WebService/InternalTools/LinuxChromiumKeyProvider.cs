@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace StrikeLink.Services.WebService
+namespace StrikeLink.Services.WebService.InternalTools
 {
 	internal sealed class LinuxChromiumKeyProvider
 	{

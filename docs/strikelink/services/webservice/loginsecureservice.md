@@ -31,6 +31,18 @@ public string LoginSecureToken { get; private set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
+### **SessionId**
+
+Gets the unique identifier for the current session.
+
+```csharp
+public string SessionId { get; private set; }
+```
+
+#### Property Value
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+
 ## Constructors
 
 ### **LoginSecureService()**

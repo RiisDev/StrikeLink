@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services.Config
 Represents a parsed configuration document.
 
 ```csharp
-public sealed class ConfigDocument : System.IEquatable`1[[StrikeLink.Services.Config.ConfigDocument, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class ConfigDocument : System.IEquatable`1[[StrikeLink.Services.Config.ConfigDocument, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ConfigDocument](./strikelink/services/config/configdocument.md)<br>

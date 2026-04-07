@@ -1,4 +1,5 @@
-﻿using System.Security.Principal;
+﻿using StrikeLink.Services.WebService.InternalTools;
+using System.Security.Principal;
 #pragma warning disable CA1031
 
 namespace StrikeLink.Services.WebService

@@ -6,7 +6,7 @@ Represents a summary of multi-kill statistics, including counts and round indice
  five-kill events.
 
 ```csharp
-public sealed class MultiKillSummary : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MultiKillSummary, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class MultiKillSummary : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MultiKillSummary, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MultiKillSummary](./strikelink/demoparser/parsing/multikillsummary.md)<br>

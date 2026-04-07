@@ -6,7 +6,7 @@ Represents statistical data for a single round, including round number, duration
  events.
 
 ```csharp
-public sealed class RoundStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class RoundStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundStats](./strikelink/demoparser/parsing/roundstats.md)<br>

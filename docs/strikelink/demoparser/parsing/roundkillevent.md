@@ -6,7 +6,7 @@ Represents a kill event that occurred during a round, including details about th
  contextual information about the kill.
 
 ```csharp
-public sealed class RoundKillEvent : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundKillEvent, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class RoundKillEvent : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundKillEvent, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundKillEvent](./strikelink/demoparser/parsing/roundkillevent.md)<br>

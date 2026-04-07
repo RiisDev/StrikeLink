@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents aggregated team damage and team kill statistics for a match or round.
 
 ```csharp
-public sealed class TeamDamageStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.TeamDamageStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class TeamDamageStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.TeamDamageStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [TeamDamageStats](./strikelink/demoparser/parsing/teamdamagestats.md)<br>

@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
 
 ```csharp
-public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)<br>
@@ -147,6 +147,30 @@ The total number of assists credited to the player.
 
 ```csharp
 public int Assists { get; set; }
+```
+
+#### Property Value
+
+[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **UtilityDamage**
+
+The total amount of damage the player dealt with utility.
+
+```csharp
+public int UtilityDamage { get; set; }
+```
+
+#### Property Value
+
+[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **MvpCount**
+
+The number of Most Valuable Player (MVP) awards earned by the player.
+
+```csharp
+public int MvpCount { get; set; }
 ```
 
 #### Property Value
@@ -347,12 +371,12 @@ public int BombDefuses { get; set; }
 
 ## Constructors
 
-### **PlayerStats(UInt64, String, Int32, Boolean, CsTeamSide, Int32, Int32, Int32, Int32, Int32, Int32, RankSnapshot, Double, MultiKillSummary, Double, Double, TradingStats, ClutchStats, Double, Double, Double, UtilityStats, TeamDamageStats, IReadOnlyList&lt;WeaponStats&gt;, PlayerImpactStats, Int32, Int32)**
+### **PlayerStats(UInt64, String, Int32, Boolean, CsTeamSide, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, RankSnapshot, Double, MultiKillSummary, Double, Double, TradingStats, ClutchStats, Double, Double, Double, UtilityStats, TeamDamageStats, IReadOnlyList&lt;WeaponStats&gt;, PlayerImpactStats, Int32, Int32)**
 
 Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
 
 ```csharp
-public PlayerStats(ulong SteamId, string Name, int UserId, bool IsBot, CsTeamSide Team, int RoundsWon, int RoundsLost, int RoundsParticipated, int Kills, int Deaths, int Assists, RankSnapshot Rank, double Adr, MultiKillSummary MultiKills, double AimRating, double UtilityRating, TradingStats Trading, ClutchStats Clutches, double HeadshotPercentage, double TotalAccuracy, double SprayAccuracy, UtilityStats Utility, TeamDamageStats TeamDamage, IReadOnlyList<WeaponStats> Weapons, PlayerImpactStats Impact, int BombPlants, int BombDefuses)
+public PlayerStats(ulong SteamId, string Name, int UserId, bool IsBot, CsTeamSide Team, int RoundsWon, int RoundsLost, int RoundsParticipated, int Kills, int Deaths, int Assists, int UtilityDamage, int MvpCount, RankSnapshot Rank, double Adr, MultiKillSummary MultiKills, double AimRating, double UtilityRating, TradingStats Trading, ClutchStats Clutches, double HeadshotPercentage, double TotalAccuracy, double SprayAccuracy, UtilityStats Utility, TeamDamageStats TeamDamage, IReadOnlyList<WeaponStats> Weapons, PlayerImpactStats Impact, int BombPlants, int BombDefuses)
 ```
 
 #### Parameters
@@ -390,6 +414,12 @@ The total number of times the player died.
 
 `Assists` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The total number of assists credited to the player.
+
+`UtilityDamage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The total amount of damage the player dealt with utility.
+
+`MvpCount` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The number of Most Valuable Player (MVP) awards earned by the player.
 
 `Rank` [RankSnapshot](./strikelink/demoparser/parsing/ranksnapshot.md)<br>
 The player's rank snapshot at the time of the statistics capture.
@@ -505,10 +535,10 @@ public PlayerStats <Clone>$()
 
 [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)<br>
 
-### **Deconstruct(UInt64&, String&, Int32&, Boolean&, CsTeamSide&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, RankSnapshot&, Double&, MultiKillSummary&, Double&, Double&, TradingStats&, ClutchStats&, Double&, Double&, Double&, UtilityStats&, TeamDamageStats&, IReadOnlyList`1&, PlayerImpactStats&, Int32&, Int32&)**
+### **Deconstruct(UInt64&, String&, Int32&, Boolean&, CsTeamSide&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, RankSnapshot&, Double&, MultiKillSummary&, Double&, Double&, TradingStats&, ClutchStats&, Double&, Double&, Double&, UtilityStats&, TeamDamageStats&, IReadOnlyList`1&, PlayerImpactStats&, Int32&, Int32&)**
 
 ```csharp
-public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& IsBot, CsTeamSide& Team, Int32& RoundsWon, Int32& RoundsLost, Int32& RoundsParticipated, Int32& Kills, Int32& Deaths, Int32& Assists, RankSnapshot& Rank, Double& Adr, MultiKillSummary& MultiKills, Double& AimRating, Double& UtilityRating, TradingStats& Trading, ClutchStats& Clutches, Double& HeadshotPercentage, Double& TotalAccuracy, Double& SprayAccuracy, UtilityStats& Utility, TeamDamageStats& TeamDamage, IReadOnlyList`1& Weapons, PlayerImpactStats& Impact, Int32& BombPlants, Int32& BombDefuses)
+public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& IsBot, CsTeamSide& Team, Int32& RoundsWon, Int32& RoundsLost, Int32& RoundsParticipated, Int32& Kills, Int32& Deaths, Int32& Assists, Int32& UtilityDamage, Int32& MvpCount, RankSnapshot& Rank, Double& Adr, MultiKillSummary& MultiKills, Double& AimRating, Double& UtilityRating, TradingStats& Trading, ClutchStats& Clutches, Double& HeadshotPercentage, Double& TotalAccuracy, Double& SprayAccuracy, UtilityStats& Utility, TeamDamageStats& TeamDamage, IReadOnlyList`1& Weapons, PlayerImpactStats& Impact, Int32& BombPlants, Int32& BombDefuses)
 ```
 
 #### Parameters
@@ -534,6 +564,10 @@ public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& I
 `Deaths` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
 
 `Assists` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
+
+`UtilityDamage` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
+
+`MvpCount` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
 
 `Rank` [RankSnapshot&](./strikelink/demoparser/parsing/ranksnapshot&.md)<br>
 

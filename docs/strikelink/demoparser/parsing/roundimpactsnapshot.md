@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a snapshot of a player's impact and performance metrics for a single round in a match.
 
 ```csharp
-public sealed class RoundImpactSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundImpactSnapshot, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class RoundImpactSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundImpactSnapshot, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)<br>

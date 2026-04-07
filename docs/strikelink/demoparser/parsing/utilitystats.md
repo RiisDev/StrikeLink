@@ -6,7 +6,7 @@ Represents a set of statistics related to utility usage and effects in a match, 
  actions involving grenades and other utility items.
 
 ```csharp
-public sealed class UtilityStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.UtilityStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class UtilityStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.UtilityStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [UtilityStats](./strikelink/demoparser/parsing/utilitystats.md)<br>

@@ -56,17 +56,33 @@
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Authors>IrisDev</Authors>
-		<PackageReleaseNotes>* Fixed linux targetting
+		<PackageReleaseNotes>## New Fatures
+* Static TokenService class which can be used to retreive Auth Code, Match Code, Dev API Key
+* Cs2DemoParser built in demo parser (still early testing, report issues) that pull most content from a demo recording
+* DemoNetwork class to Decode/Encode match share codes, as well as retrieving latest match code from API
+* Cs2DemoDownloader class to download demos based on share codes (uses boiler-writer)
 
-See documentation for below
-+ New Feature LoginSecureService which will grab the login token of currently logged in steam user
-+ New Feature CoPlayService, using LoginSecureService you can get recently played user data </PackageReleaseNotes>
+## Fixes
+* Fixed LoginSecureService returning invalid tokens
+* Fixed LoginSecureService not deleting files after creating the,
+* Fixed some disposable items not being declared properly
+* Fixed GsiManager not grabbing old port information
+* Fixed GSI MapState Enum from erroring when a team surrenders
+* Fixed GSI PlayerState Weapon Enum from erroring when using an SMG
+* Fixed CoPlayService param documentation
+
+## Changes
+* ServerListener has been renamed to GsiListener to improve readability
+* Win32 -&gt; NativeMethods
+* PDB is now embedded to improve debugging / error reporting
+* Made a global shared HttpClient to lessen socket exhaustion
+</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/RiisDev/StrikeLink</PackageProjectUrl>
 		<Copyright>IrisDev</Copyright>
 		<Description>StrikeLInk is a modern .NET library for Counter-Strike 2 and Valve ecosystem integration.
 It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
 		<PackageIcon>icon.png</PackageIcon>
-		<Version>1.1.0</Version>
+		<Version>1.2.0</Version>
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release' And '$(TargetFramework)'=='net8.0'">

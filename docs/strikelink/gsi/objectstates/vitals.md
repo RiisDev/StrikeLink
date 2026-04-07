@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents the player's current vital statistics and round-specific metrics.
 
 ```csharp
-public class Vitals : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Vitals, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class Vitals : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Vitals, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Vitals](./strikelink/gsi/objectstates/vitals.md)<br>

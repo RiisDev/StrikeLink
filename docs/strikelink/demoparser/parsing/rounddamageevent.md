@@ -6,7 +6,7 @@ Represents a damage event that occurred during a round, including information ab
  used, and damage details.
 
 ```csharp
-public sealed class RoundDamageEvent : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundDamageEvent, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class RoundDamageEvent : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundDamageEvent, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundDamageEvent](./strikelink/demoparser/parsing/rounddamageevent.md)<br>

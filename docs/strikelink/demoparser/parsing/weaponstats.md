@@ -6,7 +6,7 @@ Represents statistical data for a specific weapon, including kills, deaths, assi
  accuracy.
 
 ```csharp
-public sealed class WeaponStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.WeaponStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class WeaponStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.WeaponStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [WeaponStats](./strikelink/demoparser/parsing/weaponstats.md)<br>

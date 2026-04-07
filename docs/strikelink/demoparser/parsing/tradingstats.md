@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents aggregated statistics related to trading kills and deaths in a trading scenario.
 
 ```csharp
-public sealed class TradingStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.TradingStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class TradingStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.TradingStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [TradingStats](./strikelink/demoparser/parsing/tradingstats.md)<br>

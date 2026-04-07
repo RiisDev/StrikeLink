@@ -6,7 +6,7 @@ Represents the result of parsing a Counter-Strike 2 demo, including match statis
  details, and any warnings encountered during parsing.
 
 ```csharp
-public sealed class Cs2DemoParseResult : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.Cs2DemoParseResult, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class Cs2DemoParseResult : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.Cs2DemoParseResult, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Cs2DemoParseResult](./strikelink/demoparser/parsing/cs2demoparseresult.md)<br>

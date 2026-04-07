@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents team statistics for the current map.
 
 ```csharp
-public class Stats : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Stats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class Stats : System.IEquatable`1[[StrikeLink.GSI.ObjectStates.Stats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Stats](./strikelink/gsi/objectstates/stats.md)<br>

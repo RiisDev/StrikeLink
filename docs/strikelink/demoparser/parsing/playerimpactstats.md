@@ -6,7 +6,7 @@ Represents a set of impact statistics for a player, including overall match impa
  metrics.
 
 ```csharp
-public sealed class PlayerImpactStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerImpactStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class PlayerImpactStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerImpactStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerImpactStats](./strikelink/demoparser/parsing/playerimpactstats.md)<br>

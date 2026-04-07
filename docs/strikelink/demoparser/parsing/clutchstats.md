@@ -6,7 +6,7 @@ Represents statistical data for clutch scenarios, including total attempts, wins
  number of opponents.
 
 ```csharp
-public sealed class ClutchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.ClutchStats, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class ClutchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.ClutchStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)<br>

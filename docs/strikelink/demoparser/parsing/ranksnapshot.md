@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a snapshot of a player's rank and related statistics at a specific point in time.
 
 ```csharp
-public sealed class RankSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RankSnapshot, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class RankSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RankSnapshot, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RankSnapshot](./strikelink/demoparser/parsing/ranksnapshot.md)<br>

@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents the current state of the map as reported by GSI.
 
 ```csharp
-public class MapState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.MapState, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class MapState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.MapState, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MapState](./strikelink/gsi/objectstates/mapstate.md)<br>

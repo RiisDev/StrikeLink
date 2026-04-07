@@ -1429,12 +1429,8 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn") ??
 				                            ResolvePlayer(GetIntValue(data, "userid"));
-				if (player is null)
-				{
-					return;
-				}
 
-				player.IsConnected = false;
+				player?.IsConnected = false;
 			}
 
 			private void StartRound(int tick, bool isSynthetic = false)
@@ -1855,18 +1851,12 @@ namespace StrikeLink.DemoParser.Parsing
 
 				RoundMvpResolved++;
 				RoundAccumulator? round = CurrentRound ?? Rounds.LastOrDefault();
-				if (round is not null)
-				{
-					round.ExplicitMvpUserId = player.UserId;
-				}
+				round?.ExplicitMvpUserId = player.UserId;
 			}
 
 			private void HandleBombExploded()
 			{
-				if (CurrentRound is not null)
-				{
-					CurrentRound.BombExploded = true;
-				}
+				CurrentRound?.BombExploded = true;
 			}
 
 			private void ApplyRoundMvpAwards()
@@ -1879,7 +1869,7 @@ namespace StrikeLink.DemoParser.Parsing
 				foreach (RoundAccumulator round in Rounds)
 				{
 					int? mvpUserId = round.ExplicitMvpUserId ?? InferRoundMvpUserId(round);
-					if (mvpUserId is int resolvedUserId && PlayersByUserId.TryGetValue(resolvedUserId, out PlayerAccumulator? player))
+					if (mvpUserId is { } resolvedUserId && PlayersByUserId.TryGetValue(resolvedUserId, out PlayerAccumulator? player))
 					{
 						player.MvpCount++;
 					}
@@ -1893,12 +1883,12 @@ namespace StrikeLink.DemoParser.Parsing
 					return null;
 				}
 
-				if (round.Winner == CsTeamSide.CounterTerrorists && round.DefuserUserId is int defuserUserId)
+				if (round.Winner == CsTeamSide.CounterTerrorists && round.DefuserUserId is { } defuserUserId)
 				{
 					return defuserUserId;
 				}
 
-				if (round.Winner == CsTeamSide.Terrorists && round.BombExploded && round.PlanterUserId is int planterUserId)
+				if (round.Winner == CsTeamSide.Terrorists && round.BombExploded && round.PlanterUserId is { } planterUserId)
 				{
 					return planterUserId;
 				}
@@ -2076,12 +2066,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private PlayerAccumulator? ResolvePlayerByName(string? name)
 			{
-				if (string.IsNullOrWhiteSpace(name))
-				{
-					return null;
-				}
-
-				return PlayersByUserId.Values.FirstOrDefault(player =>
+				return string.IsNullOrWhiteSpace(name) ? null : PlayersByUserId.Values.FirstOrDefault(player =>
 					!string.IsNullOrWhiteSpace(player.Name)
 					&& string.Equals(player.Name, name, StringComparison.OrdinalIgnoreCase));
 			}

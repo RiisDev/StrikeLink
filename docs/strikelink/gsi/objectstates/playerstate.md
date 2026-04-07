@@ -5,7 +5,7 @@ Namespace: StrikeLink.GSI.ObjectStates
 Represents the current state of a player as reported by GSI.
 
 ```csharp
-public class PlayerState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.PlayerState, StrikeLink, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null]]
+public class PlayerState : StrikeLink.GSI.IGsiPayload, System.IEquatable`1[[StrikeLink.GSI.ObjectStates.PlayerState, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerState](./strikelink/gsi/objectstates/playerstate.md)<br>
