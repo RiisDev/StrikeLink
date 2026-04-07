@@ -1,4 +1,3 @@
-using System.Net;
 using StrikeLink.DemoParser.Parsing;
 
 namespace StrikeLink.DemoParser
@@ -19,32 +18,8 @@ namespace StrikeLink.DemoParser
 	/// This class does not use SteamKit or any external package. It uses the replay URL shape:
 	/// https://replay{tvPort}.valve.net/730/{matchId}_{reservationId}.dem.bz2
 	/// </remarks>
-	public sealed class Cs2DemoDownloader : IDisposable
+	public sealed class Cs2DemoDownloader
 	{
-		private readonly HttpClient _httpClient;
-		private bool _disposeClient;
-
-		public Cs2DemoDownloader(HttpClient? httpClient = null)
-		{
-			if (httpClient is not null)
-			{
-				_httpClient = httpClient;
-				_disposeClient = false;
-				return;
-			}
-
-			_httpClient = new HttpClient(new HttpClientHandler
-			{
-				AllowAutoRedirect = true,
-				AutomaticDecompression = DecompressionMethods.All
-			})
-			{
-				Timeout = TimeSpan.FromSeconds(90)
-			};
-			_httpClient.DefaultRequestHeaders.UserAgent.ParseAdd("StrikeLink/1.0");
-			_disposeClient = true;
-		}
-
 		/// <summary>
 		/// Builds the replay URL from a CS2 share code.
 		/// </summary>
@@ -63,10 +38,10 @@ namespace StrikeLink.DemoParser
 		/// <summary>
 		/// Downloads the replay into memory and returns a readable stream.
 		/// </summary>
-		public async Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, CancellationToken cancellationToken = default)
+		public static async Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, CancellationToken cancellationToken = default)
 		{
 			Uri replayUri = await BuildReplayUri(shareCode).ConfigureAwait(false);
-			using HttpResponseMessage response = await _httpClient.GetAsync(replayUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+			using HttpResponseMessage response = await SharedClient.GetAsync(replayUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 			await EnsureSuccessAsync(response).ConfigureAwait(false);
 
 			MemoryStream memory = new();
@@ -87,20 +62,18 @@ namespace StrikeLink.DemoParser
 		/// <remarks>
 		/// Set <paramref name="deleteFileOnClose"/> to true when you only need ephemeral storage.
 		/// </remarks>
-		public async Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, bool deleteFileOnClose = false, CancellationToken cancellationToken = default)
+		public static async Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, bool deleteFileOnClose = false, CancellationToken cancellationToken = default)
 		{
 			Uri replayUri = await BuildReplayUri(shareCode).ConfigureAwait(false);
-			using HttpResponseMessage response = await _httpClient.GetAsync(replayUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+			using HttpResponseMessage response = await SharedClient.GetAsync(replayUri, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 			await EnsureSuccessAsync(response).ConfigureAwait(false);
 
 			string extension = IsBzip2Replay(replayUri) ? ".dem.bz2" : ".dem";
 			string tempFile = Path.Combine(Path.GetTempPath(), $"cs2_{Guid.NewGuid():N}{extension}");
 
-			await using (FileStream writeStream = new(tempFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read))
-			await using (Stream networkStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false))
-			{
-				await networkStream.CopyToAsync(writeStream, cancellationToken).ConfigureAwait(false);
-			}
+			await using FileStream writeStream = new(tempFile, FileMode.CreateNew, FileAccess.Write, FileShare.Read);
+			await using Stream networkStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+			await networkStream.CopyToAsync(writeStream, cancellationToken).ConfigureAwait(false);
 
 			FileOptions options = deleteFileOnClose ? FileOptions.DeleteOnClose : FileOptions.None;
 			FileStream readStream = new(tempFile, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, options);
@@ -121,15 +94,6 @@ namespace StrikeLink.DemoParser
 				$"Replay download failed with {(int)response.StatusCode} ({response.ReasonPhrase}). Body: {body}",
 				null,
 				response.StatusCode);
-		}
-
-		public void Dispose()
-		{
-			if (!_disposeClient)
-				return;
-
-			_httpClient.Dispose();
-			_disposeClient = false;
 		}
 	}
 }

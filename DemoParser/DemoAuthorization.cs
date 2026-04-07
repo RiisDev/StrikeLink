@@ -46,7 +46,7 @@ namespace StrikeLink.DemoParser
 			get;
 			set
 			{
-				if (value is < 76561100000000000 or > 99999999999999999)
+				if (value is < 76561100000000000 or > 76561199999999999)
 					throw new FormatException("Invalid SteamId.");
 				field = value;
 			}

@@ -14,6 +14,12 @@ namespace StrikeLink.Services.WebService
 		/// Gets or sets the secure token used for authentication during login operations.
 		/// </summary>
 		public string LoginSecureToken { get; private set; }
+
+		/// <summary>
+		/// Gets the unique identifier for the current session.
+		/// </summary>
+		public string SessionId { get; private set; }
+
 		private readonly string _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
 		/// <summary>
@@ -36,13 +42,13 @@ namespace StrikeLink.Services.WebService
 					throw new InvalidOperationException("To grab LoginSecure you must be running as admin.");
 				}
 
-				LoginSecureToken = GetLoginSecureWindows();
+				(SessionId, LoginSecureToken) = GetLoginSecureWindows();
 				return;
 			}
 
 			if (OperatingSystem.IsLinux())
 			{
-				LoginSecureToken = GetLoginSecureLinux();
+				(SessionId, LoginSecureToken) = GetLoginSecureLinux();
 				return;
 			}
 
@@ -69,7 +75,7 @@ namespace StrikeLink.Services.WebService
 			try { Directory.Delete(_tempPath, true); } catch {/**/}
 		}
 
-		private string GetLoginSecureLinux()
+		private (string sessionId, string loginSteamSecure) GetLoginSecureLinux()
 		{
 			if (!OperatingSystem.IsLinux()) throw new InvalidOperationException("How did you possibly see this normally.");
 
@@ -97,11 +103,15 @@ namespace StrikeLink.Services.WebService
 			Directory.Delete(_tempPath, true);
 
 			string? loginSecure = plaintext.GetValueOrDefault("steamLoginSecure");
+			string? sessionId = plaintext.GetValueOrDefault("sessionid");
 
-			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
+			if (loginSecure.IsNullOrEmpty()) throw new InvalidOperationException("Failed to find loginSecure token");
+			if (sessionId.IsNullOrEmpty()) throw new InvalidOperationException("Failed to find sessionId token");
+
+			return (sessionId, loginSecure);
 		}
 
-		private string GetLoginSecureWindows()
+		private (string sessionId, string loginSteamSecure) GetLoginSecureWindows()
 		{
 			if (!OperatingSystem.IsWindows()) 
 				throw new InvalidOperationException("How did you possibly see this normally."); 
@@ -127,8 +137,12 @@ namespace StrikeLink.Services.WebService
 			Directory.Delete(_tempPath, true);
 
 			string? loginSecure = plaintext.GetValueOrDefault("steamLoginSecure");
-			
-			return loginSecure.IsNullOrEmpty() ? throw new InvalidOperationException("Failed to find loginSecure token") : loginSecure;
+			string? sessionId = plaintext.GetValueOrDefault("sessionid");
+
+			if (loginSecure.IsNullOrEmpty()) throw new InvalidOperationException("Failed to find loginSecure token");
+			if (sessionId.IsNullOrEmpty()) throw new InvalidOperationException("Failed to find sessionId token");
+
+			return (sessionId, loginSecure);
 		}
 	}
 }

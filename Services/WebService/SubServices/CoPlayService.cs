@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services.WebService
 {
@@ -37,13 +36,11 @@ namespace StrikeLink.Services.WebService
 	/// Provides methods for retrieving and parsing Steam Co-Play session data for a specific user.
 	/// </summary>
 	/// <remarks>This service manages HTTP communication with the Steam Community website to obtain co-play session
-	/// information. It requires a valid Steam login token for authentication. The class is disposable and should be
-	/// disposed when no longer needed to release network resources.</remarks>
-	public partial class CoPlayService : IDisposable
+	/// information. It requires a valid Steam login token for authentication.</remarks>
+	public partial class CoPlayService
 	{
-		private readonly HttpClient _httpClient;
-		private readonly HttpClientHandler _httpClientHandler;
 		private readonly string _userId;
+		private readonly string _loginSecure;
 
 		/// <summary>
 		/// Initializes a new instance of the CoPlayService class using the specified Steam login secure token.
@@ -55,17 +52,8 @@ namespace StrikeLink.Services.WebService
 		public CoPlayService(string loginSecure)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(loginSecure);
-
+			_loginSecure = loginSecure;
 			_userId = loginSecure[..loginSecure.IndexOf('|', StringComparison.InvariantCulture)];
-			_httpClientHandler = new HttpClientHandler()
-			{
-				AllowAutoRedirect = true,
-				UseCookies = true,
-				AutomaticDecompression = DecompressionMethods.All
-			};
-			_httpClient = new HttpClient(_httpClientHandler);
-
-			_httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Cookie", $"steamLoginSecure={loginSecure}");
 		}
 
 		/// <summary>
@@ -79,8 +67,11 @@ namespace StrikeLink.Services.WebService
 		public async Task<List<CoPlaySession>> GetCoplayData()
 		{
 			using HttpRequestMessage request = new(HttpMethod.Get, $"https://steamcommunity.com/profiles/{_userId}/friends/coplay?ajax=1");
-			using HttpResponseMessage response = await _httpClient.SendAsync(request).ConfigureAwait(false);
+			request.Headers.TryAddWithoutValidation("Cookie", $"steamLoginSecure={_loginSecure}");
+
+			using HttpResponseMessage response = await SharedClient.SendAsync(request).ConfigureAwait(false);
 			response.EnsureSuccessStatusCode();
+
 			string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 			return Parse(responseBody);
 		}
@@ -140,26 +131,5 @@ namespace StrikeLink.Services.WebService
 			return match.Groups[group].Value.Trim();
 		}
 
-		/// <inheritdoc />
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
-		/// Releases the unmanaged resources used by the class and optionally releases the managed resources.
-		/// </summary>
-		/// <remarks>This method is called by public Dispose methods and can be overridden to release additional
-		/// resources. When disposing is true, managed resources can be disposed; when false, only unmanaged resources should
-		/// be released.</remarks>
-		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposing) return;
-			_httpClient.Dispose();
-			_httpClientHandler.Dispose();
-
-		}
 	}
 }
