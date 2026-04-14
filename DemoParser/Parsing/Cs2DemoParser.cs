@@ -1559,12 +1559,6 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 
-			/* TODO:
-			 * Figure out why all kills aren't being handled,
-			 *		-> It appears kills on the enemy team were read correctly, but not local user team?
-			 *		-> I think I found the cause: user 'clue777' doesn't seem to register inside the demo,
-			 *			and kills towards him aren't being counted because of it
-			 * */
 			private void HandlePlayerDeath(int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
 				PlayerAccumulator? killer = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
@@ -1658,7 +1652,9 @@ namespace StrikeLink.DemoParser.Parsing
 					IsTrade: isTrade,
 					IsWallBang: penetrated > 0,
 					ThroughSmoke: throughSmoke,
-					AttackerBlind: attackerBlind));
+					AttackerBlind: attackerBlind
+					)
+				);
 
 				if (killer is not null && killer.Team != victim.Team && killer.UserId != victim.UserId)
 				{
