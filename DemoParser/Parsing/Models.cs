@@ -48,6 +48,26 @@ namespace StrikeLink.DemoParser.Parsing
 		/// </summary>
 		Defeat = 2,
 	}
+
+	/// <summary>
+	/// Represents the two persistent team identities in a single match.
+	/// Team A and Team B are lineup identities and do not imply a fixed side.
+	/// </summary>
+	public enum MatchTeam
+	{
+		/// <summary>
+		/// Unknown team identity.
+		/// </summary>
+		Unknown = 0,
+		/// <summary>
+		/// The first persistent lineup identity in the match.
+		/// </summary>
+		TeamA = 1,
+		/// <summary>
+		/// The second persistent lineup identity in the match.
+		/// </summary>
+		TeamB = 2,
+	}
 	
 	/// <summary>
 	/// Represents the result of parsing a Counter-Strike 2 demo, including match statistics, player statistics, round
@@ -71,8 +91,12 @@ namespace StrikeLink.DemoParser.Parsing
 	/// identifying information.
 	/// </summary>
 	/// <param name="Duration">The total duration of the match.</param>
-	/// <param name="TerroristScore">The final score achieved by the Terrorist team.</param>
-	/// <param name="CounterTerroristScore">The final score achieved by the Counter-Terrorist team.</param>
+	/// <param name="TeamAScore">The final score achieved by Team A.</param>
+	/// <param name="TeamBScore">The final score achieved by Team B.</param>
+	/// <param name="TerroristRoundWins">The number of rounds won by the Terrorist side.</param>
+	/// <param name="CounterTerroristRoundWins">The number of rounds won by the Counter-Terrorist side.</param>
+	/// <param name="TeamAStartSide">The side Team A started on at the beginning of the match.</param>
+	/// <param name="TeamBStartSide">The side Team B started on at the beginning of the match.</param>
 	/// <param name="Outcome">The outcome of the match, indicating which team won or if the match was drawn.</param>
 	/// <param name="ServerLocation">The geographic location of the server where the match was played, or null if not available.</param>
 	/// <param name="ServerAddress">The network address of the server, or null if not available.</param>
@@ -89,8 +113,12 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <remarks>Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo</remarks>
 	public sealed record MatchStats(
 		TimeSpan Duration,
-		int TerroristScore,
-		int CounterTerroristScore,
+		int TeamAScore,
+		int TeamBScore,
+		int TerroristRoundWins,
+		int CounterTerroristRoundWins,
+		CsTeamSide TeamAStartSide,
+		CsTeamSide TeamBStartSide,
 		MatchOutcome Outcome,
 		string? ServerLocation,
 		string? ServerAddress,
@@ -416,13 +444,19 @@ namespace StrikeLink.DemoParser.Parsing
 	/// </summary>
 	/// <param name="RoundNumber">The zero-based index of the round within the match. Must be non-negative.</param>
 	/// <param name="Duration">The total elapsed time of the round, or null if the duration is not available.</param>
-	/// <param name="Winner">The team that won the round, or null if the round did not have a winner.</param>
+	/// <param name="WinnerTeam">The lineup identity that won the round.</param>
+	/// <param name="WinnerSide">The side (T/CT) that won the round.</param>
+	/// <param name="TeamASide">The side Team A played on for this round.</param>
+	/// <param name="TeamBSide">The side Team B played on for this round.</param>
 	/// <param name="Kills">A read-only list of all kill events that occurred during the round. Never null.</param>
 	/// <param name="Damage">A read-only list of all damage events that occurred during the round. Never null.</param>
 	public sealed record RoundStats(
 		int RoundNumber,
 		TimeSpan? Duration,
-		CsTeamSide? Winner,
+		MatchTeam WinnerTeam,
+		CsTeamSide WinnerSide,
+		CsTeamSide TeamASide,
+		CsTeamSide TeamBSide,
 		IReadOnlyList<RoundKillEvent> Kills,
 		IReadOnlyList<RoundDamageEvent> Damage);
 

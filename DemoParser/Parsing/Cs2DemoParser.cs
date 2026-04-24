@@ -34,7 +34,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 		private const uint CompressedFlag = 64;
 
-		private readonly FileStream? _fileStream;
+		private readonly Stream? _fileStream;
 		private readonly ParseState _state;
 
 		/// <summary>
@@ -62,6 +62,28 @@ namespace StrikeLink.DemoParser.Parsing
 			FileInfo fileInfo = demoFile;
 			_fileStream = File.OpenRead(demoFile.FullName);
 			_state = new ParseState(authData, fileInfo);
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the Cs2DemoParser class for reading and parsing a demo stream using the specified
+		/// authorization data. Supports <see cref="MemoryStream"/>, <see cref="FileStream"/>, <see cref="BinaryReader"/> 
+		/// underlying streams, or any live/network stream source.
+		/// </summary>
+		/// <param name="demoStream">
+		/// A readable stream containing demo data. Must be non-null and readable.
+		/// For network/live streams, the stream does not need to be seekable.
+		/// </param>
+		/// <param name="authData">The authorization data used to access or decrypt the demo. May be null if no authorization is required.</param>
+		/// <exception cref="ArgumentNullException">Thrown if <paramref name="demoStream"/> is null.</exception>
+		/// <exception cref="ArgumentException">Thrown if <paramref name="demoStream"/> is not readable.</exception>
+		public Cs2DemoParser(Stream demoStream, DemoAuthorization authData)
+		{
+			ArgumentNullException.ThrowIfNull(demoStream);
+			if (!demoStream.CanRead)
+				throw new ArgumentException("Stream must be readable.", nameof(demoStream));
+
+			_fileStream = demoStream;
+			_state = new ParseState(authData);
 		}
 
 		/// <summary>
@@ -619,7 +641,7 @@ namespace StrikeLink.DemoParser.Parsing
 			return new GameEventValue(type, value);
 		}
 
-		private sealed class ParseState(DemoAuthorization config, FileInfo demoPath)
+		private sealed class ParseState(DemoAuthorization config, FileInfo? demoPath = null)
 		{
 			private readonly HashSet<string> _warningSet = new(StringComparer.Ordinal);
 
@@ -786,13 +808,12 @@ namespace StrikeLink.DemoParser.Parsing
 					return;
 				}
 
-				CompleteRound(CurrentRound, winner: null, CurrentFrameTick);
+				CompleteRound(CurrentRound, ResolveRequiredRoundWinner(CurrentRound), CurrentFrameTick);
 			}
 
 			public void HandleGameEvent(string name, int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
 				ObserveTrackedEventSample(name, data);
-
 				switch (name)
 				{
 					case "player_connect":
@@ -831,11 +852,39 @@ namespace StrikeLink.DemoParser.Parsing
 						break;
 
 					case "round_end":
-						CompleteRound(CurrentRound, GetTeamValue(data, "winner"), tick);
+						{
+							CsTeamSide winner = GetRoundWinnerFromEvent(data);
+							if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+							{
+								CompleteRound(CurrentRound, winner, tick);
+							}
+							else if (TryResolveRoundWinner(CurrentRound, out CsTeamSide inferredWinner))
+							{
+								CompleteRound(CurrentRound, inferredWinner, tick);
+							}
+							else
+							{
+								// Defer completion until additional events or post-pass inference can resolve winner.
+							}
+						}
 						break;
 
 					case "round_officially_ended":
-						CompleteRound(CurrentRound, InferRoundWinner(CurrentRound), tick);
+						{
+							CsTeamSide winner = GetRoundWinnerFromEvent(data);
+							if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+							{
+								CompleteRound(CurrentRound, winner, tick);
+							}
+							else if (TryResolveRoundWinner(CurrentRound, out CsTeamSide officiallyEndedWinner))
+							{
+								CompleteRound(CurrentRound, officiallyEndedWinner, tick);
+							}
+							else
+							{
+								// Some demos omit winner fields here; keep round open and resolve later.
+							}
+						}
 						break;
 
 					case "player_death":
@@ -926,6 +975,12 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					AddWarning($"Tracked event samples: {string.Join(" | ", TrackedEventSamples)}");
 				}
+
+				if (HalfTimeRoundNumber == 0 && Rounds.Count >= 12 && Rounds.Any(round => round.Winner is null))
+				{
+					HalfTimeRoundNumber = 12;
+					AddWarning("Half-time boundary was inferred as round 12 because winner resolution was deferred during live parsing.");
+				}
 				
 				// Retroactively infer winners for rounds completed before team assignments were available.
 				// All player team data is now known, so InferRoundWinner will have correct team info.
@@ -968,6 +1023,12 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 				}
 
+				RoundAccumulator? unresolvedRound = Rounds.FirstOrDefault(round => round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists));
+				if (unresolvedRound is not null)
+				{
+					throw new InvalidOperationException($"Failed to determine winner for round {unresolvedRound.Number}.");
+				}
+
 				if (PlayersByUserId.Count == 0 && Rounds.Count == 0)
 				{
 					string emptyTopMessageTypes = string.Join(", ", NetMessageCounts
@@ -1003,6 +1064,11 @@ namespace StrikeLink.DemoParser.Parsing
 					.Select(BuildRound)
 					.ToList();
 
+				int teamAScore = rounds.Count(static round => round.WinnerTeam == MatchTeam.TeamA);
+				int teamBScore = rounds.Count(static round => round.WinnerTeam == MatchTeam.TeamB);
+				int terroristRoundWins = rounds.Count(static round => round.WinnerSide == CsTeamSide.Terrorists);
+				int counterTerroristRoundWins = rounds.Count(static round => round.WinnerSide == CsTeamSide.CounterTerrorists);
+
 				TimeSpan roundDuration = rounds.Aggregate(TimeSpan.Zero, (current, roundStats) => current.Add(roundStats.Duration ?? TimeSpan.Zero));
 				TimeSpan playbackTickDuration = TickIntervalSeconds > 0 && PlaybackTicks > 0
 					? TimeSpan.FromSeconds(PlaybackTicks * TickIntervalSeconds)
@@ -1018,11 +1084,14 @@ namespace StrikeLink.DemoParser.Parsing
 					.DefaultIfEmpty(TimeSpan.Zero)
 					.Max();
 
-				DateTime fileDateUtc = File.GetCreationTimeUtc(demoPath.FullName);
-				if (fileDateUtc == DateTime.MinValue)
+				DateTime fileDateUtc;
+				if (demoPath is not null)
 				{
-					fileDateUtc = File.GetLastWriteTimeUtc(demoPath.FullName);
+					fileDateUtc = File.GetCreationTimeUtc(demoPath.FullName);
+					if (fileDateUtc == DateTime.MinValue) fileDateUtc = File.GetLastWriteTimeUtc(demoPath.FullName);
 				}
+				else fileDateUtc = DateTime.MinValue;
+				
 
 				PlayerStats? focusPlayer = players.FirstOrDefault(player => player.SteamId == (ulong)config.SteamId);
 
@@ -1042,8 +1111,12 @@ namespace StrikeLink.DemoParser.Parsing
 
 				MatchStats match = new(
 					Duration: matchDuration,
-					TerroristScore: TerroristScore,
-					CounterTerroristScore: CounterTerroristScore,
+					TeamAScore: teamAScore,
+					TeamBScore: teamBScore,
+					TerroristRoundWins: terroristRoundWins,
+					CounterTerroristRoundWins: counterTerroristRoundWins,
+					TeamAStartSide: CsTeamSide.Terrorists,
+					TeamBStartSide: CsTeamSide.CounterTerrorists,
 					Outcome: outcome,
 					ServerLocation: ServerLocation,
 					ServerAddress: ServerAddress,
@@ -1062,13 +1135,23 @@ namespace StrikeLink.DemoParser.Parsing
 				return new Cs2DemoParseResult(match, players, rounds, new ReadOnlyCollection<string>(Warnings));
 			}
 
-			private static RoundStats BuildRound(RoundAccumulator round) =>
-				new(
+			private RoundStats BuildRound(RoundAccumulator round)
+			{
+				CsTeamSide winnerSide = ResolveRequiredRoundWinner(round);
+				CsTeamSide teamASide = GetTeamASideForRound(round.Number);
+				CsTeamSide teamBSide = GetOppositeTeamSide(teamASide);
+				MatchTeam winnerTeam = winnerSide == teamASide ? MatchTeam.TeamA : MatchTeam.TeamB;
+
+				return new RoundStats(
 					round.Number,
 					round.Duration,
-					round.Winner,
+					winnerTeam,
+					winnerSide,
+					teamASide,
+					teamBSide,
 					new ReadOnlyCollection<RoundKillEvent>(round.Kills),
 					new ReadOnlyCollection<RoundDamageEvent>(round.Damage));
+			}
 
 			private PlayerStats BuildPlayer(PlayerAccumulator player)
 			{
@@ -1433,11 +1516,36 @@ namespace StrikeLink.DemoParser.Parsing
 				player?.IsConnected = false;
 			}
 
+			private static void TryAssignTeamFromEvent(PlayerAccumulator? player, IReadOnlyDictionary<string, GameEventValue> data, params string[] teamKeys)
+			{
+				if (player is null || player.Team is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+				{
+					return;
+				}
+
+				foreach (string key in teamKeys)
+				{
+					CsTeamSide side = GetTeamValue(data, key);
+					if (side is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+					{
+						player.Team = side;
+						return;
+					}
+				}
+			}
+
 			private void StartRound(int tick, bool isSynthetic = false)
 			{
 				if (CurrentRound is not null)
 				{
-					CompleteRound(CurrentRound, InferRoundWinner(CurrentRound), tick);
+					if (TryResolveRoundWinner(CurrentRound, out CsTeamSide resolvedWinner))
+					{
+						CompleteRound(CurrentRound, resolvedWinner, tick);
+					}
+					else
+					{
+						// Keep the prior round unresolved for post-pass inference when live data is insufficient.
+					}
 				}
 
 				RoundAccumulator round = new(Rounds.Count + 1, tick, isSynthetic);
@@ -1451,15 +1559,22 @@ namespace StrikeLink.DemoParser.Parsing
 				Rounds.Add(round);
 			}
 
-			private void CompleteRound(RoundAccumulator? round, CsTeamSide? winner, int tick)
+			private void CompleteRound(RoundAccumulator? round, CsTeamSide winner, int tick)
 			{
 				if (round is null)
 				{
 					return;
 				}
 
+				if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
+				{
+					throw new InvalidOperationException($"Failed to determine winner for round {round.Number}.");
+				}
+
 				round.EndTick = tick;
 				round.Winner = winner;
+
+
 				round.Duration = GetDuration(round.StartTick, tick);
 				round.CompleteShotSequences();
 
@@ -1481,10 +1596,6 @@ namespace StrikeLink.DemoParser.Parsing
 						break;
 					case CsTeamSide.CounterTerrorists:
 						CounterTerroristScore++;
-						break;
-					case CsTeamSide.Unknown:
-					case CsTeamSide.Spectator:
-					case null:
 						break;
 					default:
 						throw new ArgumentOutOfRangeException(nameof(winner), winner, null);
@@ -1517,18 +1628,15 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 				}
 
-				if (winner is not null)
+				foreach (PlayerAccumulator player in PlayersByUserId.Values.Where(static player => player.Team is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
 				{
-					foreach (PlayerAccumulator player in PlayersByUserId.Values.Where(static player => player.Team is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
+					if (player.Team == winner)
 					{
-						if (player.Team == winner)
-						{
-							player.RoundsWon++;
-						}
-						else
-						{
-							player.RoundsLost++;
-						}
+						player.RoundsWon++;
+					}
+					else
+					{
+						player.RoundsLost++;
 					}
 				}
 
@@ -1564,6 +1672,9 @@ namespace StrikeLink.DemoParser.Parsing
 				PlayerAccumulator? killer = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
 				PlayerAccumulator? assister = ResolvePlayerFromCandidates(data, "assister", "assister_pawn");
+				TryAssignTeamFromEvent(killer, data, "attackerteam", "attacker_team", "atk_team", "attacker_side");
+				TryAssignTeamFromEvent(victim, data, "userid_team", "victimteam", "victim_team", "userteam", "victim_side");
+				TryAssignTeamFromEvent(assister, data, "assisterteam", "assister_team", "assist_team");
 				string weapon = NormalizeWeapon(GetStringValue(data, "weapon"));
 				bool isHeadshot = GetBoolValue(data, "headshot");
 				int penetrated = GetIntValue(data, "penetrated");
@@ -1702,6 +1813,8 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				PlayerAccumulator? attacker = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
+				TryAssignTeamFromEvent(attacker, data, "attackerteam", "attacker_team", "atk_team", "attacker_side");
+				TryAssignTeamFromEvent(victim, data, "userid_team", "victimteam", "victim_team", "userteam", "victim_side");
 				if (attacker is null || victim is null)
 				{
 					return;
@@ -1938,6 +2051,39 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private bool ShouldStartRoundFromSignal(int tick) => PlayersByUserId.Count != 0 && (CurrentRound is null || tick - CurrentRound.StartTick >= GetRoundRestartSignalGapTicks());
 
+			private CsTeamSide GetTeamASideForRound(int roundNumber)
+			{
+				bool isSecondHalf = HalfTimeRoundNumber > 0 && roundNumber > HalfTimeRoundNumber;
+				return isSecondHalf ? CsTeamSide.CounterTerrorists : CsTeamSide.Terrorists;
+			}
+
+			private static CsTeamSide GetOppositeTeamSide(CsTeamSide side)
+				=> side == CsTeamSide.Terrorists ? CsTeamSide.CounterTerrorists : CsTeamSide.Terrorists;
+
+			private CsTeamSide ResolveRequiredRoundWinner(RoundAccumulator? round)
+			{
+				if (TryResolveRoundWinner(round, out CsTeamSide inferred))
+				{
+					return inferred;
+				}
+
+				int roundNumber = round?.Number ?? -1;
+				throw new InvalidOperationException($"Failed to determine winner for round {roundNumber}.");
+			}
+
+			private bool TryResolveRoundWinner(RoundAccumulator? round, out CsTeamSide winner)
+			{
+				CsTeamSide? inferred = InferRoundWinner(round);
+				if (inferred is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+				{
+					winner = inferred.Value;
+					return true;
+				}
+
+				winner = CsTeamSide.Unknown;
+				return false;
+			}
+
 			private CsTeamSide? InferRoundWinner(RoundAccumulator? round)
 			{
 				if (round is null)
@@ -1945,6 +2091,16 @@ namespace StrikeLink.DemoParser.Parsing
 					return null;
 				}
 
+				if (round.BombExploded)
+				{
+					return CsTeamSide.Terrorists;
+				}
+
+				if (round.DefuserUserId is not null)
+				{
+					return CsTeamSide.CounterTerrorists;
+				}
+				
 				// Determine if this is a first-half round (teams are swapped relative to current assignments)
 				bool isFirstHalf = HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber;
 
@@ -2141,6 +2297,63 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private static CsTeamSide GetTeamValue(IReadOnlyDictionary<string, GameEventValue> data, string key)
 				=> (CsTeamSide)GetIntValue(data, key);
+
+			private static CsTeamSide GetRoundWinnerFromEvent(IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				string[] candidateKeys = ["winner", "winning_team", "winner_team", "team"];
+				foreach (string key in candidateKeys)
+				{
+					CsTeamSide winner = GetTeamValue(data, key);
+					if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+					{
+						return winner;
+					}
+
+					string? text = GetStringValue(data, key);
+					if (string.IsNullOrWhiteSpace(text))
+					{
+						continue;
+					}
+
+					if (text.Equals("t", StringComparison.OrdinalIgnoreCase) || text.Equals("terrorists", StringComparison.OrdinalIgnoreCase))
+					{
+						return CsTeamSide.Terrorists;
+					}
+
+					if (text.Equals("ct", StringComparison.OrdinalIgnoreCase) || text.Equals("counterterrorists", StringComparison.OrdinalIgnoreCase) || text.Equals("counter_terrorists", StringComparison.OrdinalIgnoreCase))
+					{
+						return CsTeamSide.CounterTerrorists;
+					}
+				}
+
+				string[] reasonKeys = ["reason", "round_end_reason", "win_reason", "winreason"];
+				foreach (string key in reasonKeys)
+				{
+					if (!TryGetIntValue(data, key, out int reason))
+					{
+						continue;
+					}
+
+					if (TryMapRoundEndReasonToWinner(reason, out CsTeamSide winnerFromReason))
+					{
+						return winnerFromReason;
+					}
+				}
+
+				return CsTeamSide.Unknown;
+			}
+
+			private static bool TryMapRoundEndReasonToWinner(int reason, out CsTeamSide winner)
+			{
+				winner = reason switch
+				{
+					1 or 4 or 9 or 13 or 18 => CsTeamSide.Terrorists,
+					2 or 3 or 5 or 6 or 7 or 8 or 11 or 12 or 14 or 17 => CsTeamSide.CounterTerrorists,
+					_ => CsTeamSide.Unknown,
+				};
+
+				return winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists;
+			}
 
 			private static string FormatGameEventValue(GameEventValue value)
 			{

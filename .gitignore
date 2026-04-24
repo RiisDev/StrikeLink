@@ -407,3 +407,6 @@ FodyWeavers.xsd
 /docs/.cache
 .qodo
 StrikeLink.Test.Suite/Program.cs
+StrikeLink.Test.Suite/actual-demo-data.json
+StrikeLink.Test.Suite/demo.dem
+StrikeLink.Test.Suite/MatchData.json

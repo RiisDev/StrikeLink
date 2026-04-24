@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace StrikeLink.Services.WebService
+namespace StrikeLink.Services.WebService.SubServices
 {
 	/// <summary>
 	/// Represents a Steam user with display name, unique Steam ID, and profile URL.
