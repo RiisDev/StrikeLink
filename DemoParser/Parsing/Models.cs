@@ -1,10 +1,12 @@
 using System.Collections.ObjectModel;
+using System.Text.Json.Serialization;
 
 namespace StrikeLink.DemoParser.Parsing
 {
 	/// <summary>
 	/// Different playable sides within a Counter Strike match.
 	/// </summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<CsTeamSide>))]
 	public enum CsTeamSide
 	{
 		/// <summary>
@@ -31,6 +33,7 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <summary>
 	/// Specifies the possible outcomes of a match.
 	/// </summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<MatchOutcome>))]
 	public enum MatchOutcome
 	{
 		/// <summary>
@@ -47,12 +50,18 @@ namespace StrikeLink.DemoParser.Parsing
 		/// Used when the match is a defeat based on base user.
 		/// </summary>
 		Defeat = 2,
+
+		/// <summary>
+		/// Used when the match is a draw based on base user.
+		/// </summary>
+		Draw = 3,
 	}
 
 	/// <summary>
 	/// Represents the two persistent team identities in a single match.
 	/// Team A and Team B are lineup identities and do not imply a fixed side.
 	/// </summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<MatchTeam>))]
 	public enum MatchTeam
 	{
 		/// <summary>
@@ -87,20 +96,22 @@ namespace StrikeLink.DemoParser.Parsing
 		IReadOnlyList<string> Warnings);
 
 	/// <summary>
+	/// Represents a chat message sent by a user, including its content and visibility scope.
+	/// </summary>
+	/// <param name="UserId">The unique identifier of the user who sent the message.</param>
+	/// <param name="Text">The text content of the chat message. Cannot be null.</param>
+	/// <param name="IsTeamOnly">true if the message is visible only to the sender's team; otherwise, false.</param>
+	public sealed record DemoChatMessage(int UserId, string Text, bool IsTeamOnly);
+
+	/// <summary>
 	/// Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
 	/// identifying information.
 	/// </summary>
 	/// <param name="Duration">The total duration of the match.</param>
 	/// <param name="TeamAScore">The final score achieved by Team A.</param>
 	/// <param name="TeamBScore">The final score achieved by Team B.</param>
-	/// <param name="TerroristRoundWins">The number of rounds won by the Terrorist side.</param>
-	/// <param name="CounterTerroristRoundWins">The number of rounds won by the Counter-Terrorist side.</param>
-	/// <param name="TeamAStartSide">The side Team A started on at the beginning of the match.</param>
-	/// <param name="TeamBStartSide">The side Team B started on at the beginning of the match.</param>
 	/// <param name="Outcome">The outcome of the match, indicating which team won or if the match was drawn.</param>
 	/// <param name="ServerLocation">The geographic location of the server where the match was played, or null if not available.</param>
-	/// <param name="ServerAddress">The network address of the server, or null if not available.</param>
-	/// <param name="ServerPort">The port number used by the server, or null if not available.</param>
 	/// <param name="GameType">The type or mode of the game played, or null if not specified.</param>
 	/// <param name="MaxPlayers">The maximum number of players allowed on the server during the match, or null if not specified.</param>
 	/// <param name="Date">The date and time when the match occurred, or null if not available.</param>
@@ -110,19 +121,14 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="DemoClientName">The name of the client used to record the match demo, or null if not available.</param>
 	/// <param name="NetworkProtocol">The network protocol version used by the server, or null if not specified.</param>
 	/// <param name="FocusSteamId">The Steam ID of the player in focus for this match, or null if not specified.</param>
+	/// <param name="ChatMessages">Ordered list of chat messages sent in-game.</param>
 	/// <remarks>Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo</remarks>
 	public sealed record MatchStats(
 		TimeSpan Duration,
 		int TeamAScore,
 		int TeamBScore,
-		int TerroristRoundWins,
-		int CounterTerroristRoundWins,
-		CsTeamSide TeamAStartSide,
-		CsTeamSide TeamBStartSide,
 		MatchOutcome Outcome,
 		string? ServerLocation,
-		string? ServerAddress,
-		int? ServerPort,
 		string? GameType,
 		int? MaxPlayers,
 		DateTimeOffset? Date,
@@ -131,7 +137,8 @@ namespace StrikeLink.DemoParser.Parsing
 		string? ServerName,
 		string? DemoClientName,
 		int? NetworkProtocol,
-		ulong? FocusSteamId);
+		ulong? FocusSteamId,
+		IReadOnlyList<DemoChatMessage> ChatMessages);
 
 	/// <summary>
 	/// Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
@@ -144,7 +151,7 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="UserId">The in-game user ID assigned to the player during the match.</param>
 	/// <param name="IsBot">Indicates whether the player is a bot. Set to <see langword="true"/> if the player is an AI-controlled bot;
 	/// otherwise, <see langword="false"/>.</param>
-	/// <param name="Team">The team side the player was assigned to during the match.</param>
+	/// <param name="Team">The persistent lineup identity of the player in the match.</param>
 	/// <param name="RoundsWon">The number of rounds won by the player's team while the player participated.</param>
 	/// <param name="RoundsLost">The number of rounds lost by the player's team while the player participated.</param>
 	/// <param name="RoundsParticipated">The total number of rounds in which the player actively participated.</param>
@@ -174,7 +181,7 @@ namespace StrikeLink.DemoParser.Parsing
 		string Name,
 		int UserId,
 		bool IsBot,
-		CsTeamSide Team,
+		MatchTeam Team,
 		int RoundsWon,
 		int RoundsLost,
 		int RoundsParticipated,

@@ -1,13 +1,18 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Net;
+using System.Runtime.CompilerServices;
+using System.Text.Encodings.Web;
 using System.Text.RegularExpressions;
+
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Local
 // ReSharper disable NotAccessedPositionalProperty.Local
 // ReSharper disable StringLiteralTypo
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+
 #pragma warning disable CA5394
 #pragma warning disable CA1031
 #pragma warning disable CA1308
@@ -44,7 +49,9 @@ namespace StrikeLink.DemoParser.Parsing
 		/// dictionary that maps string keys to dynamic values, allowing storage of arbitrary event-related data. This
 		/// collection is static and read-only; its contents should be initialized at application startup and not modified at
 		/// runtime.</remarks>
-		public static readonly Dictionary<string, Dictionary<string, dynamic>> EventData = [];
+#pragma warning disable CA1002 // Do not expose generic lists
+		public static readonly List<Dictionary<string, dynamic>> EventData = [];
+#pragma warning restore CA1002 // Do not expose generic lists
 
 		/// <summary>
 		/// Initializes a new instance of the Cs2DemoParser class for reading and parsing a demo file using the specified
@@ -200,9 +207,6 @@ namespace StrikeLink.DemoParser.Parsing
 				if (string.IsNullOrWhiteSpace(serverName)) return;
 
 				state.ServerName = serverName;
-				_ = TryParseServerEndpoint(serverName, out string? address, out int? port);
-				state.ServerAddress ??= address;
-				state.ServerPort ??= port;
 				string[] serverLocation = serverName.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
 				state.ServerLocation = serverLocation.FirstOrDefault(x => x.Contains('_', StringComparison.Ordinal)) ?? "Unknown";
@@ -314,7 +318,6 @@ namespace StrikeLink.DemoParser.Parsing
 		private static void ProcessNetMessage(ParseState state, int messageType, byte[] payload)
 		{
 			state.ObserveNetMessage(messageType);
-			
 			switch (messageType)
 			{
 				case MessageTypeIds.SvcServerInfo:
@@ -336,8 +339,10 @@ namespace StrikeLink.DemoParser.Parsing
 				case MessageTypeIds.GeSource1LegacyGameEvent:
 					ApplyGameEvent(state, ProtoMessage.Parse(payload));
 					break;
+
 			}
 		}
+
 
 		private static void ApplyServerInfo(ParseState state, ProtoMessage message)
 		{
@@ -354,9 +359,6 @@ namespace StrikeLink.DemoParser.Parsing
 			if (message.TryGetString(17, out string? hostName) && !string.IsNullOrWhiteSpace(hostName))
 			{
 				state.ServerName = hostName;
-				_ = TryParseServerEndpoint(hostName, out string? address, out int? port);
-				state.ServerAddress ??= address;
-				state.ServerPort ??= port;
 			}
 
 			if (message.TryGetInt32(11, out int maxPlayers) && maxPlayers is > 0 and <= 128)
@@ -368,11 +370,10 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				foreach (int candidateField in new[] { 10, 12 })
 				{
-					if (message.TryGetInt32(candidateField, out int candidateMaxPlayers) && candidateMaxPlayers is > 0 and <= 128)
-					{
-						state.MaxPlayers = candidateMaxPlayers;
-						break;
-					}
+					if (!message.TryGetInt32(candidateField, out int candidateMaxPlayers) || candidateMaxPlayers is <= 0 or > 128) continue;
+
+					state.MaxPlayers = candidateMaxPlayers;
+					break;
 				}
 			}
 
@@ -397,17 +398,7 @@ namespace StrikeLink.DemoParser.Parsing
 		private static void ApplyServerMetadataText(ParseState state, string rawText)
 		{
 			string text = new (rawText.Select(ch => char.IsControl(ch) && ch != '\n' && ch != '\r' && ch != '\t' ? ' ' : ch).ToArray());
-
-			Match endpointMatch = Regex.Match(text, @"\b(?<ip>(?:\d{1,3}\.){3}\d{1,3}):(?<port>\d{1,5})\b");
-			if (endpointMatch.Success && IPAddress.TryParse(endpointMatch.Groups["ip"].Value, out _))
-			{
-				state.ServerAddress ??= endpointMatch.Groups["ip"].Value;
-				if (int.TryParse(endpointMatch.Groups["port"].Value, out int parsedPort) && parsedPort is >= 0 and <= 65535)
-				{
-					state.ServerPort ??= parsedPort == 0 ? null : parsedPort;
-				}
-			}
-
+			
 			Match slotsMatch = Regex.Match(text, @"numSlots\D{0,16}(?<slots>\d{1,3})", RegexOptions.IgnoreCase);
 			if (!slotsMatch.Success)
 			{
@@ -570,7 +561,6 @@ namespace StrikeLink.DemoParser.Parsing
 					keys.Add(new EventKeyDescriptor(keyName, type));
 				}
 
-				EventData.TryAdd($"{eventId}_{eventName}", new Dictionary<string, dynamic> { { "", keys } });
 				state.EventDescriptors[eventId] = new EventDescriptor(eventId, eventName!, keys);
 			}
 		}
@@ -604,7 +594,8 @@ namespace StrikeLink.DemoParser.Parsing
 			}
 
 			int eventTick = message.TryGetInt32(4, out int serverTick) ? serverTick : state.CurrentFrameTick;
-			EventData.Add($"{eventTick}_{eventId}_{Random.Shared.Next(1, int.MaxValue)}", new Dictionary<string, dynamic> { { descriptor.Name, data } });
+
+			EventData.Add(new Dictionary<string, dynamic> { { descriptor.Name, data } });
 
 			state.ObserveEventName(descriptor.Name);
 			state.HandleGameEvent(descriptor.Name, eventTick, data);
@@ -644,6 +635,10 @@ namespace StrikeLink.DemoParser.Parsing
 		private sealed class ParseState(DemoAuthorization config, FileInfo? demoPath = null)
 		{
 			private readonly HashSet<string> _warningSet = new(StringComparer.Ordinal);
+			/// <summary>Round numbers whose winner could not be resolved at event-processing time.
+			/// Cleared for each round that is successfully resolved by retroactive inference in BuildResult.
+			/// Remaining entries are promoted to actual warnings after the retroactive pass.</summary>
+			private readonly HashSet<int> _deferredRoundWinnerWarnings = new();
 
 			public Dictionary<int, EventDescriptor> EventDescriptors { get; } = [];
 
@@ -669,6 +664,10 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private Dictionary<uint, PlayerAccumulator> PlayersByAccountId { get; } = [];
 
+			private Dictionary<uint, PlayerAccumulator> PlayersByControllerHandle { get; } = [];
+
+			private Dictionary<uint, PlayerAccumulator> PlayersByPawnHandle { get; } = [];
+
 			private List<RoundAccumulator> Rounds { get; } = [];
 
 			private List<string> Warnings { get; } = [];
@@ -676,10 +675,6 @@ namespace StrikeLink.DemoParser.Parsing
 			private RoundAccumulator? CurrentRound { get; set; }
 
 			public string? ServerName { get; set; }
-
-			public string? ServerAddress { get; set; }
-
-			public int? ServerPort { get; set; }
 
 			public string? GameType { get; set; }
 
@@ -702,9 +697,9 @@ namespace StrikeLink.DemoParser.Parsing
 			/// <summary>Round number at which the first halftime team swap occurred (0 = not yet detected).</summary>
 			private int HalfTimeRoundNumber { get; set; }
 
-			public int CurrentFrameTick { get; set; }
+			public int CurrentFrameTick { get; private set; }
 
-			public int MaxObservedTick { get; private set; }
+			private int MaxObservedTick { get; set; }
 
 			public void ObserveFrameTick(int tick)
 			{
@@ -719,13 +714,26 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private int CounterTerroristScore { get; set; }
 
-			public void AddWarning(string warning)
+			private int LastObservedTerroristScore { get; set; } = -1;
+
+			private int LastObservedCounterTerroristScore { get; set; } = -1;
+
+			private static readonly JsonSerializerOptions WarningOptions = new()
+			{
+				Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+				IncludeFields = true
+			};
+
+			private static string Serialize(object data) => JsonSerializer.Serialize(data, WarningOptions);
+
+			public void AddWarning(string warning, [CallerMemberName] string callerName = "")
 			{
 				if (_warningSet.Add(warning))
 				{
-					Warnings.Add(warning);
+					Warnings.Add($"[{callerName}] [TICK_{CurrentFrameTick}] {warning}");
 				}
 			}
+
 
 			public PlayerAccumulator? FindByAccountId(uint accountId)
 				=> PlayersByAccountId.GetValueOrDefault(accountId);
@@ -738,10 +746,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private void ObserveTrackedEventSample(string eventName, IReadOnlyDictionary<string, GameEventValue> data)
 			{
-				if (TrackedEventSamples.Count >= 18)
-				{
-					return;
-				}
+				if (TrackedEventSamples.Count >= 18) { return; }
 
 				if (eventName is not ("player_death" or "player_hurt" or "bullet_damage" or "weapon_fire" or "player_spawn" or "player_team" or "round_mvp" or "player_disconnect" or "round_end" or "round_start" or "round_officially_ended"))
 				{
@@ -789,6 +794,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 				if (steamId == 0)
 				{
+					AddWarning($"Player attempted to have an empty steamId: {Serialize(player)}");
 					return;
 				}
 
@@ -805,14 +811,47 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (CurrentRound is null)
 				{
+					AddWarning($"CurrentRound is somehow null at tick: {CurrentFrameTick}");
+					return;
+				}
+
+				if (TryResolveRoundWinner(CurrentRound, out CsTeamSide resolvedWinner))
+				{
+					CompleteRound(CurrentRound, resolvedWinner, CurrentFrameTick);
+					return;
+				}
+
+				if (IsTerminalPlaceholderRound(CurrentRound))
+				{
+					int roundNumber = CurrentRound.Number;
+					Rounds.Remove(CurrentRound);
+					CurrentRound = null;
+					AddWarning($"Discarded unresolved terminal placeholder round {roundNumber} at end-of-demo.");
 					return;
 				}
 
 				CompleteRound(CurrentRound, ResolveRequiredRoundWinner(CurrentRound), CurrentFrameTick);
 			}
 
+			private static bool IsTerminalPlaceholderRound(RoundAccumulator round) =>
+				round.Kills.Count == 0
+				&& round.Damage.Count == 0
+				&& round is { BombExploded: false, PlanterUserId: null, DefuserUserId: null, Participants.Count: 0 };
+
+			public static readonly Dictionary<string, List<(int Tick, Dictionary<string, GameEventValue> Data)>> EventData = new();
+
 			public void HandleGameEvent(string name, int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
+				//if (!EventData.TryGetValue(name, out List<(int Tick, Dictionary<string, GameEventValue> Data)>? list))
+				//{
+				//	list = [];
+				//	EventData[name] = list;
+				//}
+				//Dictionary<string, GameEventValue> copiedData = new (data);
+				//list.Add((tick, copiedData));
+
+				//File.WriteAllText("EventFullData.txt", Serialize(EventData));
+
 				ObserveTrackedEventSample(name, data);
 				switch (name)
 				{
@@ -854,6 +893,10 @@ namespace StrikeLink.DemoParser.Parsing
 					case "round_end":
 						{
 							CsTeamSide winner = GetRoundWinnerFromEvent(data);
+							if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists) && TryResolveRoundWinnerFromScoreboard(data, out CsTeamSide scoreWinner))
+							{
+								winner = scoreWinner;
+							}
 							if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
 							{
 								CompleteRound(CurrentRound, winner, tick);
@@ -864,14 +907,18 @@ namespace StrikeLink.DemoParser.Parsing
 							}
 							else
 							{
-								// Defer completion until additional events or post-pass inference can resolve winner.
+								if (CurrentRound is not null) _deferredRoundWinnerWarnings.Add(CurrentRound.Number);
 							}
 						}
 						break;
 
 					case "round_officially_ended":
-						{
+					{
 							CsTeamSide winner = GetRoundWinnerFromEvent(data);
+							if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists) && TryResolveRoundWinnerFromScoreboard(data, out CsTeamSide scoreWinner))
+							{
+								winner = scoreWinner;
+							}
 							if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
 							{
 								CompleteRound(CurrentRound, winner, tick);
@@ -882,10 +929,10 @@ namespace StrikeLink.DemoParser.Parsing
 							}
 							else
 							{
-								// Some demos omit winner fields here; keep round open and resolve later.
+								if (CurrentRound is not null) _deferredRoundWinnerWarnings.Add(CurrentRound.Number);
 							}
-						}
-						break;
+					}
+					break;
 
 					case "player_death":
 						if (EnsureTrackedRound())
@@ -944,6 +991,10 @@ namespace StrikeLink.DemoParser.Parsing
 								player.BombPlants++;
 								CurrentRound!.PlanterUserId = player.UserId;
 							}
+							else
+							{
+								AddWarning($"Failed to determine bomb_plant user on round: {CurrentRound?.Number}");
+							}
 						}
 						break;
 
@@ -955,6 +1006,10 @@ namespace StrikeLink.DemoParser.Parsing
 							{
 								player.BombDefuses++;
 								CurrentRound!.DefuserUserId = player.UserId;
+							}
+							else
+							{
+								AddWarning($"Failed to determine bomb_defused user on round: {CurrentRound?.Number}");
 							}
 						}
 						break;
@@ -979,7 +1034,6 @@ namespace StrikeLink.DemoParser.Parsing
 				if (HalfTimeRoundNumber == 0 && Rounds.Count >= 12 && Rounds.Any(round => round.Winner is null))
 				{
 					HalfTimeRoundNumber = 12;
-					AddWarning("Half-time boundary was inferred as round 12 because winner resolution was deferred during live parsing.");
 				}
 				
 				// Retroactively infer winners for rounds completed before team assignments were available.
@@ -996,9 +1050,11 @@ namespace StrikeLink.DemoParser.Parsing
 							continue;
 						case CsTeamSide.Terrorists:
 							TerroristScore++;
+							_deferredRoundWinnerWarnings.Remove(round.Number);
 							break;
 						case CsTeamSide.CounterTerrorists:
 							CounterTerroristScore++;
+							_deferredRoundWinnerWarnings.Remove(round.Number);
 							break;
 						default:
 							throw new ArgumentOutOfRangeException();
@@ -1022,6 +1078,13 @@ namespace StrikeLink.DemoParser.Parsing
 						}
 					}
 				}
+
+				// Promote any round winner failures that survived the retroactive inference pass to actual warnings.
+				foreach (int roundNumber in _deferredRoundWinnerWarnings.OrderBy(static n => n))
+				{
+					AddWarning($"Round {roundNumber} winner could not be resolved from events or inference.");
+				}
+				_deferredRoundWinnerWarnings.Clear();
 
 				RoundAccumulator? unresolvedRound = Rounds.FirstOrDefault(round => round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists));
 				if (unresolvedRound is not null)
@@ -1066,8 +1129,6 @@ namespace StrikeLink.DemoParser.Parsing
 
 				int teamAScore = rounds.Count(static round => round.WinnerTeam == MatchTeam.TeamA);
 				int teamBScore = rounds.Count(static round => round.WinnerTeam == MatchTeam.TeamB);
-				int terroristRoundWins = rounds.Count(static round => round.WinnerSide == CsTeamSide.Terrorists);
-				int counterTerroristRoundWins = rounds.Count(static round => round.WinnerSide == CsTeamSide.CounterTerrorists);
 
 				TimeSpan roundDuration = rounds.Aggregate(TimeSpan.Zero, (current, roundStats) => current.Add(roundStats.Duration ?? TimeSpan.Zero));
 				TimeSpan playbackTickDuration = TickIntervalSeconds > 0 && PlaybackTicks > 0
@@ -1077,8 +1138,6 @@ namespace StrikeLink.DemoParser.Parsing
 					? TimeSpan.FromSeconds(MaxObservedTick * TickIntervalSeconds)
 					: TimeSpan.Zero;
 
-				// Prefer the largest trustworthy duration estimate.
-				// Round aggregation can undercount when a round starts before first tracked combat event.
 				TimeSpan matchDuration = new[] { PlaybackTime, playbackTickDuration, observedTickDuration, roundDuration }
 					.Where(duration => duration > TimeSpan.Zero)
 					.DefaultIfEmpty(TimeSpan.Zero)
@@ -1099,28 +1158,27 @@ namespace StrikeLink.DemoParser.Parsing
 				if (focusPlayer is not null)
 				{
 					PlayerAccumulator internalPlayer = PlayersByUserId.Values.First(player => player.SteamId == focusPlayer.SteamId);
-					if (internalPlayer.RoundsWon > internalPlayer.RoundsLost)
-					{
-						outcome = MatchOutcome.Victory;
-					}
-					else if (internalPlayer.RoundsLost > internalPlayer.RoundsWon)
-					{
-						outcome = MatchOutcome.Defeat;
-					}
+
+					if (teamAScore == teamBScore) outcome = MatchOutcome.Draw;
+					else if (internalPlayer.RoundsWon > internalPlayer.RoundsLost) outcome = MatchOutcome.Victory;
+					else outcome = MatchOutcome.Defeat;
+				}
+				else
+				{
+					AddWarning("Failed to bind match outcome, focus_player is null");
+				}
+
+				if (outcome == MatchOutcome.Unknown)
+				{
+					AddWarning("Failed to bind match outcome.");
 				}
 
 				MatchStats match = new(
 					Duration: matchDuration,
 					TeamAScore: teamAScore,
 					TeamBScore: teamBScore,
-					TerroristRoundWins: terroristRoundWins,
-					CounterTerroristRoundWins: counterTerroristRoundWins,
-					TeamAStartSide: CsTeamSide.Terrorists,
-					TeamBStartSide: CsTeamSide.CounterTerrorists,
 					Outcome: outcome,
 					ServerLocation: ServerLocation,
-					ServerAddress: ServerAddress,
-					ServerPort: ServerPort,
 					GameType: GameType,
 					MaxPlayers: MaxPlayers,
 					Date: new DateTimeOffset(fileDateUtc, TimeSpan.Zero),
@@ -1129,10 +1187,30 @@ namespace StrikeLink.DemoParser.Parsing
 					ServerName: ServerName,
 					DemoClientName: ClientName,
 					NetworkProtocol: NetworkProtocol,
-					FocusSteamId: (ulong)config.SteamId);
+					FocusSteamId: (ulong)config.SteamId,
+					ChatMessages: ExtractChatMessages());
 				
 				
 				return new Cs2DemoParseResult(match, players, rounds, new ReadOnlyCollection<string>(Warnings));
+			}
+
+			private static List<DemoChatMessage> ExtractChatMessages()
+			{
+				List<DemoChatMessage> messages = [];
+
+				string[] chatEventNames = ["player_chat", "say", "say_team"];
+
+				foreach (string eventName in chatEventNames)
+				{
+
+					//bool isTeamOnly = eventName == "say_team" || (fields.TryGetValue("teamonly", out object? teamOnlyRaw) && teamOnlyRaw is true);
+					//int userId = fields.TryGetValue("userid", out object? userIdRaw) ? Convert.ToInt32(userIdRaw, CultureInfo.InvariantCulture) : -1;
+					//string text = fields.TryGetValue("text", out object? textRaw) ? textRaw?.ToString() ?? string.Empty : string.Empty;
+
+					//messages.Add(new DemoChatMessage(userId, text, isTeamOnly));
+				}
+
+				return messages;
 			}
 
 			private RoundStats BuildRound(RoundAccumulator round)
@@ -1198,7 +1276,7 @@ namespace StrikeLink.DemoParser.Parsing
 					Name: player.Name,
 					UserId: player.UserId,
 					IsBot: player.IsBot,
-					Team: player.Team,
+					Team: ResolvePlayerMatchTeam(player, roundSnapshots),
 					RoundsWon: player.RoundsWon,
 					RoundsLost: player.RoundsLost,
 					RoundsParticipated: player.RoundsParticipated,
@@ -1249,6 +1327,44 @@ namespace StrikeLink.DemoParser.Parsing
 					BombPlants: player.BombPlants,
 					BombDefuses: player.BombDefuses
 					);
+			}
+
+			private MatchTeam ResolvePlayerMatchTeam(PlayerAccumulator player, IReadOnlyList<RoundImpactSnapshot> roundSnapshots)
+			{
+				int teamARounds = 0;
+				int teamBRounds = 0;
+
+				foreach (RoundImpactSnapshot snapshot in roundSnapshots)
+				{
+					if (snapshot.Side is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
+					{
+						continue;
+					}
+
+					CsTeamSide teamASide = GetTeamASideForRound(snapshot.RoundNumber);
+					if (snapshot.Side == teamASide)
+					{
+						teamARounds++;
+					}
+					else
+					{
+						teamBRounds++;
+					}
+				}
+
+				if (teamARounds != teamBRounds)
+				{
+					return teamARounds > teamBRounds ? MatchTeam.TeamA : MatchTeam.TeamB;
+				}
+
+				CsTeamSide teamASideNow = GetTeamASideForRound(Math.Max(Rounds.Count, 1));
+				return player.Team switch
+				{
+					CsTeamSide.Terrorists when teamASideNow == CsTeamSide.Terrorists => MatchTeam.TeamA,
+					CsTeamSide.CounterTerrorists when teamASideNow == CsTeamSide.CounterTerrorists => MatchTeam.TeamA,
+					CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists => MatchTeam.TeamB,
+					_ => MatchTeam.Unknown,
+				};
 			}
 
 			private List<RoundImpactSnapshot> BuildRoundImpactSnapshots(PlayerAccumulator player)
@@ -1394,6 +1510,11 @@ namespace StrikeLink.DemoParser.Parsing
 				int userId = GetIntValue(data, "userid");
 				ulong steamId = GetUInt64Value(data, "xuid");
 				UpsertPlayerIdentity(userId, GetStringValue(data, "name"), steamId, GetBoolValue(data, "bot"), userId, mapUserIdAsEntitySlot: false);
+
+				PlayerAccumulator? player = ResolvePlayer(userId, allowZeroUserId: true) ?? ResolvePlayerBySteamId(steamId);
+				ObserveControllerHandle(player, data, "userid");
+				ObservePawnHandle(player, data, "userid_pawn");
+				TryAssignControllerTeamFromEvent(player, data);
 			}
 
 			private void HandleServerCvar(IReadOnlyDictionary<string, GameEventValue> data)
@@ -1410,27 +1531,8 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					case "hostname":
 						ServerName = cvarValue;
-						_ = TryParseServerEndpoint(cvarValue, out string? hostAddress, out int? hostPort);
-						ServerAddress ??= hostAddress;
-						ServerPort ??= hostPort;
 						break;
-
-					case "hostip":
-					case "ip":
-					case "net_public_adr":
-						if (TryParseIpValue(cvarValue, out string? parsedAddress))
-						{
-							ServerAddress = parsedAddress;
-						}
-						break;
-
-					case "hostport":
-						if (int.TryParse(cvarValue, out int parsedPort) && parsedPort is > 0 and <= 65535)
-						{
-							ServerPort = parsedPort;
-						}
-						break;
-
+						
 					case "mapname":
 						MapName = cvarValue;
 						break;
@@ -1475,17 +1577,23 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				// In CS2, player_spawn carries userid as a type-9 controller handle.
 				// Use it to map entity slot -> player and ensure team assignment is current.
-				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn");
+				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "entityid", "entindex", "slot", "index")
+				                        ?? ResolvePlayer(GetIntValue(data, "userid"))
+				                        ?? ResolvePlayer(GetIntValue(data, "entindex"));
+
 				if (player is null)
 				{
+					AddWarning($"Player is somehow null on spawn: {Serialize(data)}");
 					return;
 				}
 
-				// teamnum field is type 5 (byte) in this event
-				int teamNum = GetIntValue(data, "teamnum");
-				if (teamNum != 0)
+				ObserveControllerHandle(player, data, "userid");
+				ObservePawnHandle(player, data, "userid_pawn");
+				TryAssignControllerTeamFromEvent(player, data);
+
+				if (TryGetSpawnTeam(data, out CsTeamSide spawnTeam))
 				{
-					player.Team = (CsTeamSide)teamNum;
+					player.Team = spawnTeam;
 				}
 			}
 
@@ -1495,10 +1603,21 @@ namespace StrikeLink.DemoParser.Parsing
 				                            ResolvePlayer(GetIntValue(data, "userid"));
 				if (player is null)
 				{
+					AddWarning($"Player is somehow null on team: {Serialize(data)}");
 					return;
 				}
 
-				player.Team = (CsTeamSide)GetIntValue(data, "team");
+				ObserveControllerHandle(player, data, "userid");
+				ObservePawnHandle(player, data, "userid_pawn");
+
+				if (TryGetSpawnTeam(data, out CsTeamSide parsedTeam))
+				{
+					player.Team = parsedTeam;
+				}
+				else
+				{
+					player.Team = (CsTeamSide)GetIntValue(data, "team");
+				}
 				player.IsConnected = true;
 
 				// Detect halftime: player_team fires between rounds (CurrentRound null) and we have rounds already
@@ -1506,6 +1625,139 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					HalfTimeRoundNumber = Rounds.Count;
 				}
+			}
+
+			private static void TryAssignControllerTeamFromEvent(PlayerAccumulator? player, IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				if (player is null)
+				{
+					return;
+				}
+
+				if (TryGetSpawnTeam(data, out CsTeamSide parsedTeam))
+				{
+					player.Team = parsedTeam;
+				}
+			}
+
+			private void ObserveControllerHandle(PlayerAccumulator? player, IReadOnlyDictionary<string, GameEventValue> data, string key)
+			{
+				if (player is null)
+				{
+					return;
+				}
+
+				ObservePlayerHandle(player, data, key, expectedType: 9, PlayersByControllerHandle);
+			}
+
+			private void ObservePawnHandle(PlayerAccumulator? player, IReadOnlyDictionary<string, GameEventValue> data, string key)
+			{
+				if (player is null)
+				{
+					return;
+				}
+
+				ObservePlayerHandle(player, data, key, expectedType: 8, PlayersByPawnHandle);
+			}
+
+			private static void ObservePlayerHandle(PlayerAccumulator player, IReadOnlyDictionary<string, GameEventValue> data, string key, int expectedType, Dictionary<uint, PlayerAccumulator> destination)
+			{
+				if (!data.TryGetValue(key, out GameEventValue value) || value.Type != expectedType)
+				{
+					return;
+				}
+
+				ulong raw = value.AsUInt64();
+				if (raw is 0 or uint.MaxValue)
+				{
+					return;
+				}
+
+				destination[unchecked((uint)raw)] = player;
+			}
+
+			private static bool TryGetSpawnTeam(IReadOnlyDictionary<string, GameEventValue> data, out CsTeamSide team)
+			{
+				string[] numericKeys =
+				[
+					// Explicit controller netvar keys
+					"CCSPlayerController.m_iTeamNum",
+					"m_iTeamNum",
+					// Common event aliases
+					"teamnum",
+					"team",
+					"team_num",
+					"player_team",
+					"userid_team",
+					"userteam"
+				];
+				foreach (string key in numericKeys)
+				{
+					CsTeamSide candidate = GetTeamValue(data, key);
+					if (candidate is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
+					{
+						team = candidate;
+						return true;
+					}
+				}
+
+				team = CsTeamSide.Unknown;
+				return false;
+			}
+
+			private bool TryResolveRoundWinnerFromScoreboard(IReadOnlyDictionary<string, GameEventValue> data, out CsTeamSide winner)
+			{
+				winner = CsTeamSide.Unknown;
+
+				if (!TryGetScorePair(data, out int currentTScore, out int currentCtScore))
+				{
+					return false;
+				}
+
+				if (LastObservedTerroristScore >= 0 && LastObservedCounterTerroristScore >= 0)
+				{
+					int tDelta = currentTScore - LastObservedTerroristScore;
+					int ctDelta = currentCtScore - LastObservedCounterTerroristScore;
+					if (tDelta == 1 && ctDelta == 0)
+					{
+						winner = CsTeamSide.Terrorists;
+					}
+					else if (ctDelta == 1 && tDelta == 0)
+					{
+						winner = CsTeamSide.CounterTerrorists;
+					}
+				}
+
+				LastObservedTerroristScore = currentTScore;
+				LastObservedCounterTerroristScore = currentCtScore;
+				return winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists;
+			}
+
+			private static bool TryGetScorePair(IReadOnlyDictionary<string, GameEventValue> data, out int tScore, out int ctScore)
+			{
+				tScore = 0;
+				ctScore = 0;
+
+				string[] tKeys = ["t_score", "score_t", "terrorist_score"];
+				string[] ctKeys = ["ct_score", "score_ct", "counterterrorist_score"];
+
+				bool hasT = false;
+				foreach (string tKey in tKeys)
+				{
+					if (!TryGetIntValue(data, tKey, out tScore)) continue;
+					hasT = true;
+					break;
+				}
+
+				bool hasCt = false;
+				foreach (string ctKey in ctKeys)
+				{
+					if (!TryGetIntValue(data, ctKey, out ctScore)) continue;
+					hasCt = true;
+					break;
+				}
+
+				return hasT && hasCt;
 			}
 
 			private void HandlePlayerDisconnect(IReadOnlyDictionary<string, GameEventValue> data)
@@ -1526,11 +1778,10 @@ namespace StrikeLink.DemoParser.Parsing
 				foreach (string key in teamKeys)
 				{
 					CsTeamSide side = GetTeamValue(data, key);
-					if (side is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
-					{
-						player.Team = side;
-						return;
-					}
+					if (side is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)) continue;
+
+					player.Team = side;
+					return;
 				}
 			}
 
@@ -1544,7 +1795,7 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 					else
 					{
-						// Keep the prior round unresolved for post-pass inference when live data is insufficient.
+						_deferredRoundWinnerWarnings.Add(CurrentRound.Number);
 					}
 				}
 
@@ -1563,6 +1814,7 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (round is null)
 				{
+					AddWarning($"Round {CurrentRound?.Number} at tick {tick} was percieved as null and could not be completed.");
 					return;
 				}
 
@@ -1573,6 +1825,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 				round.EndTick = tick;
 				round.Winner = winner;
+				_deferredRoundWinnerWarnings.Remove(round.Number);
 
 
 				round.Duration = GetDuration(round.StartTick, tick);
@@ -1597,6 +1850,8 @@ namespace StrikeLink.DemoParser.Parsing
 					case CsTeamSide.CounterTerrorists:
 						CounterTerroristScore++;
 						break;
+					case CsTeamSide.Spectator:
+					case CsTeamSide.Unknown:
 					default:
 						throw new ArgumentOutOfRangeException(nameof(winner), winner, null);
 				}
@@ -1605,6 +1860,7 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					if (!PlayersByUserId.TryGetValue(userId, out PlayerAccumulator? player))
 					{
+						AddWarning($"Failed to TryGet {userId} via PlayersByUserId dictionary: {Serialize(PlayersByUserId)}");
 						continue;
 					}
 
@@ -1648,6 +1904,7 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (winner is null)
 				{
+					AddWarning($"Winner was unable to be determined: {Serialize(round)}");
 					return;
 				}
 
@@ -1655,15 +1912,15 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					if (!PlayersByUserId.TryGetValue(candidate.UserId, out PlayerAccumulator? player))
 					{
+						AddWarning($"Failed to TryGet {candidate.UserId} via PlayersByUserId dictionary: {Serialize(PlayersByUserId)}");
 						continue;
 					}
 
 					player.ClutchAttempts++;
-					if (player.Team == winner && round.Alive.TryGetValue(candidate.UserId, out bool alive) && alive)
-					{
-						player.ClutchWins++;
-						player.ClutchWinsByOpponents[candidate.OpponentsAlive] = player.ClutchWinsByOpponents.GetValueOrDefault(candidate.OpponentsAlive) + 1;
-					}
+					if (player.Team != winner || !round.Alive.TryGetValue(candidate.UserId, out bool alive) || !alive) continue;
+
+					player.ClutchWins++;
+					player.ClutchWinsByOpponents[candidate.OpponentsAlive] = player.ClutchWinsByOpponents.GetValueOrDefault(candidate.OpponentsAlive) + 1;
 				}
 			}
 
@@ -1672,6 +1929,14 @@ namespace StrikeLink.DemoParser.Parsing
 				PlayerAccumulator? killer = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
 				PlayerAccumulator? assister = ResolvePlayerFromCandidates(data, "assister", "assister_pawn");
+				ObserveControllerHandle(killer, data, "attacker");
+				ObservePawnHandle(killer, data, "attacker_pawn");
+				ObserveControllerHandle(victim, data, "userid");
+				ObserveControllerHandle(victim, data, "victim");
+				ObservePawnHandle(victim, data, "userid_pawn");
+				ObservePawnHandle(victim, data, "victim_pawn");
+				ObserveControllerHandle(assister, data, "assister");
+				ObservePawnHandle(assister, data, "assister_pawn");
 				TryAssignTeamFromEvent(killer, data, "attackerteam", "attacker_team", "atk_team", "attacker_side");
 				TryAssignTeamFromEvent(victim, data, "userid_team", "victimteam", "victim_team", "userteam", "victim_side");
 				TryAssignTeamFromEvent(assister, data, "assisterteam", "assister_team", "assist_team");
@@ -1683,6 +1948,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 				if (victim is null || CurrentRound is null)
 				{
+					AddWarning($"Failed to handle death | VICTIM: {victim == null} | CURRENT_ROUND: {CurrentRound == null} | {Serialize(data)}");
 					return;
 				}
 
@@ -1779,6 +2045,7 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (killer is null || CurrentRound is null)
 				{
+					AddWarning($"Failed to resolve trade | KILLER: {killer == null} | CURRENT_ROUND: {CurrentRound == null} | {Serialize(victim)}");
 					return false;
 				}
 
@@ -1813,16 +2080,24 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				PlayerAccumulator? attacker = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
+				ObserveControllerHandle(attacker, data, "attacker");
+				ObservePawnHandle(attacker, data, "attacker_pawn");
+				ObserveControllerHandle(victim, data, "userid");
+				ObserveControllerHandle(victim, data, "victim");
+				ObservePawnHandle(victim, data, "userid_pawn");
+				ObservePawnHandle(victim, data, "victim_pawn");
 				TryAssignTeamFromEvent(attacker, data, "attackerteam", "attacker_team", "atk_team", "attacker_side");
 				TryAssignTeamFromEvent(victim, data, "userid_team", "victimteam", "victim_team", "userteam", "victim_side");
 				if (attacker is null || victim is null)
 				{
+					AddWarning($"Couldn't handle player_hurt on round {CurrentRound?.Number} (EMPTY): ATTACKER: {attacker == null} | VICTIM: {victim == null}");
 					return;
 				}
 
 				// Skip damage to already-dead players to avoid overkill accumulation.
 				if (CurrentRound is not null && CurrentRound.Alive.TryGetValue(victim.UserId, out bool stillAlive) && !stillAlive)
 				{
+					AddWarning($"Couldn't handle player_hurt on round {CurrentRound.Number} (DEAD_PLR): {Serialize(victim)}");
 					return;
 				}
 
@@ -1851,8 +2126,15 @@ namespace StrikeLink.DemoParser.Parsing
 					damage = rawDamage;
 				}
 
+				if (rawDamage < 0)
+				{
+					AddWarning($"Negative dmg_health in player_hurt event | {Serialize(data)}");
+					return;
+				}
+
 				if (damage <= 0)
 				{
+					// Silently skip: either a zero-damage server event or the victim's HP cap was already reached.
 					return;
 				}
 
@@ -1891,6 +2173,7 @@ namespace StrikeLink.DemoParser.Parsing
 				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn");
 				if (player is null || CurrentRound is null)
 				{
+					AddWarning($"Failed to handle weapon_fire | PLAYER: {player == null} | ROUND: {CurrentRound == null} | {Serialize(data)}");
 					return;
 				}
 
@@ -1905,6 +2188,7 @@ namespace StrikeLink.DemoParser.Parsing
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
 				if (victim is null)
 				{
+					AddWarning($"Failed to handle player_blind | ROUND: {CurrentRound == null} | {Serialize(data)}");
 					return;
 				}
 
@@ -1922,9 +2206,11 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private void IncrementUtilityCount(IReadOnlyDictionary<string, GameEventValue> data, WeaponKind weaponKind)
 			{
-				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn");
+				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "entityid");
+
 				if (player is null)
 				{
+					AddWarning($"Failed to increment utility | KIND: {weaponKind} | ROUND: {CurrentRound == null} | {Serialize(data)}");
 					return;
 				}
 
@@ -1941,7 +2227,6 @@ namespace StrikeLink.DemoParser.Parsing
 						break;
 					case WeaponKind.Other:
 					case WeaponKind.OtherUtility:
-						break;
 					default:
 						throw new ArgumentOutOfRangeException(nameof(weaponKind), weaponKind, null);
 				}
@@ -1955,6 +2240,7 @@ namespace StrikeLink.DemoParser.Parsing
 				                            ?? ResolvePlayerByName(GetStringValue(data, "name") ?? GetStringValue(data, "playername"));
 				if (player is null)
 				{
+					AddWarning($"Failed to handle MVP | ROUND: {CurrentRound == null} | {Serialize(data)}");
 					return;
 				}
 
@@ -1989,17 +2275,16 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
 				{
+					AddWarning($"Failed to infer MVP | {Serialize(round)}");
 					return null;
 				}
 
-				if (round.Winner == CsTeamSide.CounterTerrorists && round.DefuserUserId is { } defuserUserId)
+				switch (round)
 				{
-					return defuserUserId;
-				}
-
-				if (round.Winner == CsTeamSide.Terrorists && round.BombExploded && round.PlanterUserId is { } planterUserId)
-				{
-					return planterUserId;
+					case { Winner: CsTeamSide.CounterTerrorists, DefuserUserId: { } defuserUserId }:
+						return defuserUserId;
+					case { Winner: CsTeamSide.Terrorists, BombExploded: true, PlanterUserId: { } planterUserId }:
+						return planterUserId;
 				}
 
 				IEnumerable<PlayerAccumulator> candidates = PlayersByUserId.Values
@@ -2024,6 +2309,7 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (CurrentRound is null)
 				{
+					AddWarning("Failed to evaluate clutches, current round null");
 					return;
 				}
 
@@ -2088,6 +2374,7 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (round is null)
 				{
+					AddWarning("Failed to infer round winner, round is null");
 					return null;
 				}
 
@@ -2103,17 +2390,6 @@ namespace StrikeLink.DemoParser.Parsing
 				
 				// Determine if this is a first-half round (teams are swapped relative to current assignments)
 				bool isFirstHalf = HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber;
-
-				// Helper: resolve team for a player, accounting for halftime swap
-				CsTeamSide? GetPlayerTeam(int userId)
-				{
-					CsTeamSide? team = PlayersByUserId.GetValueOrDefault(userId)?.Team;
-					return team is null or CsTeamSide.Unknown or CsTeamSide.Spectator 
-						? null
-						: !isFirstHalf 
-							? team :
-								team == CsTeamSide.Terrorists ? CsTeamSide.CounterTerrorists : CsTeamSide.Terrorists;
-				}
 
 				// Primary: use Alive tracking with PlayerSideAtStart (teams captured at round start)
 				// For rounds where sideSnapshot was filled, use it. Other-wise use current teams (halftime-adjusted).
@@ -2162,6 +2438,17 @@ namespace StrikeLink.DemoParser.Parsing
 				if (tDeaths > ctDeaths && tDeaths > tPlayerCount / 2) return CsTeamSide.CounterTerrorists;
 
 				return null;
+
+				// Helper: resolve team for a player, accounting for halftime swap
+				CsTeamSide? GetPlayerTeam(int userId)
+				{
+					CsTeamSide? team = PlayersByUserId.GetValueOrDefault(userId)?.Team;
+					return team is null or CsTeamSide.Unknown or CsTeamSide.Spectator 
+						? null
+						: !isFirstHalf 
+							? team :
+							team == CsTeamSide.Terrorists ? CsTeamSide.CounterTerrorists : CsTeamSide.Terrorists;
+				}
 			}
 
 			private int GetSprayGapTicks() => TickIntervalSeconds <= 0 ? 16 : Math.Max(1, (int)Math.Round(0.25d / TickIntervalSeconds));
@@ -2235,7 +2522,18 @@ namespace StrikeLink.DemoParser.Parsing
 				// CS2 entity handle types — stored as uint (int32 reinterpreted as unsigned)
 				if (value.Type is 8 or 9)
 				{
-					return ResolvePlayerByHandle(value.AsUInt64());
+					uint handle = unchecked((uint)value.AsUInt64());
+					if (value.Type == 9 && PlayersByControllerHandle.TryGetValue(handle, out PlayerAccumulator? byControllerHandle))
+					{
+						return byControllerHandle;
+					}
+
+					if (value.Type == 8 && PlayersByPawnHandle.TryGetValue(handle, out PlayerAccumulator? byPawnHandle))
+					{
+						return byPawnHandle;
+					}
+
+					return ResolvePlayerByHandle(handle);
 				}
 
 				// Legacy short userid
@@ -2553,11 +2851,10 @@ namespace StrikeLink.DemoParser.Parsing
 
 			public WeaponAccumulator Weapon(string weapon)
 			{
-				if (!WeaponStats.TryGetValue(weapon, out WeaponAccumulator? stats))
-				{
-					stats = new WeaponAccumulator(weapon);
-					WeaponStats[weapon] = stats;
-				}
+				if (WeaponStats.TryGetValue(weapon, out WeaponAccumulator? stats)) return stats;
+
+				stats = new WeaponAccumulator(weapon);
+				WeaponStats[weapon] = stats;
 
 				return stats;
 			}
@@ -2677,11 +2974,10 @@ namespace StrikeLink.DemoParser.Parsing
 
 			public void Commit(PlayerAccumulator player)
 			{
-				if (Shots >= 4)
-				{
-					player.SprayShots += Shots;
-					player.SprayHits += Hits;
-				}
+				if (Shots < 4) return;
+
+				player.SprayShots += Shots;
+				player.SprayHits += Hits;
 			}
 		}
 

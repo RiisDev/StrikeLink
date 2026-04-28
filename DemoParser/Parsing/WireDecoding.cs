@@ -30,6 +30,7 @@ namespace StrikeLink.DemoParser.Parsing
 	{
 		public const int SvcServerInfo = 40;
 		public const int SvcUserMessage = 72;
+		public const int SvcPacketEntities = 55;
 		public const int GeSource1LegacyGameEventList = 205;
 		public const int GeSource1LegacyGameEvent = 207;
 
@@ -224,6 +225,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 			return readBytes;
 		}
+
+		public bool ReadBit() => ReadBits(1) != 0;
 	}
 
 	internal enum ProtoWireType
@@ -248,6 +251,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 	internal sealed class ProtoMessage(Dictionary<int, List<ProtoFieldValue>> fields)
 	{
+		public IEnumerable<KeyValuePair<int, List<ProtoFieldValue>>> EnumerateFields() => fields;
+
 		public static ProtoMessage Parse(ReadOnlySpan<byte> payload)
 		{
 			Dictionary<int, List<ProtoFieldValue>> fields = new();
