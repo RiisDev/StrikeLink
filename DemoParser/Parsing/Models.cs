@@ -95,13 +95,99 @@ namespace StrikeLink.DemoParser.Parsing
 		IReadOnlyList<RoundStats> Rounds,
 		IReadOnlyList<string> Warnings);
 
+
 	/// <summary>
-	/// Represents a chat message sent by a user, including its content and visibility scope.
+	/// Represents the different chat message formats used in CS.
 	/// </summary>
-	/// <param name="UserId">The unique identifier of the user who sent the message.</param>
-	/// <param name="Text">The text content of the chat message. Cannot be null.</param>
-	/// <param name="IsTeamOnly">true if the message is visible only to the sender's team; otherwise, false.</param>
-	public sealed record DemoChatMessage(int UserId, string Text, bool IsTeamOnly);
+	[JsonConverter(typeof(JsonStringEnumConverter<ChatType>))]
+	public enum ChatType
+	{
+		/// <summary>
+		/// Empty
+		/// </summary>
+		None = 0,
+
+		/// <summary>
+		/// [ALL] %s1: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatAll = 1,
+
+		/// <summary>
+		/// [ALL] %s1 [DEAD]: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatAllDead = 2,
+
+		/// <summary>
+		/// [ALL] %s1 [SPEC]: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatAllSpec = 3,
+
+		/// <summary>
+		/// [CT] %s1: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatCt = 10,
+
+		/// <summary>
+		/// [CT] %s1 [DEAD]: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatCtDead = 11,
+
+		/// <summary>
+		/// [CT] %s1 @ %s3: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// %s3 = Location
+		/// </summary>
+		ChatCtLoc = 12,
+
+		/// <summary>
+		/// [T] %s1: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatT = 20,
+
+		/// <summary>
+		/// [T] %s1 [DEAD]: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatTDead = 21,
+
+		/// <summary>
+		/// [T] %s1 @ %s3: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// %s3 = Location
+		/// </summary>
+		ChatTLoc = 22,
+
+		/// <summary>
+		/// [SPEC] %s1: %s2
+		/// %s1 = Player name
+		/// %s2 = Message
+		/// </summary>
+		ChatSpec = 30
+	}
+
+	/// <summary>
+	/// Represents a chat message sent within the demo.
+	/// </summary>
+	/// <param name="ChatType">The Chat type <see cref="ChatType"/></param>
+	/// <param name="Username">The username of the individual</param>
+	/// <param name="Message">The message.</param>
+	/// <param name="Tick">The tick the message was sent on</param>>
+	public sealed record DemoChatMessage(ChatType ChatType, string Username, string Message, int Tick);
 
 	/// <summary>
 	/// Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
@@ -450,6 +536,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// events.
 	/// </summary>
 	/// <param name="RoundNumber">The zero-based index of the round within the match. Must be non-negative.</param>
+	/// <param name="StartTick">Beginning Tick of the round.</param>
+	/// <param name="EndTick">End tick of the round.</param>
 	/// <param name="Duration">The total elapsed time of the round, or null if the duration is not available.</param>
 	/// <param name="WinnerTeam">The lineup identity that won the round.</param>
 	/// <param name="WinnerSide">The side (T/CT) that won the round.</param>
@@ -459,6 +547,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="Damage">A read-only list of all damage events that occurred during the round. Never null.</param>
 	public sealed record RoundStats(
 		int RoundNumber,
+		int StartTick,
+		int EndTick,
 		TimeSpan? Duration,
 		MatchTeam WinnerTeam,
 		CsTeamSide WinnerSide,

@@ -1,4 +1,6 @@
 using System.Buffers;
+// ReSharper disable GrammarMistakeInComment
+#pragma warning disable CA1031
 
 namespace StrikeLink.DemoParser.Parsing
 {
@@ -37,6 +39,11 @@ namespace StrikeLink.DemoParser.Parsing
 		public const int CsUmPlayerStatsUpdate = 336;
 		public const int CsUmXRankUpd = 341;
 		public const int CsUmServerRankUpdate = 352;
+
+		public const int UmTxtMessage = 124;
+		public const int UmSayText = 117;
+		public const int UmSayText2 = 118;
+		public const int UmSayTextChannel = 119;
 	}
 
 	internal sealed class DemoStreamReader(Stream stream)
@@ -149,7 +156,6 @@ namespace StrikeLink.DemoParser.Parsing
 			int bitOffset = _bitPosition & 7;
 			_bitPosition += count;
 
-			// Collect all bytes that span the required bits into a ulong window, then extract.
 			int numBytes = (bitOffset + count + 7) >> 3;
 			ulong window = 0;
 			for (int i = 0; i < numBytes; i++)
@@ -170,11 +176,9 @@ namespace StrikeLink.DemoParser.Parsing
 			int bitOffset = _bitPosition & 7;
 			_bitPosition += 8;
 
-			if (bitOffset == 0)
-				return buffer[byteIndex];
-
-			// Bit position straddles two bytes — shift the window across the boundary.
-			return (byte)((buffer[byteIndex] >> bitOffset) | (buffer[byteIndex + 1] << (8 - bitOffset)));
+			return bitOffset == 0 ? buffer[byteIndex] :
+				// Bit position straddles two bytes — shift the window across the boundary.
+				(byte)((buffer[byteIndex] >> bitOffset) | (buffer[byteIndex + 1] << (8 - bitOffset)));
 		}
 
 		public uint ReadVarUInt32()
@@ -432,7 +436,82 @@ namespace StrikeLink.DemoParser.Parsing
 			index += 8;
 			return value;
 		}
+
+		private static string? TryParseNested(byte[] bytes)
+		{
+			try
+			{
+				ProtoMessage nested = Parse(bytes);
+
+				using IEnumerator<KeyValuePair<int, List<ProtoFieldValue>>> enumerator = nested.EnumerateFields().GetEnumerator();
+
+				return !enumerator.MoveNext() ? null : "[nested message]";
+			}
+			catch { return null; }
+		}
+
+		private static string? TryDecodeUtf8(byte[] bytes)
+		{
+			try
+			{
+				string s = Encoding.UTF8.GetString(bytes);
+				return s.Any(c => char.IsControl(c) && !char.IsWhiteSpace(c)) ? null : s;
+			}
+			catch { return null; }
+		}
+
+		private static string FormatFieldValue(ProtoFieldValue field)
+		{
+			switch (field.WireType)
+			{
+				case ProtoWireType.Varint:
+				{
+					ulong raw = field.Varint;
+					return $"varint: {raw} (int32: {(int)raw}, bool: {raw != 0})";
+				}
+
+				case ProtoWireType.Fixed32:
+				{
+					uint raw = field.Fixed32;
+					float asFloat = BitConverter.Int32BitsToSingle(unchecked((int)raw));
+					return $"fixed32: {raw} (float: {asFloat})";
+				}
+
+				case ProtoWireType.Fixed64:
+				{
+					ulong raw = field.Fixed64;
+					double asDouble = BitConverter.Int64BitsToDouble(unchecked((long)raw));
+					return $"fixed64: {raw} (double: {asDouble})";
+				}
+
+				case ProtoWireType.LengthDelimited:
+				{
+					byte[] bytes = field.Bytes ?? [];
+					string? str = TryDecodeUtf8(bytes);
+					string? nested = TryParseNested(bytes);
+					return $"len[{bytes.Length}]: " +
+					       (str != null ? $"string=\"{str}\" " : "") +
+					       $"hex={BitConverter.ToString(bytes)}" +
+					       (nested != null ? $" | nested: {nested}" : "");
+				}
+
+				default:
+					return $"unknown wire type {field.WireType}";
+			}
+		}
+
+		public void DumpMessage()
+		{
+			foreach ((int fieldNumber, List<ProtoFieldValue> value) in EnumerateFields())
+			{
+				foreach (string formatted in value.Select(FormatFieldValue))
+				{
+					Debug.WriteLine($"Field {fieldNumber}: {formatted}");
+				}
+			}
+		}
 	}
+
 
 	internal static class SnappyBlockDecoder
 	{
@@ -478,10 +557,7 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 
-			if (outputIndex != expectedLength)
-				throw new InvalidDataException($"Snappy output length mismatch. Expected {expectedLength}, got {outputIndex}.");
-
-			return output;
+			return outputIndex != expectedLength ? throw new InvalidDataException($"Snappy output length mismatch. Expected {expectedLength}, got {outputIndex}.") : output;
 		}
 
 		private static void CopyLiteral(byte[] input, ref int index, byte[] output, ref int outputIndex, byte tag)

@@ -1,21 +1,15 @@
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Globalization;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Text.Encodings.Web;
-using System.Text.RegularExpressions;
+// ReSharper disable IdentifierTypo
+// ReSharper disable StringLiteralTypo
 
+// ReSharper disable InvertIf
 // ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Local
-// ReSharper disable NotAccessedPositionalProperty.Local
-// ReSharper disable StringLiteralTypo
-// ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-
-#pragma warning disable CA5394
-#pragma warning disable CA1031
 #pragma warning disable CA1308
+#pragma warning disable CA1031
 
 // Thank god for claude again, I couldn't figure out parsing, but now I can get this ingrained to see how it's done.
 
@@ -42,16 +36,6 @@ namespace StrikeLink.DemoParser.Parsing
 		private readonly Stream? _fileStream;
 		private readonly ParseState _state;
 
-		/// <summary>
-		/// Provides a mapping of event names to their associated data collections.
-		/// </summary>
-		/// <remarks>Each key in the outer dictionary represents an event name. The corresponding value is a
-		/// dictionary that maps string keys to dynamic values, allowing storage of arbitrary event-related data. This
-		/// collection is static and read-only; its contents should be initialized at application startup and not modified at
-		/// runtime.</remarks>
-#pragma warning disable CA1002 // Do not expose generic lists
-		public static readonly List<Dictionary<string, dynamic>> EventData = [];
-#pragma warning restore CA1002 // Do not expose generic lists
 
 		/// <summary>
 		/// Initializes a new instance of the Cs2DemoParser class for reading and parsing a demo file using the specified
@@ -314,18 +298,19 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 		}
-
+		
 		private static void ProcessNetMessage(ParseState state, int messageType, byte[] payload)
 		{
 			state.ObserveNetMessage(messageType);
+			
 			switch (messageType)
 			{
 				case MessageTypeIds.SvcServerInfo:
 					ApplyServerInfo(state, ProtoMessage.Parse(payload));
 					break;
 
-				case MessageTypeIds.SvcUserMessage:
-					ApplyUserMessage(state, ProtoMessage.Parse(payload));
+				case MessageTypeIds.UmSayText2:
+					ApplyChatMessage(state, payload);
 					break;
 
 				case MessageTypeIds.CsUmServerRankUpdate:
@@ -343,9 +328,60 @@ namespace StrikeLink.DemoParser.Parsing
 			}
 		}
 
+		private static void ApplyChatMessage(ParseState state, byte[] payload)
+		{
+			ProtoMessage msg = ProtoMessage.Parse(payload);
+
+			msg.TryGetString(3, out string? channel);
+			msg.TryGetString(4, out string? playerName);
+			msg.TryGetString(5, out string? message);
+			
+			ChatType chatType = channel switch
+			{
+				"Cstrike_Chat_All" => ChatType.ChatAll,
+				"Cstrike_Chat_AllDead" => ChatType.ChatAllDead,
+				"Cstrike_Chat_AllSpec" => ChatType.ChatAllSpec,
+
+				"Cstrike_Chat_CT" => ChatType.ChatCt,
+				"Cstrike_Chat_CT_Dead" => ChatType.ChatCtDead,
+				"Cstrike_Chat_CT_Loc" => ChatType.ChatCtLoc,
+
+				"Cstrike_Chat_T" => ChatType.ChatT,
+				"Cstrike_Chat_T_Dead" => ChatType.ChatTDead,
+				"Cstrike_Chat_T_Loc" => ChatType.ChatTLoc,
+
+				"Cstrike_Chat_Spec" => ChatType.ChatSpec,
+
+				_ => throw new ArgumentOutOfRangeException(nameof(payload), channel, null)
+			};
+
+			if (string.IsNullOrWhiteSpace(message))
+			{
+				state.AddWarning($"{JsonSerializer.Serialize(payload)} has an empty message");
+				return;
+			}
+			
+			if (string.IsNullOrWhiteSpace(playerName))
+			{
+				state.AddWarning($"{JsonSerializer.Serialize(payload)} has an empty playerName");
+				return;
+			}
+			
+			state.ChatMessages.Add(new DemoChatMessage(chatType, playerName, message, state.CurrentFrameTick));
+		}
 
 		private static void ApplyServerInfo(ParseState state, ProtoMessage message)
 		{
+			if (message.TryGetBytes(19, out byte[]? nestedPayload))
+			{
+				if (nestedPayload is not null)
+				{
+					ProtoMessage nestedProto = ProtoMessage.Parse(nestedPayload);
+					nestedProto.TryGetString(12, out string? gameType);
+					state.GameType = gameType;
+				}
+			}
+
 			if (message.TryGetFloat(13, out float tickInterval) && tickInterval > 0)
 			{
 				state.TickIntervalSeconds = tickInterval;
@@ -376,126 +412,8 @@ namespace StrikeLink.DemoParser.Parsing
 					break;
 				}
 			}
-
-			if (message.TryGetBytes(19, out byte[]? serverBlob) && serverBlob is { Length: > 0 })
-			{
-				ApplyServerMetadataBlob(state, serverBlob);
-			}
-
-			if (message.TryGetString(19, out string? serverBlobText) && !string.IsNullOrWhiteSpace(serverBlobText))
-			{
-				ApplyServerMetadataText(state, serverBlobText);
-			}
 		}
-
-		private static void ApplyServerMetadataBlob(ParseState state, byte[] blob)
-		{
-			string utf8 = Encoding.UTF8.GetString(blob);
-			string latin1 = Encoding.Latin1.GetString(blob);
-			ApplyServerMetadataText(state, utf8.Length >= latin1.Length ? utf8 : latin1);
-		}
-
-		private static void ApplyServerMetadataText(ParseState state, string rawText)
-		{
-			string text = new (rawText.Select(ch => char.IsControl(ch) && ch != '\n' && ch != '\r' && ch != '\t' ? ' ' : ch).ToArray());
-			
-			Match slotsMatch = Regex.Match(text, @"numSlots\D{0,16}(?<slots>\d{1,3})", RegexOptions.IgnoreCase);
-			if (!slotsMatch.Success)
-			{
-				slotsMatch = Regex.Match(text, @"(?:maxplayers|sv_visiblemaxplayers)\D{0,16}(?<slots>\d{1,3})", RegexOptions.IgnoreCase);
-			}
-			if (slotsMatch.Success && int.TryParse(slotsMatch.Groups["slots"].Value, out int parsedSlots) && parsedSlots is > 0 and <= 128)
-			{
-				state.MaxPlayers ??= parsedSlots;
-			}
-
-			string? gameType = TryExtractTaggedNumeric(text, "c_game_type") ?? TryExtractTaggedNumeric(text, "default_game_type");
-			string? gameMode = TryExtractTaggedNumeric(text, "c_game_mode") ?? TryExtractTaggedNumeric(text, "default_game_mode");
-			if (!string.IsNullOrWhiteSpace(gameType) || !string.IsNullOrWhiteSpace(gameMode))
-			{
-				state.GameType = string.IsNullOrWhiteSpace(gameMode) ? gameType : $"{gameType}/{gameMode}";
-			}
-
-			if (string.IsNullOrWhiteSpace(state.GameType))
-			{
-				Match nameBasedGameType = Regex.Match(text, @"\b(competitive|premier|casual|wingman|deathmatch|armsrace|retakes)\b", RegexOptions.IgnoreCase);
-				if (nameBasedGameType.Success)
-				{
-					state.GameType = nameBasedGameType.Groups[1].Value.ToLowerInvariant();
-				}
-			}
-
-			if (string.IsNullOrWhiteSpace(state.MapName))
-			{
-				Match mapMatch = Regex.Match(text, @"\b(de|cs|ar|fy)_[a-z0-9_]+\b", RegexOptions.IgnoreCase);
-				if (mapMatch.Success)
-				{
-					state.MapName = mapMatch.Value;
-				}
-			}
-		}
-
-		private static string? TryExtractTaggedNumeric(string text, string tag)
-		{
-			Match match = Regex.Match(text, $@"{Regex.Escape(tag)}\D{{0,16}}(?<value>\d{{1,3}})", RegexOptions.IgnoreCase);
-			return match.Success ? match.Groups["value"].Value : null;
-		}
-
-		private static bool TryParseServerEndpoint(string input, out string? address, out int? port)
-		{
-			address = null;
-			port = null;
-			if (string.IsNullOrWhiteSpace(input))
-			{
-				return false;
-			}
-
-			string[] tokens = input.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-			foreach (string token in tokens)
-			{
-				string candidate = token.Trim('[', ']', '(', ')', ';', ',');
-				int colonIndex = candidate.LastIndexOf(':');
-				if (colonIndex <= 0 || colonIndex >= candidate.Length - 1)
-				{
-					continue;
-				}
-
-				string hostPart = candidate[..colonIndex];
-				string portPart = candidate[(colonIndex + 1)..];
-				if (!int.TryParse(portPart, out int parsedPort) || parsedPort is <= 0 or > 65535)
-				{
-					continue;
-				}
-
-				if (IPAddress.TryParse(hostPart, out _))
-				{
-					address = hostPart;
-					port = parsedPort;
-					return true;
-				}
-			}
-
-			return false;
-		}
-
-		private static void ApplyUserMessage(ParseState state, ProtoMessage envelope)
-		{
-			if (!envelope.TryGetInt32(1, out int userMessageType) || !envelope.TryGetBytes(2, out byte[]? payload) || payload is null)
-				return;
-
-			ProtoMessage decodedPayload = ProtoMessage.Parse(payload);
-			switch (userMessageType)
-			{
-				case MessageTypeIds.CsUmServerRankUpdate:
-					ApplyServerRankUpdate(state, decodedPayload);
-					break;
-
-				case MessageTypeIds.CsUmXRankUpd:
-					state.AddWarning("Received XRank update payload. The message does not contain a player identifier, so it cannot be mapped safely without additional client-state decoding.");
-					break;
-			}
-		}
-
+		
 		private static void ApplyServerRankUpdate(ParseState state, ProtoMessage rankMessage)
 		{
 			foreach (ProtoFieldValue updateField in rankMessage.GetValues(1))
@@ -561,7 +479,7 @@ namespace StrikeLink.DemoParser.Parsing
 					keys.Add(new EventKeyDescriptor(keyName, type));
 				}
 
-				state.EventDescriptors[eventId] = new EventDescriptor(eventId, eventName!, keys);
+				state.EventDescriptors[eventId] = new EventDescriptor(eventName!, keys);
 			}
 		}
 
@@ -594,9 +512,7 @@ namespace StrikeLink.DemoParser.Parsing
 			}
 
 			int eventTick = message.TryGetInt32(4, out int serverTick) ? serverTick : state.CurrentFrameTick;
-
-			EventData.Add(new Dictionary<string, dynamic> { { descriptor.Name, data } });
-
+			
 			state.ObserveEventName(descriptor.Name);
 			state.HandleGameEvent(descriptor.Name, eventTick, data);
 		}
@@ -635,10 +551,11 @@ namespace StrikeLink.DemoParser.Parsing
 		private sealed class ParseState(DemoAuthorization config, FileInfo? demoPath = null)
 		{
 			private readonly HashSet<string> _warningSet = new(StringComparer.Ordinal);
+
 			/// <summary>Round numbers whose winner could not be resolved at event-processing time.
 			/// Cleared for each round that is successfully resolved by retroactive inference in BuildResult.
 			/// Remaining entries are promoted to actual warnings after the retroactive pass.</summary>
-			private readonly HashSet<int> _deferredRoundWinnerWarnings = new();
+			private readonly HashSet<int> _deferredRoundWinnerWarnings = [];
 
 			public Dictionary<int, EventDescriptor> EventDescriptors { get; } = [];
 
@@ -674,6 +591,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private RoundAccumulator? CurrentRound { get; set; }
 
+			public List<DemoChatMessage> ChatMessages { get; } = [];
+
 			public string? ServerName { get; set; }
 
 			public string? GameType { get; set; }
@@ -694,7 +613,6 @@ namespace StrikeLink.DemoParser.Parsing
 
 			public float TickIntervalSeconds { get; set; }
 
-			/// <summary>Round number at which the first halftime team swap occurred (0 = not yet detected).</summary>
 			private int HalfTimeRoundNumber { get; set; }
 
 			public int CurrentFrameTick { get; private set; }
@@ -780,7 +698,6 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 
 				player.IsBot = player.IsBot || isBot;
-				player.IsConnected = true;
 
 				if (mapUserIdAsEntitySlot)
 				{
@@ -838,21 +755,30 @@ namespace StrikeLink.DemoParser.Parsing
 				&& round.Damage.Count == 0
 				&& round is { BombExploded: false, PlanterUserId: null, DefuserUserId: null, Participants.Count: 0 };
 
-			public static readonly Dictionary<string, List<(int Tick, Dictionary<string, GameEventValue> Data)>> EventData = new();
+
+			/// <summary>
+			/// Provides a mapping of event names to their associated data collections.
+			/// </summary>
+			/// <remarks>Each key in the outer dictionary represents an event name. The corresponding value is a
+			/// dictionary that maps string keys to dynamic values, allowing storage of arbitrary event-related data. This
+			/// collection is static and read-only; its contents should be initialized at application startup and not modified at
+			/// runtime.</remarks>
+			private static Dictionary<string, List<(int Tick, Dictionary<string, GameEventValue> Data)>> EventData { get; } = [];
+
 
 			public void HandleGameEvent(string name, int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
-				//if (!EventData.TryGetValue(name, out List<(int Tick, Dictionary<string, GameEventValue> Data)>? list))
-				//{
-				//	list = [];
-				//	EventData[name] = list;
-				//}
-				//Dictionary<string, GameEventValue> copiedData = new (data);
-				//list.Add((tick, copiedData));
+				if (!EventData.TryGetValue(name, out List<(int Tick, Dictionary<string, GameEventValue> Data)>? list))
+				{
+					list = [];
+					EventData[name] = list;
+				}
 
-				//File.WriteAllText("EventFullData.txt", Serialize(EventData));
+				Dictionary<string, GameEventValue> copiedData = new(data);
+				list.Add((tick, copiedData));
 
 				ObserveTrackedEventSample(name, data);
+
 				switch (name)
 				{
 					case "player_connect":
@@ -866,49 +792,13 @@ namespace StrikeLink.DemoParser.Parsing
 					case "player_team":
 						HandlePlayerTeam(data);
 						break;
-
-					case "player_disconnect":
-						HandlePlayerDisconnect(data);
-						break;
-
-					case "begin_new_match":
-						break;
-
-					case "server_cvar":
-						HandleServerCvar(data);
-						break;
-
+						
 					case "round_start":
-						StartRound(tick);
-						break;
-
 					case "cs_round_start_beep":
 					case "round_freeze_end":
 						if (ShouldStartRoundFromSignal(tick))
 						{
 							StartRound(tick);
-						}
-						break;
-
-					case "round_end":
-						{
-							CsTeamSide winner = GetRoundWinnerFromEvent(data);
-							if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists) && TryResolveRoundWinnerFromScoreboard(data, out CsTeamSide scoreWinner))
-							{
-								winner = scoreWinner;
-							}
-							if (winner is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
-							{
-								CompleteRound(CurrentRound, winner, tick);
-							}
-							else if (TryResolveRoundWinner(CurrentRound, out CsTeamSide inferredWinner))
-							{
-								CompleteRound(CurrentRound, inferredWinner, tick);
-							}
-							else
-							{
-								if (CurrentRound is not null) _deferredRoundWinnerWarnings.Add(CurrentRound.Number);
-							}
 						}
 						break;
 
@@ -1012,9 +902,6 @@ namespace StrikeLink.DemoParser.Parsing
 								AddWarning($"Failed to determine bomb_defused user on round: {CurrentRound?.Number}");
 							}
 						}
-						break;
-
-					case "item_purchase":
 						break;
 				}
 			}
@@ -1151,7 +1038,6 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 				else fileDateUtc = DateTime.MinValue;
 				
-
 				PlayerStats? focusPlayer = players.FirstOrDefault(player => player.SteamId == (ulong)config.SteamId);
 
 				MatchOutcome outcome = MatchOutcome.Unknown;
@@ -1188,30 +1074,11 @@ namespace StrikeLink.DemoParser.Parsing
 					DemoClientName: ClientName,
 					NetworkProtocol: NetworkProtocol,
 					FocusSteamId: (ulong)config.SteamId,
-					ChatMessages: ExtractChatMessages());
-				
+					ChatMessages: ChatMessages);
 				
 				return new Cs2DemoParseResult(match, players, rounds, new ReadOnlyCollection<string>(Warnings));
 			}
 
-			private static List<DemoChatMessage> ExtractChatMessages()
-			{
-				List<DemoChatMessage> messages = [];
-
-				string[] chatEventNames = ["player_chat", "say", "say_team"];
-
-				foreach (string eventName in chatEventNames)
-				{
-
-					//bool isTeamOnly = eventName == "say_team" || (fields.TryGetValue("teamonly", out object? teamOnlyRaw) && teamOnlyRaw is true);
-					//int userId = fields.TryGetValue("userid", out object? userIdRaw) ? Convert.ToInt32(userIdRaw, CultureInfo.InvariantCulture) : -1;
-					//string text = fields.TryGetValue("text", out object? textRaw) ? textRaw?.ToString() ?? string.Empty : string.Empty;
-
-					//messages.Add(new DemoChatMessage(userId, text, isTeamOnly));
-				}
-
-				return messages;
-			}
 
 			private RoundStats BuildRound(RoundAccumulator round)
 			{
@@ -1222,6 +1089,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 				return new RoundStats(
 					round.Number,
+					round.StartTick,
+					round.EndTick,
 					round.Duration,
 					winnerTeam,
 					winnerSide,
@@ -1517,62 +1386,7 @@ namespace StrikeLink.DemoParser.Parsing
 				TryAssignControllerTeamFromEvent(player, data);
 			}
 
-			private void HandleServerCvar(IReadOnlyDictionary<string, GameEventValue> data)
-			{
-				string? cvarName = GetStringValue(data, "cvarname") ?? GetStringValue(data, "name");
-				string? cvarValue = GetStringValue(data, "cvarvalue") ?? GetStringValue(data, "value");
-				if (string.IsNullOrWhiteSpace(cvarName) || string.IsNullOrWhiteSpace(cvarValue))
-				{
-					return;
-				}
-
-				string key = cvarName.Trim().ToLowerInvariant();
-				switch (key)
-				{
-					case "hostname":
-						ServerName = cvarValue;
-						break;
-						
-					case "mapname":
-						MapName = cvarValue;
-						break;
-
-					case "game_type":
-					case "game_mode":
-					case "mp_gamemode":
-						GameType = cvarValue;
-						break;
-
-					case "maxplayers":
-					case "sv_visiblemaxplayers":
-					case "sv_maxplayers":
-						if (int.TryParse(cvarValue, out int parsedMaxPlayers) && parsedMaxPlayers is > 0 and <= 128)
-						{
-							MaxPlayers = parsedMaxPlayers;
-						}
-						break;
-				}
-			}
-
-			private static bool TryParseIpValue(string value, out string? ip)
-			{
-				ip = null;
-				string trimmed = value.Trim();
-				if (IPAddress.TryParse(trimmed, out _))
-				{
-					ip = trimmed;
-					return true;
-				}
-
-				if (uint.TryParse(trimmed, out uint numericHostIp))
-				{
-					ip = new IPAddress(numericHostIp).ToString();
-					return true;
-				}
-
-				return false;
-			}
-
+			
 			private void HandlePlayerSpawn(IReadOnlyDictionary<string, GameEventValue> data)
 			{
 				// In CS2, player_spawn carries userid as a type-9 controller handle.
@@ -1618,7 +1432,6 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					player.Team = (CsTeamSide)GetIntValue(data, "team");
 				}
-				player.IsConnected = true;
 
 				// Detect halftime: player_team fires between rounds (CurrentRound null) and we have rounds already
 				if (CurrentRound is null && Rounds.Count > 0 && HalfTimeRoundNumber == 0)
@@ -1680,7 +1493,6 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				string[] numericKeys =
 				[
-					// Explicit controller netvar keys
 					"CCSPlayerController.m_iTeamNum",
 					"m_iTeamNum",
 					// Common event aliases
@@ -1760,13 +1572,6 @@ namespace StrikeLink.DemoParser.Parsing
 				return hasT && hasCt;
 			}
 
-			private void HandlePlayerDisconnect(IReadOnlyDictionary<string, GameEventValue> data)
-			{
-				PlayerAccumulator? player = ResolvePlayerFromCandidates(data, "userid", "userid_pawn") ??
-				                            ResolvePlayer(GetIntValue(data, "userid"));
-
-				player?.IsConnected = false;
-			}
 
 			private static void TryAssignTeamFromEvent(PlayerAccumulator? player, IReadOnlyDictionary<string, GameEventValue> data, params string[] teamKeys)
 			{
@@ -1795,6 +1600,8 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 					else
 					{
+						CurrentRound.EndTick = tick;
+						CurrentRound.Duration = GetDuration(CurrentRound.StartTick, tick);
 						_deferredRoundWinnerWarnings.Add(CurrentRound.Number);
 					}
 				}
@@ -2461,9 +2268,10 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				if (TickIntervalSeconds <= 0 || endTick < startTick)
 				{
+					AddWarning($"{CurrentRound?.Number} failed duration | INV_VAL: {TickIntervalSeconds <= 0} | END_TICK {endTick} | START_TICK {startTick}");
 					return null;
 				}
-
+				
 				return TimeSpan.FromSeconds((endTick - startTick) * TickIntervalSeconds);
 			}
 
@@ -2523,17 +2331,14 @@ namespace StrikeLink.DemoParser.Parsing
 				if (value.Type is 8 or 9)
 				{
 					uint handle = unchecked((uint)value.AsUInt64());
-					if (value.Type == 9 && PlayersByControllerHandle.TryGetValue(handle, out PlayerAccumulator? byControllerHandle))
-					{
-						return byControllerHandle;
-					}
-
-					if (value.Type == 8 && PlayersByPawnHandle.TryGetValue(handle, out PlayerAccumulator? byPawnHandle))
-					{
-						return byPawnHandle;
-					}
-
-					return ResolvePlayerByHandle(handle);
+					return value.Type == 9 &&
+					       PlayersByControllerHandle.TryGetValue(handle, out PlayerAccumulator? byControllerHandle)
+						?
+						byControllerHandle
+						: value.Type == 8 &&
+						  PlayersByPawnHandle.TryGetValue(handle, out PlayerAccumulator? byPawnHandle)
+							? byPawnHandle
+							: ResolvePlayerByHandle(handle);
 				}
 
 				// Legacy short userid
@@ -2678,8 +2483,6 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 
 				string lower = weapon.Trim().ToLowerInvariant();
-				// weapon_fire events prefix weapon names with "weapon_"; strip it so
-				// the same key is used as in player_hurt / player_death events.
 				if (lower.StartsWith("weapon_", StringComparison.Ordinal))
 				{
 					lower = lower["weapon_".Length..];
@@ -2691,15 +2494,15 @@ namespace StrikeLink.DemoParser.Parsing
 			private static WeaponClass ClassifyWeapon(string weapon)
 				=> weapon switch
 				{
-					"hegrenade" => new WeaponClass(WeaponKind.HeGrenade, true, true, false),
-					"flashbang" => new WeaponClass(WeaponKind.Flashbang, true, false, false),
-					"molotov" or "inferno" or "incgrenade" => new WeaponClass(WeaponKind.Molotov, true, false, true),
-					"smokegrenade" or "decoy" => new WeaponClass(WeaponKind.OtherUtility, true, false, false),
-					_ => new WeaponClass(WeaponKind.Other, false, false, false),
+					"hegrenade" => new WeaponClass(true, true, false),
+					"flashbang" => new WeaponClass(true, false, false),
+					"molotov" or "inferno" or "incgrenade" => new WeaponClass(true, false, true),
+					"smokegrenade" or "decoy" => new WeaponClass(true, false, false),
+					_ => new WeaponClass(false, false, false),
 				};
 		}
 
-		private sealed record EventDescriptor(int EventId, string Name, IReadOnlyList<EventKeyDescriptor> Keys);
+		private sealed record EventDescriptor(string Name, IReadOnlyList<EventKeyDescriptor> Keys);
 
 		private sealed record EventKeyDescriptor(string Name, int Type);
 
@@ -2750,9 +2553,7 @@ namespace StrikeLink.DemoParser.Parsing
 			public uint AccountId { get; set; }
 
 			public bool IsBot { get; set; }
-
-			public bool IsConnected { get; set; }
-
+			
 			public CsTeamSide Team { get; set; }
 
 			public int Kills { get; set; }
@@ -2994,6 +2795,6 @@ namespace StrikeLink.DemoParser.Parsing
 			OtherUtility = 4,
 		}
 
-		private readonly record struct WeaponClass(WeaponKind Kind, bool IsUtility, bool IsFrag, bool IsMolotov);
+		private readonly record struct WeaponClass(bool IsUtility, bool IsFrag, bool IsMolotov);
 	}
 }
