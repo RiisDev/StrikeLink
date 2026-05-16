@@ -1,6 +1,7 @@
 ﻿using StrikeLink.GSI.ObjectStates;
 using StrikeLink.GSI.Parsing;
 using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 #pragma warning disable CA1031
 #pragma warning disable CA1003
@@ -86,37 +87,25 @@ namespace StrikeLink.GSI
 		/// </remarks>
 		public async Task StartAsync(IPAddress? address = null, int? port = null, string? steamPath = null)
 		{
-			// This block checks if we need to generate and use a new port and address
-			// in case the user specified one that is already in use or invalid
-			bool userSpecifiedAddress = address is not null;
-			bool userSpecifiedPort = port is not null;
-
 			IPAddress requestedAddress = address ?? IPAddress.Loopback;
 			int requestedPort = port ?? GetFreePort();
 
-			(IPAddress newAddress, int newPort) =
+			(IPAddress resolvedAddress, int resolvedPort) =
 				await GsiManager.GenerateGsiFile(requestedAddress, requestedPort, steamPath)
 					.ConfigureAwait(false);
 
-			bool addressChanged = !requestedAddress.Equals(newAddress);
-			bool portChanged = requestedPort != newPort;
+			bool userOverrodeConfig = (address is not null || port is not null) &&
+			                          (!requestedAddress.Equals(resolvedAddress) || requestedPort != resolvedPort);
+			bool portBlocked = IsPortOpen(resolvedPort);
 
-			// This is cancer I apologize
-			bool shouldCheckProcess = 
-				(userSpecifiedAddress || userSpecifiedPort) &&
-				(addressChanged || portChanged) || (!userSpecifiedAddress &&
-				!userSpecifiedPort && (addressChanged || portChanged));
-
-			if (shouldCheckProcess && Process.GetProcessesByName("cs2").Length > 0)
+			if ((userOverrodeConfig || portBlocked) && Process.GetProcessesByName("cs2").Length > 0)
 			{
 				throw new InvalidOperationException(
-					"Counter Strike must not be running during first run."
-				);
+					"Counter Strike must not be running during first run.");
 			}
 
-			// Now we can start the listener
-			Address = newAddress;
-			Port = newPort;
+			Address = resolvedAddress;
+			Port = resolvedPort;
 
 			try
 			{
@@ -377,6 +366,13 @@ namespace StrikeLink.GSI
 			int port = ((IPEndPoint)listener.LocalEndpoint).Port;
 			listener.Stop();
 			return port;
+		}
+
+		private static bool IsPortOpen(int port)
+		{
+			IPGlobalProperties properties = IPGlobalProperties.GetIPGlobalProperties();
+			IPEndPoint[] activeListeners = properties.GetActiveTcpListeners();
+			return activeListeners.Any(x => x.Port == port);
 		}
 
 		/// <summary>

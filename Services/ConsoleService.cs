@@ -9,6 +9,12 @@ using System.Text.RegularExpressions;
 
 namespace StrikeLink.Services
 {
+	internal class StatusData
+	{
+		public bool IsStatusScanning { get; set; }
+		public StringBuilder StatusBuilder { get; set; } = new();
+	}
+
 	/// <summary>
 	/// Provides access to the game console output and emits high-level events
 	/// for game state changes, chat messages, server activity, and addon progress.
@@ -144,6 +150,14 @@ namespace StrikeLink.Services
 		public event Action<AddonProgress>? OnAddonProgress;
 
 		/// <summary>
+		/// Occurs when a status message is available.
+		/// </summary>
+		/// <remarks>Subscribers receive an object containing status information. The specific type and content of the
+		/// object depend on the context in which the event is raised. Handlers should verify the type of the event argument
+		/// before use.</remarks>
+		public event Action<Cs2StatusMessage>? OnStatusMessage;
+
+		/// <summary>
 		/// Occurs when an addon has finished downloading.
 		/// </summary>
 		public event Action? OnAddonFinished;
@@ -163,9 +177,15 @@ namespace StrikeLink.Services
 		/// </summary>
 		public event Action? OnServerDisconnected;
 
+		/// <summary>
+		/// Occurs when the client receives 'Match Found' screen.
+		/// </summary>
+		public event Action? OnMatchPrompt;
+
 		// Fields
 		private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+		private readonly StatusData _statusData = new();
 		private readonly string _consoleLogPath;
 		private readonly string _strikeConsoleTmp;
 		private string _downloadingUgcData = string.Empty;
@@ -194,22 +214,42 @@ namespace StrikeLink.Services
 			_consoleLogPath = Path.Combine(counterStrikePath, "game", "csgo", "console.log");
 			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
 		}
-
-		/*
-		 *
-		 * Note for future self:
-		 * Can parse the status output by first checking if the lineText contains status, and then waiting for the last line that contains "end of status".
-		 *
-		 */
+		
 		private void ParseLineData(string lineText)
 		{
 			if (_firstRun) return;
 
-			Debug.WriteLine(lineText);
+			//Debug.WriteLine(lineText);
 			OnLogReceived?.Invoke(lineText);
+
+			lock (_statusData)
+			{
+				if (_statusData.IsStatusScanning)
+				{
+					_statusData.StatusBuilder.AppendLine(lineText);
+				}
+			}
 
 			switch (lineText)
 			{
+				case var _ when lineText.Contains("----- Status -----", StringComparison.InvariantCultureIgnoreCase):
+					lock (_statusData)
+					{
+						_statusData.IsStatusScanning = true;
+						_statusData.StatusBuilder.AppendLine(lineText);
+					}
+					break;
+				case var _ when lineText.Contains("[Client] #end", StringComparison.InvariantCultureIgnoreCase):
+					lock (_statusData)
+					{
+						_statusData.IsStatusScanning = false;
+						_statusData.StatusBuilder.AppendLine(lineText);
+					}
+					ParseStatusData();
+					break;
+				case var _ when lineText.Contains("match_id=", StringComparison.InvariantCultureIgnoreCase):
+					OnMatchPrompt?.Invoke();
+					break;
 				case var _ when lineText.Contains(" [ALL] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
 					ParseChatLine(lineText,false);
 					break;
@@ -293,6 +333,16 @@ namespace StrikeLink.Services
 					OnMapJoined?.Invoke(mapName);
 					break;
 
+			}
+		}
+
+		private void ParseStatusData()
+		{
+			lock (_statusData)
+			{
+				string statusText = _statusData.StatusBuilder.ToString();
+				_statusData.StatusBuilder.Clear();
+				OnStatusMessage?.Invoke(Cs2StatusParser.Parse(statusText));
 			}
 		}
 
@@ -417,5 +467,289 @@ namespace StrikeLink.Services
 		[GeneratedRegex(@"^\[([^\]]+)\]\s+([^:]+):\s+(.+)$", RegexOptions.Singleline)]
 		private static partial Regex ChatRegex();
 
+	}
+
+	/// <summary>
+	/// Represents a snapshot of the current status of a CS2 server, including server information, player data, and spawn
+	/// group details.
+	/// </summary>
+	/// <param name="Timestamp">The date and time when the status message was generated.</param>
+	/// <param name="CurrentState">The current operational state of the server, such as running, paused, or stopped.</param>
+	/// <param name="Server">Information about the server, including its configuration and status.</param>
+	/// <param name="SpawnGroups">A read-only list of spawn group details present on the server at the time of the status message.</param>
+	/// <param name="Players">A read-only list of player entries representing all players currently connected to the server.</param>
+	/// <param name="ServerTag">A tag or identifier associated with the server, used for categorization or filtering.</param>
+	public record Cs2StatusMessage(
+		DateTimeOffset Timestamp,
+		string CurrentState,
+		ServerInfo Server,
+		IReadOnlyList<SpawnGroup> SpawnGroups,
+		IReadOnlyList<PlayerEntry> Players,
+		string ServerTag
+	);
+
+	/// <summary>
+	/// Represents information about a game server, including its version, player counts, status, and reservation details.
+	/// </summary>
+	/// <param name="Slot">The slot number assigned to the server instance.</param>
+	/// <param name="Version">The version string of the server software.</param>
+	/// <param name="BuildNumber">The build number identifying the specific server build.</param>
+	/// <param name="SecurityMode">The security mode in which the server is operating.</param>
+	/// <param name="Visibility">The visibility status of the server, indicating whether it is public or private.</param>
+	/// <param name="SteamId">The unique Steam identifier associated with the server.</param>
+	/// <param name="HumanCount">The number of human players currently connected to the server.</param>
+	/// <param name="BotCount">The number of bot players currently present on the server.</param>
+	/// <param name="MaxPlayers">The maximum number of players that the server supports.</param>
+	/// <param name="IsHibernating">A value indicating whether the server is currently in a hibernating state.</param>
+	/// <param name="ReservationId">The reservation identifier associated with the server session, if any.</param>
+	public record ServerInfo(
+		int Slot,
+		string Version,
+		string BuildNumber,
+		string SecurityMode,
+		string Visibility,
+		string SteamId,
+		int HumanCount,
+		int BotCount,
+		int MaxPlayers,
+		bool IsHibernating,
+		string ReservationId
+	);
+
+	/// <summary>
+	/// Represents a group of spawn entities with associated metadata for a specific map and lump type.
+	/// </summary>
+	/// <param name="Id">The unique identifier for the spawn group.</param>
+	/// <param name="MapName">The name of the map to which this spawn group belongs. Cannot be null.</param>
+	/// <param name="LumpType">The type of lump associated with this spawn group. Cannot be null.</param>
+	/// <param name="LoadType">The load type that determines how the spawn group is processed. Cannot be null.</param>
+	/// <param name="Flags">A read-only list of flags that define additional properties or behaviors for the spawn group. Cannot be null.</param>
+	public record SpawnGroup(
+		int Id,
+		string MapName,
+		string LumpType,
+		string LoadType,
+		IReadOnlyList<string> Flags
+	);
+
+	/// <summary>
+	/// Represents a player entry containing connection and status information for a player in a session.
+	/// </summary>
+	/// <param name="Id">The unique identifier for the player entry.</param>
+	/// <param name="Channel">The name of the channel to which the player is connected, or null if not assigned.</param>
+	/// <param name="TimeConnected">The duration for which the player has been connected.</param>
+	/// <param name="Ping">The current network ping for the player, measured in milliseconds.</param>
+	/// <param name="Loss">The percentage of packet loss experienced by the player.</param>
+	/// <param name="State">The current connection or activity state of the player.</param>
+	/// <param name="Rate">The data transfer rate allocated to the player, in bytes per second.</param>
+	/// <param name="Name">The display name of the player.</param>
+	/// <param name="IsBot">true if the player is a bot; otherwise, false.</param>
+	public record PlayerEntry(
+		int Id,
+		string? Channel,
+		TimeSpan TimeConnected,
+		int Ping,
+		int Loss,
+		string State,
+		int Rate,
+		string Name,
+		bool IsBot
+	);
+
+
+	internal static partial class Cs2StatusParser
+	{
+		[GeneratedRegex(@"^\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[\w+\] ", RegexOptions.Compiled)]
+		private static partial Regex LogPrefixRegex();
+
+		[GeneratedRegex(@"@\s+Current\s+:\s+(\S+)", RegexOptions.Compiled)]
+		private static partial Regex CurrentStateRegex();
+
+		[GeneratedRegex(@"source\s+:\s+slot\s+(\d+)", RegexOptions.Compiled)]
+		private static partial Regex SlotRegex();
+
+		[GeneratedRegex(@"version\s+:\s+([\d.]+/\d+)\s+(\d+)\s+(\w+)\s+(\w+)", RegexOptions.Compiled)]
+		private static partial Regex VersionRegex();
+
+		[GeneratedRegex(@"steamid\s+:\s+(\[[^\]]+\])", RegexOptions.Compiled)]
+		private static partial Regex SteamIdRegex();
+
+		[GeneratedRegex(@"players\s+:\s+(\d+)\s+humans,\s+(\d+)\s+bots\s+\((\d+)\s+max\)\s+\((not )?hibernating\)(?:\s+\(reserved\s+([0-9a-f]+)\))?", RegexOptions.Compiled)]
+		private static partial Regex PlayersRegex();
+
+		[GeneratedRegex(@"loaded spawngroup\(\s*(\d+)\)\s+:\s+SV:\s+\[\d+:\s+([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|\]]+?)(?:\s*\|\s*([^\]]+))?\]", RegexOptions.Compiled)]
+		private static partial Regex SpawnGroupRegex();
+
+		[GeneratedRegex(@"^\s*(\d+)\s+(?:\[(\w+)\]|(\d+:\d+)|BOT)\s+(\d+)\s+(\d+)\s+(\w+)\s+(\d+)\s+'([^']*)'", RegexOptions.Compiled)]
+		private static partial Regex PlayerRegex();
+
+		public static Cs2StatusMessage Parse(string rawLog)
+		{
+			string[] lines = rawLog.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+			string[] stripped = lines
+				.Select(l => LogPrefixRegex().Replace(l.Trim(), string.Empty))
+				.ToArray();
+
+			DateTimeOffset timestamp = ParseTimestamp(lines[0]);
+			string currentState = string.Empty;
+			ServerInfo? serverInfo = null;
+			List<SpawnGroup> spawnGroups = [];
+			List<PlayerEntry> players = [];
+			string serverTag = string.Empty;
+
+			bool inPlayers = false;
+			bool inSpawnGroups = false;
+
+			int slot = 0;
+			string version = string.Empty, build = string.Empty, security = string.Empty, visibility = string.Empty;
+			string steamId = string.Empty;
+
+			foreach (string line in stripped)
+			{
+				if (CurrentStateRegex().Match(line) is { Success: true } csMatch)
+				{
+					currentState = csMatch.Groups[1].Value;
+					continue;
+				}
+
+				if (SlotRegex().Match(line) is { Success: true } slotMatch)
+				{
+					slot = int.Parse(slotMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+					continue;
+				}
+
+				if (VersionRegex().Match(line) is { Success: true } verMatch)
+				{
+					version = verMatch.Groups[1].Value;
+					build = verMatch.Groups[2].Value;
+					security = verMatch.Groups[3].Value;
+					visibility = verMatch.Groups[4].Value;
+					continue;
+				}
+
+				if (SteamIdRegex().Match(line) is { Success: true } steamMatch)
+				{
+					steamId = steamMatch.Groups[1].Value;
+					continue;
+				}
+
+				if (PlayersRegex().Match(line) is { Success: true } playersMatch)
+				{
+					int humans = int.Parse(playersMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+					int bots = int.Parse(playersMatch.Groups[2].Value, CultureInfo.InvariantCulture);
+					int maxPlayers = int.Parse(playersMatch.Groups[3].Value, CultureInfo.InvariantCulture);
+					bool hibernating = !playersMatch.Groups[4].Success;
+					string reservation = playersMatch.Groups[5].Value;
+
+					serverInfo = new ServerInfo(
+						slot, version, build, security, visibility,
+						steamId, humans, bots, maxPlayers, hibernating, reservation
+					);
+					continue;
+				}
+
+				if (line.Contains("spawngroups", StringComparison.OrdinalIgnoreCase))
+				{
+					inSpawnGroups = true;
+					inPlayers = false;
+					continue;
+				}
+
+				if (line.Contains("---------players--------", StringComparison.OrdinalIgnoreCase))
+				{
+					inPlayers = true;
+					inSpawnGroups = false;
+					continue;
+				}
+
+				if (inPlayers && line.TrimStart().StartsWith("id ", StringComparison.OrdinalIgnoreCase))
+					continue;
+
+				if (line == "Official Valve Server")
+				{
+					serverTag = line;
+					continue;
+				}
+
+				if (line == "#end")
+					break;
+
+				if (inSpawnGroups && SpawnGroupRegex().Match(line) is { Success: true } sgMatch)
+				{
+					List<string> flags = [];
+
+					for (int i = 3; i <= 5; i++)
+					{
+						string flag = sgMatch.Groups[i].Value.Trim();
+						if (!string.IsNullOrWhiteSpace(flag))
+							flags.Add(flag);
+					}
+
+					spawnGroups.Add(new SpawnGroup(
+						Id: int.Parse(sgMatch.Groups[1].Value, CultureInfo.InvariantCulture),
+						MapName: sgMatch.Groups[2].Value.Trim(),
+						LumpType: flags.Count > 0 ? flags[0] : string.Empty,
+						LoadType: flags.Count > 1 ? flags[1] : string.Empty,
+						Flags: flags.Count > 2 ? flags[2..] : []
+					));
+					continue;
+				}
+
+				if (inPlayers && PlayerRegex().Match(line) is { Success: true } pMatch)
+				{
+					int id = int.Parse(pMatch.Groups[1].Value, CultureInfo.InvariantCulture);
+					string? channel = pMatch.Groups[2].Success ? pMatch.Groups[2].Value : null;
+					bool isBot = line.Contains("BOT", StringComparison.Ordinal) && !pMatch.Groups[3].Success;
+					TimeSpan time = TimeSpan.Zero;
+
+					if (pMatch.Groups[3].Success)
+					{
+						string[] parts = pMatch.Groups[3].Value.Split(':');
+						time = new TimeSpan(0, int.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[1], CultureInfo.InvariantCulture));
+					}
+
+					players.Add(new PlayerEntry(
+						Id: id,
+						Channel: channel,
+						TimeConnected: time,
+						Ping: int.Parse(pMatch.Groups[4].Value, CultureInfo.InvariantCulture),
+						Loss: int.Parse(pMatch.Groups[5].Value, CultureInfo.InvariantCulture),
+						State: pMatch.Groups[6].Value,
+						Rate: int.Parse(pMatch.Groups[7].Value, CultureInfo.InvariantCulture),
+						Name: pMatch.Groups[8].Value,
+						IsBot: isBot
+					));
+				}
+			}
+
+			foreach (PlayerEntry player in players.ToList())
+			{
+				if (player is { Channel: "NoChan", State: "challenging" })
+				{
+					players.Remove(player);
+				}
+			}
+
+			return new Cs2StatusMessage(
+				Timestamp: timestamp,
+				CurrentState: currentState,
+				Server: serverInfo ?? throw new FormatException("Server info block not found."),
+				SpawnGroups: spawnGroups.AsReadOnly(),
+				Players: players.AsReadOnly(),
+				ServerTag: serverTag
+			);
+		}
+
+		private static DateTimeOffset ParseTimestamp(string firstLine)
+		{
+			ReadOnlySpan<char> span = firstLine.AsSpan(0, 14);
+			int month = int.Parse(span[..2], CultureInfo.InvariantCulture);
+			int day = int.Parse(span[3..5], CultureInfo.InvariantCulture);
+			int hour = int.Parse(span[6..8], CultureInfo.InvariantCulture);
+			int minute = int.Parse(span[9..11], CultureInfo.InvariantCulture);
+			int second = int.Parse(span[12..14], CultureInfo.InvariantCulture);
+			return new DateTimeOffset(DateTimeOffset.UtcNow.Year, month, day, hour, minute, second, TimeSpan.Zero);
+		}
 	}
 }
