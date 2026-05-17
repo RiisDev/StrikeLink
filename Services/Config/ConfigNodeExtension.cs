@@ -6,48 +6,45 @@
 	public static class ConfigNodeExtension
 	{
 		/// <summary>
-		/// Adds further navigation methods to <see cref="ConfigNode"/>.
+		/// Gets a nested configuration node using a dot-separated path.
 		/// </summary>
-		extension(ConfigNode node)
+		/// <param name="path">
+		/// A dot-separated property path (for example, <c>"Software.Valve.Steam"</c>).
+		/// </param>
+		/// <returns>
+		/// The configuration node located at the specified path.
+		/// </returns>
+		/// <exception cref="ArgumentException">
+		/// Thrown when <paramref name="path"/> is <c>null</c>, empty, or whitespace.
+		/// </exception>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown when an intermediate node is not an object.
+		/// </exception>
+		/// <exception cref="KeyNotFoundException">
+		/// Thrown when a path segment does not exist.
+		/// </exception>
+		public static ConfigNode GetPath(this ConfigNode node, string path)
 		{
-			/// <summary>
-			/// Gets a nested configuration node using a dot-separated path.
-			/// </summary>
-			/// <param name="path">
-			/// A dot-separated property path (for example, <c>"Software.Valve.Steam"</c>).
-			/// </param>
-			/// <returns>
-			/// The configuration node located at the specified path.
-			/// </returns>
-			/// <exception cref="ArgumentException">
-			/// Thrown when <paramref name="path"/> is <c>null</c>, empty, or whitespace.
-			/// </exception>
-			/// <exception cref="InvalidOperationException">
-			/// Thrown when an intermediate node is not an object.
-			/// </exception>
-			/// <exception cref="KeyNotFoundException">
-			/// Thrown when a path segment does not exist.
-			/// </exception>
-			public ConfigNode GetPath(string path)
+			if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+
+			ReadOnlySpan<char> span = path.AsSpan();
+
+			while (true)
 			{
-				if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+				int dotIndex = span.IndexOf('.');
 
-				ReadOnlySpan<char> span = path.AsSpan();
+				ReadOnlySpan<char> segment = dotIndex < 0 ? span : span[..dotIndex];
 
-				while (true)
-				{
-					int dotIndex = span.IndexOf('.');
+				node = node.GetProperty(segment.ToString());
 
-					ReadOnlySpan<char> segment = dotIndex < 0 ? span : span[..dotIndex];
+				if (dotIndex < 0) return node;
 
-					node = node.GetProperty(segment.ToString());
-
-					if (dotIndex < 0) return node;
-
-					span = span[(dotIndex + 1)..];
-				}
+				span = span[(dotIndex + 1)..];
 			}
+		}
 
+		extension (ConfigNode node)
+		{
 			/// <summary>
 			/// Attempts to get a nested configuration node using a dot-separated path.
 			/// </summary>

@@ -1,6 +1,7 @@
-﻿namespace StrikeLink.Services.WebService.InternalTools
+﻿
+namespace StrikeLink.Services.WebService.InternalTools
 {
-	internal class ShadowCopyService
+	internal sealed class ShadowCopyService
 	{
 		internal static void CopyFilesViaShadowCopy(IEnumerable<string> filePaths, string saveLocation)
 		{
@@ -67,7 +68,7 @@
 				shadow = shadowObj;
 			}
 
-			if (shadow is null) {return "";}
+			if (shadow is null) return "";
 
 			string deviceName = shadow["DeviceObject"]?.ToString() ?? string.Empty;
 			string relativePath = filePath[Path.GetPathRoot(filePath)!.Length..];

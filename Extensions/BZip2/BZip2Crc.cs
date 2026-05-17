@@ -39,7 +39,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// memory consumed by the lookup tables. (Slicing-by-16 requires a 16KB table,
 	/// which is still small enough to fit in most processors' L1 cache.)
 	/// </remarks>
-	public sealed class BZip2Crc : IChecksum
+	internal sealed class BZip2Crc : IChecksum
 	{
 		#region Instance Fields
 
@@ -58,7 +58,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Initialise a default instance of <see cref="BZip2Crc"></see>
 		/// </summary>
-		public BZip2Crc()
+		internal BZip2Crc()
 		{
 			Reset();
 		}

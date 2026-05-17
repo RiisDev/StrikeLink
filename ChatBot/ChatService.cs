@@ -12,11 +12,12 @@ namespace StrikeLink.ChatBot
 	/// This service manages the lifecycle of chat interactions and delegates
 	/// message handling to underlying infrastructure components.
 	/// </remarks>
-	public class ChatService : IDisposable
+	public class ChatService : IAsyncDisposable
 	{
-		private readonly string _chatCfgLocation;
 		private readonly ConsoleService _consoleService;
-		private readonly Config _config;
+		private readonly ConsoleServiceConfig _consoleServiceConfig;
+		private readonly bool _ownsConsoleService; // true only when we newed it up
+		private bool _disposed;
 
 		private readonly ConcurrentQueue<(string Message, DateTime Timestamp)> _sentMessages = [];
 		private static readonly TimeSpan SentMessageTtl = TimeSpan.FromSeconds(2);
@@ -24,49 +25,52 @@ namespace StrikeLink.ChatBot
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ChatService"/> class.
 		/// </summary>
-		/// <param name="config">
-		/// The configuration object containing chat service settings and dependencies, <see cref="Config"/>
+		/// <param name="consoleServiceConfig">
+		/// The configuration object containing chat service settings and dependencies, <see cref="ConsoleServiceConfig"/>
+		/// </param>
+		/// <param name="console">
+		/// A premade instance of the console service
 		/// </param>
 		/// <exception cref="ArgumentNullException">
-		/// Thrown when <paramref name="config"/> is <c>null</c>.
+		/// Thrown when <paramref name="consoleServiceConfig"/> is <c>null</c>.
 		/// </exception>
-		public ChatService(Config config)
+		public ChatService(ConsoleServiceConfig consoleServiceConfig, ConsoleService? console = null)
 		{
-			ArgumentNullException.ThrowIfNull(config);
-			_config = config;
-			_consoleService = new ConsoleService();
+			ArgumentNullException.ThrowIfNull(consoleServiceConfig);
+			_consoleServiceConfig = consoleServiceConfig;
+
+			_ownsConsoleService = console is null;
+			_consoleService = console ?? new ConsoleService();
+
 			CheckCs2UserConfig();
-			_consoleService.StartListening();
-
-			_chatCfgLocation = Path.Combine(SteamService.GetGamePath(730), "game", "csgo", "cfg", "strike_link.cfg");
-
+			
 			string localUsername = GetLocalUsername();
 
-			if (config.OnTeamChat is not null)
+			if (consoleServiceConfig.OnTeamChat is not null)
 			{
 				_consoleService.OnTeamChatMessageReceived += data =>
 				{
 					if (IsProgrammedMessage(data.Message))
 						return;
 
-					if (config.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
+					if (consoleServiceConfig.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
 						return;
 
-					config.OnTeamChat(data);
+					consoleServiceConfig.OnTeamChat(data);
 				};
 			}
 
-			if (config.OnGlobalChat is not null)
+			if (consoleServiceConfig.OnGlobalChat is not null)
 			{
 				_consoleService.OnGlobalChatMessageReceived += data =>
 				{
 					if (IsProgrammedMessage(data.Message))
 						return;
 
-					if (config.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
+					if (consoleServiceConfig.IgnoreLocalUser && data.Username.Contains(localUsername, StringComparison.InvariantCulture))
 						return;
 
-					config.OnGlobalChat(data);
+					consoleServiceConfig.OnGlobalChat(data);
 				};
 			}
 		}
@@ -85,38 +89,17 @@ namespace StrikeLink.ChatBot
 		/// </exception>
 		public async Task SendChatAsync(NewChatMessage message)
 		{
-			bool sent = false;
-			Process[] csProcesses = Process.GetProcessesByName("cs2");
-			if (csProcesses.Length == 0) { Log("CS:2 Process not found, skipping call"); return; }
-
-			Process csProcess = csProcesses[0];
+			ArgumentNullException.ThrowIfNull(message);
 			
 			string messageActual = message.Message.Length > 256 ? message.Message[..256] : message.Message;
 			string messagePrefix = message.Channel == ChatChannel.Global ? "say " : "say_team ";
 
 			_sentMessages.Enqueue((messageActual, DateTime.UtcNow));
 
-			await File.WriteAllTextAsync(_chatCfgLocation, $"{messagePrefix}{messageActual}").ConfigureAwait(false);
+			(string error, bool success) = await _consoleService.SendConsoleCommand($"{messagePrefix}{messageActual}", _consoleServiceConfig).ConfigureAwait(false);
 
-			// Allow some time for CS2 to process the file write
-			await Task.Delay(250).ConfigureAwait(false);
-
-			for (int retryCount = 0; retryCount < 5; retryCount++)
-			{
-				if (!NativeMethods.IsPrcoessActivated(csProcess))
-				{
-					await Task.Delay(250).ConfigureAwait(false);
-					continue;
-				}
-				
-				NativeMethods.PressKey(_config.Keybind);
-				sent = true;
-				Log($"Sent chat message after {retryCount} retries");
-				break;
-			}
-
-			if (!sent)
-				Log("Failed to send chat message: CS2 window not focused.");
+			if (!success)
+				throw new InvalidOperationException(error);
 		}
 		
 		private void CheckCs2UserConfig()
@@ -126,7 +109,7 @@ namespace StrikeLink.ChatBot
 			string counterStrikeKeybindPath = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
 
 			if (!Directory.Exists(counterStrikeKeybindPath))
-				throw new DirectoryNotFoundException($"Failed to find user config path: {counterStrikeKeybindPath}");
+				throw new DirectoryNotFoundException($"Failed to find user consoleServiceConfig path: {counterStrikeKeybindPath}");
 
 			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
 
@@ -135,8 +118,8 @@ namespace StrikeLink.ChatBot
 			if (!localConfigReady)
 				throw new InvalidOperationException("CS2 user keybind configuration not found. Please configure a keybind for Strike Link in CS2 settings.");
 
-			if (localKeybind != NativeMethods.VirtualKeyToChar[_config.Keybind])
-				throw new InvalidOperationException($"CS2 user keybind configuration does not match the configured keybind '{_config.Keybind}'. Please update your CS2 keybind configuration accordingly.");
+			if (localKeybind != NativeMethods.VirtualKeyToChar[_consoleServiceConfig.Keybind])
+				throw new InvalidOperationException($"CS2 user keybind configuration does not match the configured keybind '{_consoleServiceConfig.Keybind}'. Please update your CS2 keybind configuration accordingly.");
 		}
 		
 		private static (bool, string) CheckLocalCs2Config(string localConfigPath)
@@ -153,7 +136,8 @@ namespace StrikeLink.ChatBot
 			foreach (KeyValuePair<string, ConfigNode> property in bindings.EnumerateObject())
 			{
 				string command = property.Value.GetString();
-				if (command == "exec strike_link.cfg") return (true, property.Key);
+				if (command == "exec strike_link.cfg") 
+					return (true, property.Key);
 			}
 
 			return (false, "");
@@ -166,7 +150,7 @@ namespace StrikeLink.ChatBot
 			string counterStrikeKeybindPath = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
 
 			if (!Directory.Exists(counterStrikeKeybindPath))
-				throw new DirectoryNotFoundException($"Failed to find user config path: {counterStrikeKeybindPath}");
+				throw new DirectoryNotFoundException($"Failed to find user consoleServiceConfig path: {counterStrikeKeybindPath}");
 
 			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
 
@@ -190,8 +174,8 @@ namespace StrikeLink.ChatBot
 
 			while (_sentMessages.TryPeek(out (string Message, DateTime Timestamp) entry))
 			{
-				if (now - entry.Timestamp > SentMessageTtl) { _sentMessages.TryDequeue(out _); continue; }
-				if (entry.Message.NormalizeForComparison().Contains(normalizedIncomingMessage, StringComparison.InvariantCulture)) { _sentMessages.TryDequeue(out _); return true; }
+				if (now - entry.Timestamp > SentMessageTtl) { _ = _sentMessages.TryDequeue(out _); continue; }
+				if (entry.Message.NormalizeForComparison().Contains(normalizedIncomingMessage, StringComparison.InvariantCulture)) { _ = _sentMessages.TryDequeue(out _); return true; }
 
 				break;
 			}
@@ -200,29 +184,21 @@ namespace StrikeLink.ChatBot
 		}
 
 		/// <summary>
-		/// Releases all resources used by the <see cref="ChatService"/>.
-		/// </summary>
-		/// <remarks>
-		/// This method suppresses finalization and disposes managed resources.
-		/// </remarks>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		/// <summary>
 		/// Releases the unmanaged resources used by the object and optionally releases the managed resources.
 		/// </summary>
 		/// <remarks>This method is called by public Dispose methods and the finalizer. When disposing is true, this
 		/// method disposes all managed resources referenced by the object. Override this method to release additional
 		/// resources.</remarks>
-		/// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposing) return;
 
-			_consoleService.Dispose();
+		public async ValueTask DisposeAsync()
+		{
+			if (_disposed) return;
+			_disposed = true;
+
+			if (_ownsConsoleService)
+				await _consoleService.DisposeAsync().ConfigureAwait(false);
+
+			GC.SuppressFinalize(this);
 		}
 	}
 }

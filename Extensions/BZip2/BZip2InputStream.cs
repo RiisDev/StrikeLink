@@ -7,7 +7,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <summary>
 	/// An input stream that decompresses files in the BZip2 format
 	/// </summary>
-	public class BZip2InputStream : Stream
+	internal class BZip2InputStream : Stream
 	{
 		#region Constants
 
@@ -97,7 +97,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Construct instance for reading from stream
 		/// </summary>
 		/// <param name="stream">Data source</param>
-		public BZip2InputStream(Stream stream)
+		internal BZip2InputStream(Stream stream)
 		{
 			if (stream == null)
 				throw new ArgumentNullException(nameof(stream));
@@ -121,7 +121,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Get/set flag indicating ownership of underlying stream.
 		/// When the flag is true <see cref="Stream.Dispose()" /> will close the underlying stream also.
 		/// </summary>
-		public bool IsStreamOwner { get; set; } = true;
+		internal bool IsStreamOwner { get; set; } = true;
 
 		#region Stream Overrides
 

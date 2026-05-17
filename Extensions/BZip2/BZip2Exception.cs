@@ -6,12 +6,12 @@ namespace StrikeLink.Extensions.BZip2
 	/// BZip2Exception represents exceptions specific to BZip2 classes and code.
 	/// </summary>
 	[Serializable]
-	public class BZip2Exception : SharpZipBaseException
+	internal class BZip2Exception : SharpZipBaseException
 	{
 		/// <summary>
 		/// Initialise a new instance of <see cref="BZip2Exception" />.
 		/// </summary>
-		public BZip2Exception()
+		internal BZip2Exception()
 		{
 		}
 
@@ -19,7 +19,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initialise a new instance of <see cref="BZip2Exception" /> with its message string.
 		/// </summary>
 		/// <param name="message">A <see cref="string"/> that describes the error.</param>
-		public BZip2Exception(string message)
+		internal BZip2Exception(string message)
 			: base(message)
 		{
 		}
@@ -29,7 +29,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="message">A <see cref="string"/> that describes the error.</param>
 		/// <param name="innerException">The <see cref="Exception"/> that caused this exception.</param>
-		public BZip2Exception(string message, Exception innerException)
+		internal BZip2Exception(string message, Exception innerException)
 			: base(message, innerException)
 		{
 		}

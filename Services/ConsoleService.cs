@@ -2,6 +2,8 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using System.Threading.Channels;
+// ReSharper disable AccessToDisposedClosure
 #pragma warning disable CA1031
 #pragma warning disable CA1308
 #pragma warning disable CA1003
@@ -19,8 +21,10 @@ namespace StrikeLink.Services
 	/// Provides access to the game console output and emits high-level events
 	/// for game state changes, chat messages, server activity, and addon progress.
 	/// </summary>
-	public partial class ConsoleService : IDisposable
+	public partial class ConsoleService : IAsyncDisposable
 	{
+		private sealed record CommandRequest(string Command, ConsoleServiceConfig ConsoleServiceConfig, TaskCompletionSource<(string Message, bool Success)> Tcs);
+
 		/// <summary>
 		/// Represents the current UI state of the game.
 		/// </summary>
@@ -182,52 +186,244 @@ namespace StrikeLink.Services
 		/// </summary>
 		public event Action? OnMatchPrompt;
 
-		// Fields
-		private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+		private const int MaxQueueDepth = 100;
+		private const int RetryLimit = 10;
+		private const int DelayAfterWrite = 250;
+		private const int DelayPerRetry = 250;
+
+		private readonly CancellationTokenSource? _cancellationTokenSource = new();
+
+		private readonly Channel<CommandRequest> _commandChannel;
+		private readonly Task _commandWorker;
 
 		private readonly StatusData _statusData = new();
+		private readonly ConsoleServiceConfig? _execCfg;
 		private readonly string _consoleLogPath;
 		private readonly string _strikeConsoleTmp;
+		private readonly string _chatCfgLocation;
 		private string _downloadingUgcData = string.Empty;
 
 		private int _lastLineIndex;
 		private string? _lastLineText;
 		private bool _firstRun = true;
+		private bool _disposed;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="ConsoleService"/> class.
 		/// </summary>
+		/// <param name="config">
+		/// ConsoleServiceConfig record, only needs to be set if intending to use <see cref="SendConsoleCommand"/>.
+		/// </param>
 		/// <exception cref="DirectoryNotFoundException">
 		/// Thrown when the Counter-Strike 2 installation directory cannot be located.
 		/// </exception>
 		/// <exception cref="InvalidOperationException">
 		/// Thrown when the game was not launched with the <c>-condebug</c> launch option.
 		/// </exception>
-		public ConsoleService()
+		public ConsoleService(ConsoleServiceConfig? config = null)
 		{
 			if (!SteamService.TryGetGamePath(730, out string? counterStrikePath) || counterStrikePath.IsNullOrEmpty())
 				throw new DirectoryNotFoundException("Failed to find CS:2 game directory.");
 
-			bool conDebug = SteamService.GetGameLaunchOptions(730).Any(x=> x == "-condebug");
+			bool conDebug = SteamService.GetGameLaunchOptions(730).Any(x => x == "-condebug");
 			if (!conDebug) throw new InvalidOperationException("CS:2 was not launched with -condebug, console log will not be available.");
 
 			_consoleLogPath = Path.Combine(counterStrikePath, "game", "csgo", "console.log");
 			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
+			_chatCfgLocation = Path.Combine(counterStrikePath, "game", "csgo", "cfg", "strike_link.cfg");
+			_execCfg = config;
+
+			BoundedChannelOptions channelOptions = new(MaxQueueDepth)
+			{
+				FullMode = BoundedChannelFullMode.Wait,
+				SingleReader = true,
+				SingleWriter = false,
+			};
+
+			_commandChannel = Channel.CreateBounded<CommandRequest>(channelOptions);
+			_commandWorker = Task.Run(CommandWorkerLoop);
+
+			StartListening();
 		}
-		
+
+		/// <summary>
+		/// Sends a console command by enqueuing a command request and asynchronously returns the response message and a
+		/// success flag.
+		/// </summary>
+		/// <remarks>The command is enqueued to an internal channel and the returned task completes when the command
+		/// processing signals its result.</remarks>
+		/// <param name="command">Console command text to execute; must not be null, empty, or whitespace. Leading and trailing whitespace are
+		/// trimmed.</param>
+		/// <param name="config">Optional execution configuration; when null the instance configuration is used.</param>
+		/// <param name="ct">Cancellation token to cancel the asynchronous operation.</param>
+		/// <returns>A task that completes with a (Message, Success) tuple containing the response message and a boolean indicating
+		/// success.</returns>
+		/// <exception cref="InvalidOperationException">Thrown when neither the provided consoleServiceConfig nor the instance configuration is available.</exception>
+		public async Task<(string Message, bool Success)> SendConsoleCommand(string command, ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			ConsoleServiceConfig requiredConsoleServiceConfig = config ?? _execCfg ?? throw new InvalidOperationException("SendConsoleCommand requires either constructor consoleServiceConfig or a parameter consoleServiceConfig.");
+
+			ArgumentException.ThrowIfNullOrWhiteSpace(command);
+
+			TaskCompletionSource<(string Message, bool Success)> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+			CommandRequest request = new(command.Trim(), requiredConsoleServiceConfig, tcs);
+
+			await _commandChannel.Writer.WriteAsync(request, ct).ConfigureAwait(false);
+
+			return await tcs.Task.ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Sends the "status" console command and returns the next Cs2StatusMessage received in response.
+		/// </summary>
+		/// <remarks>Registers a temporary event handler, sends the "status" console command via SendConsoleCommand,
+		/// awaits the response or cancellation, and unsubscribes the handler. The response wait is subject to a 5-second
+		/// timeout.</remarks>
+		/// <param name="config">Execution configuration to use; if null the instance configuration is used. Throws InvalidOperationException if
+		/// neither is available.</param>
+		/// <param name="ct">Cancellation token that can cancel the operation. The operation is also subject to a 5-second timeout combined
+		/// with this token.</param>
+		/// <returns>A task that completes with the next Cs2StatusMessage received in response to the sent command.</returns>
+		/// <exception cref="InvalidOperationException">Thrown when no configuration is provided and no instance configuration is available.</exception>
+		public async Task<Cs2StatusMessage> GetStatus(ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			ConsoleServiceConfig requiredConsoleServiceConfig = config ?? _execCfg ?? throw new InvalidOperationException("SendConsoleCommand requires either constructor consoleServiceConfig or a parameter consoleServiceConfig.");
+
+			using CancellationTokenSource timeoutCts = new(TimeSpan.FromSeconds(5));
+			using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
+
+			TaskCompletionSource<Cs2StatusMessage> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+			CancellationTokenRegistration ctr = linkedCts.Token.Register(() => tcs.TrySetCanceled(linkedCts.Token));
+			await using ConfiguredAsyncDisposable _ = ctr.ConfigureAwait(false);
+
+			OnStatusMessage += OnOnStatusMessage;
+
+			try
+			{
+				await SendConsoleCommand("status", requiredConsoleServiceConfig, ct).ConfigureAwait(false);
+				return await tcs.Task.WaitAsync(linkedCts.Token).ConfigureAwait(false);
+			}
+			finally { OnStatusMessage -= OnOnStatusMessage; }
+
+			void OnOnStatusMessage(Cs2StatusMessage msg) => tcs.TrySetResult(msg);
+		}
+
+		private async Task CommandWorkerLoop()
+		{
+			await foreach (CommandRequest req in _commandChannel.Reader.ReadAllAsync().ConfigureAwait(false))
+			{
+				(string Message, bool Success) result = await ExecuteCommand(req).ConfigureAwait(false);
+				req.Tcs.TrySetResult(result);
+			}
+		}
+
+		private async Task<(string Message, bool Success)> ExecuteCommand(CommandRequest req)
+		{
+			Process[] csProcesses = Process.GetProcessesByName("cs2");
+
+			if (csProcesses.Length == 0)
+			{
+				Log("CS2 process not found, skipping call.");
+				return ("CS2 process not found, skipping call.", false);
+			}
+
+			Process csProcess = csProcesses[0];
+
+			await File.WriteAllTextAsync(_chatCfgLocation, req.Command).ConfigureAwait(false);
+			await Task.Delay(DelayAfterWrite).ConfigureAwait(false);
+
+			for (int retry = 0; retry < RetryLimit; retry++)
+			{
+				if (!NativeMethods.IsProcessActivated(csProcess))
+				{
+					await Task.Delay(DelayPerRetry).ConfigureAwait(false);
+					continue;
+				}
+
+				NativeMethods.PressKey(req.ConsoleServiceConfig.Keybind);
+				Log($"Sent command '{req.Command}' after {retry} retries.");
+				return ("", true);
+			}
+
+			Log("Failed to send command: CS2 window not focused.");
+			return ("Failed to send command: CS2 window not focused.", false);
+		}
+
+		private void StartListening()
+		{
+			_ = Task.Run(async () =>
+			{
+				try
+				{
+					while (!_cancellationTokenSource?.IsCancellationRequested ?? false)
+					{
+						if (!File.Exists(_consoleLogPath)) continue;
+
+						string logText = await ReadLogTextAsync().ConfigureAwait(false);
+						if (logText.IsNullOrEmpty()) continue;
+
+						string[] logLines = logText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+						if (_lastLineIndex > logLines.Length)
+							_lastLineIndex = 0;
+
+						for (int lineIndex = _lastLineIndex; lineIndex < logLines.Length; lineIndex++)
+						{
+							string lineText = logLines[lineIndex];
+							if (lineText == _lastLineText) continue;
+
+							try { ParseLineData(lineText); }
+							catch { /**/ }
+
+							_lastLineText = lineText;
+						}
+
+						_lastLineIndex = logLines.Length;
+						_firstRun = false;
+					}
+				}
+				catch (OperationCanceledException) { }
+			});
+		}
+
+		private async Task<string> ReadLogTextAsync()
+		{
+			const int maxAttempts = 5;
+			const int delayMilliseconds = 150;
+
+			for (int attempt = 0; attempt < maxAttempts; attempt++)
+			{
+				try
+				{
+					File.Copy(_consoleLogPath, _strikeConsoleTmp, overwrite: true);
+
+					FileStream fileStream = new(_strikeConsoleTmp, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan);
+					await using ConfiguredAsyncDisposable stream = fileStream.ConfigureAwait(false);
+					using StreamReader streamReader = new(fileStream);
+					string content = await streamReader.ReadToEndAsync().ConfigureAwait(false);
+
+					return content;
+				}
+				catch (IOException) { await Task.Delay(delayMilliseconds, _cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(false); }
+				finally { try { File.Delete(_strikeConsoleTmp); } catch (IOException) { } }
+			}
+
+			return string.Empty;
+		}
+
 		private void ParseLineData(string lineText)
 		{
 			if (_firstRun) return;
 
-			//Debug.WriteLine(lineText);
 			OnLogReceived?.Invoke(lineText);
 
 			lock (_statusData)
 			{
 				if (_statusData.IsStatusScanning)
-				{
-					_statusData.StatusBuilder.AppendLine(lineText);
-				}
+					_ = _statusData.StatusBuilder.AppendLine(lineText);
 			}
 
 			switch (lineText)
@@ -236,14 +432,14 @@ namespace StrikeLink.Services
 					lock (_statusData)
 					{
 						_statusData.IsStatusScanning = true;
-						_statusData.StatusBuilder.AppendLine(lineText);
+						_ = _statusData.StatusBuilder.AppendLine(lineText);
 					}
 					break;
 				case var _ when lineText.Contains("[Client] #end", StringComparison.InvariantCultureIgnoreCase):
 					lock (_statusData)
 					{
 						_statusData.IsStatusScanning = false;
-						_statusData.StatusBuilder.AppendLine(lineText);
+						_ = _statusData.StatusBuilder.AppendLine(lineText);
 					}
 					ParseStatusData();
 					break;
@@ -251,7 +447,7 @@ namespace StrikeLink.Services
 					OnMatchPrompt?.Invoke();
 					break;
 				case var _ when lineText.Contains(" [ALL] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
-					ParseChatLine(lineText,false);
+					ParseChatLine(lineText, false);
 					break;
 				case var _ when lineText.Contains(" [T] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
 				case var _ when lineText.Contains(" [CT] ", StringComparison.InvariantCulture) && lineText.Contains(':', StringComparison.InvariantCulture):
@@ -262,9 +458,9 @@ namespace StrikeLink.Services
 					string[] states = stateChangePart.Split("->", StringSplitOptions.TrimEntries);
 					string beforeState = states[0];
 					string afterState = states[1];
-					
-					GameUiState oldState = Enum.TryParse(beforeState[(beforeState.LastIndexOf('_')+1)..], true, out GameUiState state) ? state : GameUiState.Invalid;
-					GameUiState newState = Enum.TryParse(afterState[(afterState.LastIndexOf('_')+1)..], true, out state) ? state : GameUiState.Invalid;
+
+					GameUiState oldState = Enum.TryParse(beforeState[(beforeState.LastIndexOf('_') + 1)..], true, out GameUiState state) ? state : GameUiState.Invalid;
+					GameUiState newState = Enum.TryParse(afterState[(afterState.LastIndexOf('_') + 1)..], true, out state) ? state : GameUiState.Invalid;
 
 					OnUiStateChanged?.Invoke(new StateChanged(oldState, newState));
 					break;
@@ -277,7 +473,6 @@ namespace StrikeLink.Services
 				case var _ when lineText.Contains("connected", StringComparison.InvariantCulture):
 					int connectedIndex = lineText.IndexOf("connected", StringComparison.InvariantCulture);
 					if (connectedIndex <= 0) return;
-					// 15 is the length of the timestamp and space: "12/20 22:08:54 "
 					string username = lineText[15..connectedIndex].Trim();
 					OnPlayerConnected?.Invoke(username);
 					break;
@@ -288,14 +483,11 @@ namespace StrikeLink.Services
 					_downloadingUgcData = actualData;
 
 					Match dataMatch = Regex.Match(actualData, "ugc.+\"(\\d+)\".+(\\d+).+\\/([\\d|.]+)");
-
 					if (!dataMatch.Success) return;
 
 					long addonId = long.Parse(dataMatch.Groups[1].Value, CultureInfo.InvariantCulture);
-
 					double downloadedBytes = double.Parse(dataMatch.Groups[2].Value, CultureInfo.InvariantCulture);
 					string downloadSizeStr = dataMatch.Groups[3].Value;
-
 					double totalBytes = double.Parse(dataMatch.Groups[4].Value, CultureInfo.InvariantCulture);
 					string totalSizeStr = dataMatch.Groups[5].Value;
 
@@ -322,7 +514,6 @@ namespace StrikeLink.Services
 					));
 
 					if (Math.Abs(downloadedBytes - totalBytes) < 0.05) OnAddonFinished?.Invoke();
-
 					break;
 				case var _ when lineText.Contains("[Client] Sending connect to", StringComparison.InvariantCulture):
 				case var _ when lineText.Contains(" Connecting to ", StringComparison.InvariantCulture):
@@ -332,7 +523,6 @@ namespace StrikeLink.Services
 					string mapName = lineText.Split(": ", 2)[1].Trim().Trim('"');
 					OnMapJoined?.Invoke(mapName);
 					break;
-
 			}
 		}
 
@@ -341,7 +531,8 @@ namespace StrikeLink.Services
 			lock (_statusData)
 			{
 				string statusText = _statusData.StatusBuilder.ToString();
-				_statusData.StatusBuilder.Clear();
+				_ = _statusData.StatusBuilder.Clear();
+				Log("Running Invoke");
 				OnStatusMessage?.Invoke(Cs2StatusParser.Parse(statusText));
 			}
 		}
@@ -353,7 +544,6 @@ namespace StrikeLink.Services
 
 			string username = chatMatch.Groups[2].Value;
 			string message = chatMatch.Groups[3].Value;
-
 			bool dead = false;
 
 			if (username.Contains("[DEAD]", StringComparison.InvariantCulture))
@@ -365,108 +555,33 @@ namespace StrikeLink.Services
 			{
 				username = username[..username.LastIndexOf('﹫')];
 			}
-			
+
 			if (team) OnTeamChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 			else OnGlobalChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 		}
-
+		
 		/// <summary>
-		/// Starts monitoring the game console log and begins emitting console events.
+		/// Completes the command queue (no new commands accepted), waits for any
+		/// in-flight commands to finish, then cancels the log listener.
 		/// </summary>
-		/// <remarks>
-		/// This method must be called before any console-related events will fire.
-		/// </remarks>
-		public void StartListening()
+		public async ValueTask DisposeAsync()
 		{
-			_ = Task.Run(async () =>
-			{
-				try
-				{
-					while (!_cancellationTokenSource.IsCancellationRequested)
-					{
-						if (!File.Exists(_consoleLogPath)) continue;
+			if (_disposed) return;
+			_disposed = true;
 
-						string logText = await ReadLogTextAsync().ConfigureAwait(false);
-						if (logText.IsNullOrEmpty()) continue;
+			_commandChannel.Writer.Complete();
+			await _commandWorker.ConfigureAwait(false);
 
-						string[] logLines = logText.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+			try { if (_cancellationTokenSource is not null) await _cancellationTokenSource.CancelAsync().ConfigureAwait(false); }
+			catch { /**/ }
 
-						if (_lastLineIndex > logLines.Length)
-							_lastLineIndex = 0;
+			_cancellationTokenSource?.Dispose();
 
-						for (int lineIndex = _lastLineIndex; lineIndex < logLines.Length; lineIndex++)
-						{
-							string lineText = logLines[lineIndex];
-							if (lineText == _lastLineText) continue;
-
-							try { ParseLineData(lineText); }
-							catch { /**/ }
-							
-							_lastLineText = lineText;
-						}
-
-						_lastLineIndex = logLines.Length;
-						_firstRun = false;
-					}
-				}
-				catch (OperationCanceledException) { }
-			});
-		}
-
-		private async Task<string> ReadLogTextAsync()
-		{
-			const int maxAttempts = 5;
-			const int delayMilliseconds = 150;
-
-			for (int attempt = 0; attempt < maxAttempts; attempt++)
-			{
-				try
-				{
-					File.Copy(_consoleLogPath, _strikeConsoleTmp, overwrite: true);
-
-					FileStream fileStream = new(_strikeConsoleTmp, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan);
-					await using ConfiguredAsyncDisposable stream = fileStream.ConfigureAwait(false);
-					using StreamReader streamReader = new (fileStream);
-					string content = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-
-					return content;
-				}
-				catch (IOException) { await Task.Delay(delayMilliseconds, _cancellationTokenSource.Token).ConfigureAwait(false); }
-				finally { try { File.Delete(_strikeConsoleTmp); } catch (IOException) {} }
-			}
-
-			return string.Empty;
-		}
-
-		/// <summary>
-		/// Releases all resources used by the <see cref="ChatService"/>.
-		/// </summary>
-		/// <remarks>
-		/// This method suppresses finalization and disposes managed resources.
-		/// </remarks>
-		public void Dispose()
-		{
-			Dispose(true);
 			GC.SuppressFinalize(this);
 		}
 
-		/// <summary>
-		/// Releases all resources used by the <see cref="ChatService"/>.
-		/// </summary>
-		/// <remarks>
-		/// This method suppresses finalization and disposes managed resources.
-		/// </remarks>
-		protected virtual void Dispose(bool disposing)
-		{
-			if (!disposing) return;
-			_cancellationTokenSource.Cancel();
-			_cancellationTokenSource.Dispose();
-		}
-
-
 		[GeneratedRegex(@"^\[([^\]]+)\]\s+([^:]+):\s+(.+)$", RegexOptions.Singleline)]
 		private static partial Regex ChatRegex();
-
 	}
 
 	/// <summary>
@@ -556,30 +671,22 @@ namespace StrikeLink.Services
 		bool IsBot
 	);
 
-
 	internal static partial class Cs2StatusParser
 	{
 		[GeneratedRegex(@"^\d{2}/\d{2} \d{2}:\d{2}:\d{2} \[\w+\] ", RegexOptions.Compiled)]
 		private static partial Regex LogPrefixRegex();
-
 		[GeneratedRegex(@"@\s+Current\s+:\s+(\S+)", RegexOptions.Compiled)]
 		private static partial Regex CurrentStateRegex();
-
 		[GeneratedRegex(@"source\s+:\s+slot\s+(\d+)", RegexOptions.Compiled)]
 		private static partial Regex SlotRegex();
-
 		[GeneratedRegex(@"version\s+:\s+([\d.]+/\d+)\s+(\d+)\s+(\w+)\s+(\w+)", RegexOptions.Compiled)]
 		private static partial Regex VersionRegex();
-
 		[GeneratedRegex(@"steamid\s+:\s+(\[[^\]]+\])", RegexOptions.Compiled)]
 		private static partial Regex SteamIdRegex();
-
 		[GeneratedRegex(@"players\s+:\s+(\d+)\s+humans,\s+(\d+)\s+bots\s+\((\d+)\s+max\)\s+\((not )?hibernating\)(?:\s+\(reserved\s+([0-9a-f]+)\))?", RegexOptions.Compiled)]
 		private static partial Regex PlayersRegex();
-
 		[GeneratedRegex(@"loaded spawngroup\(\s*(\d+)\)\s+:\s+SV:\s+\[\d+:\s+([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*([^|\]]+?)(?:\s*\|\s*([^\]]+))?\]", RegexOptions.Compiled)]
 		private static partial Regex SpawnGroupRegex();
-
 		[GeneratedRegex(@"^\s*(\d+)\s+(?:\[(\w+)\]|(\d+:\d+)|BOT)\s+(\d+)\s+(\d+)\s+(\w+)\s+(\d+)\s+'([^']*)'", RegexOptions.Compiled)]
 		private static partial Regex PlayerRegex();
 
@@ -602,22 +709,19 @@ namespace StrikeLink.Services
 			bool inSpawnGroups = false;
 
 			int slot = 0;
-			string version = string.Empty, build = string.Empty, security = string.Empty, visibility = string.Empty;
+			string version = string.Empty;
+			string build = string.Empty;
+			string security = string.Empty;
+			string visibility = string.Empty;
 			string steamId = string.Empty;
 
 			foreach (string line in stripped)
 			{
 				if (CurrentStateRegex().Match(line) is { Success: true } csMatch)
-				{
-					currentState = csMatch.Groups[1].Value;
-					continue;
-				}
+				{ currentState = csMatch.Groups[1].Value; continue; }
 
 				if (SlotRegex().Match(line) is { Success: true } slotMatch)
-				{
-					slot = int.Parse(slotMatch.Groups[1].Value, CultureInfo.InvariantCulture);
-					continue;
-				}
+				{ slot = int.Parse(slotMatch.Groups[1].Value, CultureInfo.InvariantCulture); continue; }
 
 				if (VersionRegex().Match(line) is { Success: true } verMatch)
 				{
@@ -629,10 +733,7 @@ namespace StrikeLink.Services
 				}
 
 				if (SteamIdRegex().Match(line) is { Success: true } steamMatch)
-				{
-					steamId = steamMatch.Groups[1].Value;
-					continue;
-				}
+				{ steamId = steamMatch.Groups[1].Value; continue; }
 
 				if (PlayersRegex().Match(line) is { Success: true } playersMatch)
 				{
@@ -642,50 +743,30 @@ namespace StrikeLink.Services
 					bool hibernating = !playersMatch.Groups[4].Success;
 					string reservation = playersMatch.Groups[5].Value;
 
-					serverInfo = new ServerInfo(
-						slot, version, build, security, visibility,
-						steamId, humans, bots, maxPlayers, hibernating, reservation
-					);
+					serverInfo = new ServerInfo(slot, version, build, security, visibility,
+						steamId, humans, bots, maxPlayers, hibernating, reservation);
 					continue;
 				}
 
 				if (line.Contains("spawngroups", StringComparison.OrdinalIgnoreCase))
-				{
-					inSpawnGroups = true;
-					inPlayers = false;
-					continue;
-				}
+				{ inSpawnGroups = true; inPlayers = false; continue; }
 
 				if (line.Contains("---------players--------", StringComparison.OrdinalIgnoreCase))
-				{
-					inPlayers = true;
-					inSpawnGroups = false;
-					continue;
-				}
+				{ inPlayers = true; inSpawnGroups = false; continue; }
 
-				if (inPlayers && line.TrimStart().StartsWith("id ", StringComparison.OrdinalIgnoreCase))
-					continue;
+				if (inPlayers && line.TrimStart().StartsWith("id ", StringComparison.OrdinalIgnoreCase)) continue;
 
-				if (line == "Official Valve Server")
-				{
-					serverTag = line;
-					continue;
-				}
-
-				if (line == "#end")
-					break;
+				if (line == "Official Valve Server") { serverTag = line; continue; }
+				if (line == "#end") break;
 
 				if (inSpawnGroups && SpawnGroupRegex().Match(line) is { Success: true } sgMatch)
 				{
 					List<string> flags = [];
-
 					for (int i = 3; i <= 5; i++)
 					{
 						string flag = sgMatch.Groups[i].Value.Trim();
-						if (!string.IsNullOrWhiteSpace(flag))
-							flags.Add(flag);
+						if (!string.IsNullOrWhiteSpace(flag)) flags.Add(flag);
 					}
-
 					spawnGroups.Add(new SpawnGroup(
 						Id: int.Parse(sgMatch.Groups[1].Value, CultureInfo.InvariantCulture),
 						MapName: sgMatch.Groups[2].Value.Trim(),
@@ -706,7 +787,9 @@ namespace StrikeLink.Services
 					if (pMatch.Groups[3].Success)
 					{
 						string[] parts = pMatch.Groups[3].Value.Split(':');
-						time = new TimeSpan(0, int.Parse(parts[0], CultureInfo.InvariantCulture), int.Parse(parts[1], CultureInfo.InvariantCulture));
+						time = new TimeSpan(0,
+							int.Parse(parts[0], CultureInfo.InvariantCulture),
+							int.Parse(parts[1], CultureInfo.InvariantCulture));
 					}
 
 					players.Add(new PlayerEntry(
@@ -726,9 +809,7 @@ namespace StrikeLink.Services
 			foreach (PlayerEntry player in players.ToList())
 			{
 				if (player is { Channel: "NoChan", State: "challenging" })
-				{
 					players.Remove(player);
-				}
 			}
 
 			return new Cs2StatusMessage(

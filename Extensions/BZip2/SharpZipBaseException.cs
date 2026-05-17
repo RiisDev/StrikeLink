@@ -9,12 +9,12 @@ namespace StrikeLink.Extensions.BZip2
 	/// <remarks>NOTE: Not all exceptions thrown will be derived from this class.
 	/// A variety of other exceptions are possible for example <see cref="ArgumentNullException"></see></remarks>
 	[Serializable]
-	public class SharpZipBaseException : Exception
+	internal class SharpZipBaseException : Exception
 	{
 		/// <summary>
 		/// Initializes a new instance of the SharpZipBaseException class.
 		/// </summary>
-		public SharpZipBaseException()
+		internal SharpZipBaseException()
 		{
 		}
 
@@ -22,7 +22,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initializes a new instance of the SharpZipBaseException class with a specified error message.
 		/// </summary>
 		/// <param name="message">A message describing the exception.</param>
-		public SharpZipBaseException(string message)
+		internal SharpZipBaseException(string message)
 			: base(message)
 		{
 		}
@@ -33,7 +33,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="message">A message describing the exception.</param>
 		/// <param name="innerException">The inner exception</param>
-		public SharpZipBaseException(string message, Exception innerException)
+		internal SharpZipBaseException(string message, Exception innerException)
 			: base(message, innerException)
 		{
 		}

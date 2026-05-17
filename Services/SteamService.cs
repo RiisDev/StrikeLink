@@ -211,7 +211,7 @@ namespace StrikeLink.Services
 				int bytesToRead = (int)Math.Min(bufferSize, position);
 				position -= bytesToRead;
 
-				fileStream.Seek(position, SeekOrigin.Begin);
+				_ = fileStream.Seek(position, SeekOrigin.Begin);
 				fileStream.ReadExactly(buffer.AsSpan(0, bytesToRead));
 
 				for (int i = bytesToRead - 1; i >= 0; i--)

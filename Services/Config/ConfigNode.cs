@@ -144,13 +144,13 @@ namespace StrikeLink.Services.Config
 		/// <exception cref="InvalidOperationException">
 		/// Thrown when this node is not a value node or the value cannot be parsed.
 		/// </exception>
-		public long GetInt64()
-		{
-			if (NodeType != ConfigNodeType.Value) throw new InvalidOperationException("Node is not a value.");
-
-			return long.TryParse(_value!, out long result) ? result : throw new InvalidOperationException("value is not an int64");
-		}
-		
+		public long GetInt64() =>
+			NodeType != ConfigNodeType.Value
+				? throw new InvalidOperationException("Node is not a value.")
+				: long.TryParse(_value!,
+					out long result)
+					? result
+					: throw new InvalidOperationException("value is not an int64");
 	}
 
 }

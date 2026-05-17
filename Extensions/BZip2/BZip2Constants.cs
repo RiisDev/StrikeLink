@@ -8,7 +8,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Random numbers used to randomise repetitive blocks
 		/// </summary>
-		public readonly static int[] RandomNumbers = {
+		internal readonly static int[] RandomNumbers = {
 			619, 720, 127, 481, 931, 816, 813, 233, 566, 247,
 			985, 724, 205, 454, 863, 491, 741, 242, 949, 214,
 			733, 859, 335, 708, 621, 574,  73, 654, 730, 472,
@@ -67,51 +67,51 @@ namespace StrikeLink.Extensions.BZip2
 		/// When multiplied by compression parameter (1-9) gives the block size for compression
 		/// 9 gives the best compression but uses the most memory.
 		/// </summary>
-		public const int BaseBlockSize = 100000;
+		internal const int BaseBlockSize = 100000;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int MaximumAlphaSize = 258;
+		internal const int MaximumAlphaSize = 258;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int MaximumCodeLength = 23;
+		internal const int MaximumCodeLength = 23;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int RunA = 0;
+		internal const int RunA = 0;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int RunB = 1;
+		internal const int RunB = 1;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int GroupCount = 6;
+		internal const int GroupCount = 6;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int GroupSize = 50;
+		internal const int GroupSize = 50;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int NumberOfIterations = 4;
+		internal const int NumberOfIterations = 4;
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int MaximumSelectors = (2 + (900000 / GroupSize));
+		internal const int MaximumSelectors = (2 + (900000 / GroupSize));
 
 		/// <summary>
 		/// Backend constant
 		/// </summary>
-		public const int OvershootBytes = 20;
+		internal const int OvershootBytes = 20;
 	}
 }

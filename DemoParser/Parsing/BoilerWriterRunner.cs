@@ -4,13 +4,13 @@
 
 namespace StrikeLink.DemoParser.Parsing
 {
-	internal sealed class BoilerWriterRunner
+	internal static class BoilerWriterRunner
 	{
 		public static async Task<string?> GetDemoUrl(ulong matchId, ulong outcomeId, long tokenId)
 		{
 			string tempDirPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid():N}");
 			string tempFileName = Path.Combine(tempDirPath, $"{Guid.NewGuid():N}");
-			Directory.CreateDirectory(tempDirPath);
+			_ = Directory.CreateDirectory(tempDirPath);
 
 			try
 			{
@@ -29,13 +29,13 @@ namespace StrikeLink.DemoParser.Parsing
 					CreateNoWindow = true,
 				};
 
-				process.Start();
+				_ = process.Start();
 
 				Task<string> stdoutTask = process.StandardOutput.ReadToEndAsync();
 				Task<string> stderrTask = process.StandardError.ReadToEndAsync();
 
 				await process.WaitForExitAsync().ConfigureAwait(false);
-				await Task.WhenAll(stdoutTask, stderrTask).ConfigureAwait(false);
+				_ = await Task.WhenAll(stdoutTask, stderrTask).ConfigureAwait(false);
 
 				if (process.ExitCode != 0)
 				{
@@ -75,7 +75,7 @@ namespace StrikeLink.DemoParser.Parsing
 				{
 					bool endMatch = !endPattern.Where((t, j) => data[k + j] != t).Any();
 					if (!endMatch) continue;
-					int length = (k + endPattern.Length) - i;
+					int length = k + endPattern.Length - i;
 					byte[] result = new byte[length];
 					Array.Copy(data, i, result, 0, length);
 					return result;

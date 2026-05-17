@@ -8,7 +8,7 @@
 
 namespace StrikeLink.Extensions
 {
-	public static class NativeMethods
+	public static partial class NativeMethods
 	{
 		public enum VirtualKey : uint
 		{
@@ -137,27 +137,30 @@ namespace StrikeLink.Extensions
 			ScrollLock = 0x91,
 			NumLock = 0x90
 		}
-		
-		[DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-		private static extern void keybd_event(uint bVk, uint bScan, uint dwFlags, uint dwExtraInfo);
 
 		internal static void PressKey(VirtualKey key)
 		{
-			keybd_event((uint)key, 0, 0, 0); 
-			keybd_event((uint)key, 0, 2, 0);
+			KeybdEvent((uint)key, 0, 0, 0);
+			KeybdEvent((uint)key, 0, 2, 0);
 		}
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-		private static extern IntPtr GetForegroundWindow();
+		[LibraryImport("user32.dll", EntryPoint = "keybd_event")]
+		[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+		internal static partial void KeybdEvent(uint bVk, uint bScan, uint dwFlags, uint dwExtraInfo);
 
-		[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-		private static extern int GetWindowThreadProcessId(IntPtr handle, out int processId);
+		[LibraryImport("user32.dll", EntryPoint = "GetForegroundWindow")]
+		[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+		internal static partial IntPtr GetForegroundWindow();
 
-		internal static bool IsPrcoessActivated(Process process)
+		[LibraryImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
+		[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+		internal static partial uint GetWindowThreadProcessId(IntPtr handle, out uint processId);
+
+		internal static bool IsProcessActivated(Process process)
 		{
 			IntPtr activatedHandle = GetForegroundWindow();
 			if (activatedHandle == IntPtr.Zero) return false;
-			_ = GetWindowThreadProcessId(activatedHandle, out int activeProcId);
+			_ = GetWindowThreadProcessId(activatedHandle, out uint activeProcId);
 			return activeProcId == process.Id;
 		}
 

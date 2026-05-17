@@ -16,7 +16,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <example>The following expression includes all name ending in '.dat' with the exception of 'dummy.dat'
 	/// "+\.dat$;-^dummy\.dat$"
 	/// </example>
-	public class NameFilter : IScanFilter
+	internal class NameFilter : IScanFilter
 	{
 		#region Constructors
 
@@ -24,7 +24,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Construct an instance based on the filter expression passed
 		/// </summary>
 		/// <param name="filter">The filter expression.</param>
-		public NameFilter(string filter)
+		internal NameFilter(string filter)
 		{
 			filter_ = filter;
 			inclusions_ = new List<Regex>();
@@ -39,7 +39,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="expression">The expression to test.</param>
 		/// <returns>True if expression is a valid <see cref="System.Text.RegularExpressions.Regex"/> false otherwise.</returns>
-		public static bool IsValidExpression(string expression)
+		internal static bool IsValidExpression(string expression)
 		{
 			bool result = true;
 			try
@@ -58,7 +58,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="toTest">The filter expression to test.</param>
 		/// <returns>True if the expression is valid, false otherwise.</returns>
-		public static bool IsValidFilterExpression(string toTest)
+		internal static bool IsValidFilterExpression(string toTest)
 		{
 			bool result = true;
 
@@ -104,7 +104,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="original">The original string</param>
 		/// <returns>Returns an array of <see cref="System.String"/> values containing the individual filter elements.</returns>
-		public static string[] SplitQuoted(string original)
+		internal static string[] SplitQuoted(string original)
 		{
 			char escape = '\\';
 			char[] separators = { ';' };
@@ -168,7 +168,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="name">The value to test.</param>
 		/// <returns>True if the value is included, false otherwise.</returns>
-		public bool IsIncluded(string name)
+		internal bool IsIncluded(string name)
 		{
 			bool result = false;
 			if (inclusions_.Count == 0)
@@ -194,7 +194,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="name">The value to test.</param>
 		/// <returns>True if the value is excluded, false otherwise.</returns>
-		public bool IsExcluded(string name)
+		internal bool IsExcluded(string name)
 		{
 			bool result = false;
 			foreach (Regex r in exclusions_)

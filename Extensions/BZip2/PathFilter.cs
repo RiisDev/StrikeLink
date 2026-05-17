@@ -5,7 +5,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// by full path name.
 	/// See <see cref="NameFilter">NameFilter</see> for more detail on filtering.
 	/// </summary>
-	public class PathFilter : IScanFilter
+	internal class PathFilter : IScanFilter
 	{
 		#region Constructors
 
@@ -13,7 +13,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initialise a new instance of <see cref="PathFilter"></see>.
 		/// </summary>
 		/// <param name="filter">The <see cref="NameFilter">filter</see> expression to apply.</param>
-		public PathFilter(string filter)
+		internal PathFilter(string filter)
 		{
 			nameFilter_ = new NameFilter(filter);
 		}
@@ -55,7 +55,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// ExtendedPathFilter filters based on name, file size, and the last write time of the file.
 	/// </summary>
 	/// <remarks>Provides an example of how to customise filtering.</remarks>
-	public class ExtendedPathFilter : PathFilter
+	internal class ExtendedPathFilter : PathFilter
 	{
 		#region Constructors
 
@@ -65,7 +65,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <param name="filter">The filter to apply.</param>
 		/// <param name="minSize">The minimum file size to include.</param>
 		/// <param name="maxSize">The maximum file size to include.</param>
-		public ExtendedPathFilter(string filter,
+		internal ExtendedPathFilter(string filter,
 			long minSize, long maxSize)
 			: base(filter)
 		{
@@ -79,7 +79,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <param name="filter">The filter to apply.</param>
 		/// <param name="minDate">The minimum <see cref="DateTime"/> to include.</param>
 		/// <param name="maxDate">The maximum <see cref="DateTime"/> to include.</param>
-		public ExtendedPathFilter(string filter,
+		internal ExtendedPathFilter(string filter,
 			DateTime minDate, DateTime maxDate)
 			: base(filter)
 		{
@@ -95,7 +95,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <param name="maxSize">The maximum file size to include.</param>
 		/// <param name="minDate">The minimum <see cref="DateTime"/> to include.</param>
 		/// <param name="maxDate">The maximum <see cref="DateTime"/> to include.</param>
-		public ExtendedPathFilter(string filter,
+		internal ExtendedPathFilter(string filter,
 			long minSize, long maxSize,
 			DateTime minDate, DateTime maxDate)
 			: base(filter)
@@ -142,7 +142,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <remarks>The default value is zero.</remarks>
 		/// <exception cref="ArgumentOutOfRangeException">value is less than zero; greater than <see cref="MaxSize"/></exception>
-		public long MinSize
+		internal long MinSize
 		{
 			get { return minSize_; }
 			set
@@ -161,7 +161,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <remarks>The default value is <see cref="System.Int64.MaxValue"/></remarks>
 		/// <exception cref="ArgumentOutOfRangeException">value is less than zero or less than <see cref="MinSize"/></exception>
-		public long MaxSize
+		internal long MaxSize
 		{
 			get { return maxSize_; }
 			set
@@ -179,7 +179,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Get/set the minimum <see cref="DateTime"/> value that will match for this filter.
 		/// </summary>
 		/// <remarks>Files with a LastWrite time less than this value are excluded by the filter.</remarks>
-		public DateTime MinDate
+		internal DateTime MinDate
 		{
 			get
 			{
@@ -201,7 +201,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Get/set the maximum <see cref="DateTime"/> value that will match for this filter.
 		/// </summary>
 		/// <remarks>Files with a LastWrite time greater than this value are excluded by the filter.</remarks>
-		public DateTime MaxDate
+		internal DateTime MaxDate
 		{
 			get
 			{
@@ -236,7 +236,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// </summary>
 	/// <remarks>A sample showing how filters might be extended.</remarks>
 	[Obsolete("Use ExtendedPathFilter instead")]
-	public class NameAndSizeFilter : PathFilter
+	internal class NameAndSizeFilter : PathFilter
 	{
 		/// <summary>
 		/// Initialise a new instance of NameAndSizeFilter.
@@ -244,7 +244,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <param name="filter">The filter to apply.</param>
 		/// <param name="minSize">The minimum file size to include.</param>
 		/// <param name="maxSize">The maximum file size to include.</param>
-		public NameAndSizeFilter(string filter, long minSize, long maxSize)
+		internal NameAndSizeFilter(string filter, long minSize, long maxSize)
 			: base(filter)
 		{
 			MinSize = minSize;
@@ -274,7 +274,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get/set the minimum size for a file that will match this filter.
 		/// </summary>
-		public long MinSize
+		internal long MinSize
 		{
 			get { return minSize_; }
 			set
@@ -291,7 +291,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get/set the maximum size for a file that will match this filter.
 		/// </summary>
-		public long MaxSize
+		internal long MaxSize
 		{
 			get { return maxSize_; }
 			set

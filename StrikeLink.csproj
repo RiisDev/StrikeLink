@@ -83,6 +83,7 @@
 It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
 		<PackageIcon>icon.png</PackageIcon>
 		<Version>1.2.0</Version>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition="'$(Configuration)'=='Release' And '$(TargetFramework)'=='net8.0'">
@@ -177,5 +178,11 @@ It provides event-driven access to in-game chat, game state updates, Steam clien
 	<ItemGroup>
 	  <EmbeddedResource Include="DemoParser\EmbeddedResources\boiler.exe" />
 	  <EmbeddedResource Include="DemoParser\EmbeddedResources\steam_api64.dll" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Extensions\BZip2\**\*.cs">
+			<AnalysisLevel>none</AnalysisLevel>
+		</Compile>
 	</ItemGroup>
 </Project>

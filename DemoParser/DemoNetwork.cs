@@ -33,8 +33,8 @@ namespace StrikeLink.DemoParser
 		[GeneratedRegex("^CSGO-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}-[a-z0-9]{5}$", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
 		private static partial Regex MatchShareCodeFormat();
 
-		private record Result([property: JsonPropertyName("nextcode")] string Nextcode);
-		private record ShareCodeRoot([property: JsonPropertyName("result")] Result Result);
+		internal record Result([property: JsonPropertyName("nextcode")] string Nextcode);
+		internal record ShareCodeRoot([property: JsonPropertyName("result")] Result Result);
 		
 		/// <summary>
 		/// Retrieves the most recent valid match share code available for the authenticated user.

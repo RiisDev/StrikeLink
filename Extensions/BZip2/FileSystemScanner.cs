@@ -5,7 +5,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <summary>
 	/// Event arguments for scanning.
 	/// </summary>
-	public class ScanEventArgs : EventArgs
+	internal class ScanEventArgs : EventArgs
 	{
 		#region Constructors
 
@@ -13,7 +13,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initialise a new instance of <see cref="ScanEventArgs"/>
 		/// </summary>
 		/// <param name="name">The file or directory name.</param>
-		public ScanEventArgs(string name)
+		internal ScanEventArgs(string name)
 		{
 			name_ = name;
 		}
@@ -23,7 +23,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// The file or directory name for this event.
 		/// </summary>
-		public string Name
+		internal string Name
 		{
 			get { return name_; }
 		}
@@ -31,7 +31,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get set a value indicating if scanning should continue or not.
 		/// </summary>
-		public bool ContinueRunning
+		internal bool ContinueRunning
 		{
 			get { return continueRunning_; }
 			set { continueRunning_ = value; }
@@ -48,7 +48,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <summary>
 	/// Event arguments during processing of a single file or directory.
 	/// </summary>
-	public class ProgressEventArgs : EventArgs
+	internal class ProgressEventArgs : EventArgs
 	{
 		#region Constructors
 
@@ -58,7 +58,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <param name="name">The file or directory name if known.</param>
 		/// <param name="processed">The number of bytes processed so far</param>
 		/// <param name="target">The total number of bytes to process, 0 if not known</param>
-		public ProgressEventArgs(string name, long processed, long target)
+		internal ProgressEventArgs(string name, long processed, long target)
 		{
 			name_ = name;
 			processed_ = processed;
@@ -70,7 +70,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// The name for this event if known.
 		/// </summary>
-		public string Name
+		internal string Name
 		{
 			get { return name_; }
 		}
@@ -78,7 +78,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get set a value indicating whether scanning should continue or not.
 		/// </summary>
-		public bool ContinueRunning
+		internal bool ContinueRunning
 		{
 			get { return continueRunning_; }
 			set { continueRunning_ = value; }
@@ -88,7 +88,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Get a percentage representing how much of the <see cref="Target"></see> has been processed
 		/// </summary>
 		/// <value>0.0 to 100.0 percent; 0 if target is not known.</value>
-		public float PercentComplete
+		internal float PercentComplete
 		{
 			get
 			{
@@ -108,7 +108,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// The number of bytes processed so far
 		/// </summary>
-		public long Processed
+		internal long Processed
 		{
 			get { return processed_; }
 		}
@@ -117,7 +117,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// The number of bytes to process.
 		/// </summary>
 		/// <remarks>Target may be 0 or negative if the value isnt known.</remarks>
-		public long Target
+		internal long Target
 		{
 			get { return target_; }
 		}
@@ -135,7 +135,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <summary>
 	/// Event arguments for directories.
 	/// </summary>
-	public class DirectoryEventArgs : ScanEventArgs
+	internal class DirectoryEventArgs : ScanEventArgs
 	{
 		#region Constructors
 
@@ -144,7 +144,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="name">The name for this directory.</param>
 		/// <param name="hasMatchingFiles">Flag value indicating if any matching files are contained in this directory.</param>
-		public DirectoryEventArgs(string name, bool hasMatchingFiles)
+		internal DirectoryEventArgs(string name, bool hasMatchingFiles)
 			: base(name)
 		{
 			hasMatchingFiles_ = hasMatchingFiles;
@@ -155,7 +155,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get a value indicating if the directory contains any matching files or not.
 		/// </summary>
-		public bool HasMatchingFiles
+		internal bool HasMatchingFiles
 		{
 			get { return hasMatchingFiles_; }
 		}
@@ -172,7 +172,7 @@ namespace StrikeLink.Extensions.BZip2
 	/// <summary>
 	/// Arguments passed when scan failures are detected.
 	/// </summary>
-	public class ScanFailureEventArgs : EventArgs
+	internal class ScanFailureEventArgs : EventArgs
 	{
 		#region Constructors
 
@@ -181,7 +181,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="name">The name to apply.</param>
 		/// <param name="e">The exception to use.</param>
-		public ScanFailureEventArgs(string name, Exception e)
+		internal ScanFailureEventArgs(string name, Exception e)
 		{
 			name_ = name;
 			exception_ = e;
@@ -193,7 +193,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// The applicable name.
 		/// </summary>
-		public string Name
+		internal string Name
 		{
 			get { return name_; }
 		}
@@ -201,7 +201,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// The applicable exception.
 		/// </summary>
-		public Exception Exception
+		internal Exception Exception
 		{
 			get { return exception_; }
 		}
@@ -209,7 +209,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Get / set a value indicating whether scanning should continue.
 		/// </summary>
-		public bool ContinueRunning
+		internal bool ContinueRunning
 		{
 			get { return continueRunning_; }
 			set { continueRunning_ = value; }
@@ -233,42 +233,42 @@ namespace StrikeLink.Extensions.BZip2
 	/// </summary>
 	/// <param name="sender">The source of the event</param>
 	/// <param name="e">The event arguments.</param>
-	public delegate void ProcessFileHandler(object sender, ScanEventArgs e);
+	internal delegate void ProcessFileHandler(object sender, ScanEventArgs e);
 
 	/// <summary>
 	/// Delegate invoked during processing of a file or directory
 	/// </summary>
 	/// <param name="sender">The source of the event</param>
 	/// <param name="e">The event arguments.</param>
-	public delegate void ProgressHandler(object sender, ProgressEventArgs e);
+	internal delegate void ProgressHandler(object sender, ProgressEventArgs e);
 
 	/// <summary>
 	/// Delegate invoked when a file has been completely processed.
 	/// </summary>
 	/// <param name="sender">The source of the event</param>
 	/// <param name="e">The event arguments.</param>
-	public delegate void CompletedFileHandler(object sender, ScanEventArgs e);
+	internal delegate void CompletedFileHandler(object sender, ScanEventArgs e);
 
 	/// <summary>
 	/// Delegate invoked when a directory failure is detected.
 	/// </summary>
 	/// <param name="sender">The source of the event</param>
 	/// <param name="e">The event arguments.</param>
-	public delegate void DirectoryFailureHandler(object sender, ScanFailureEventArgs e);
+	internal delegate void DirectoryFailureHandler(object sender, ScanFailureEventArgs e);
 
 	/// <summary>
 	/// Delegate invoked when a file failure is detected.
 	/// </summary>
 	/// <param name="sender">The source of the event</param>
 	/// <param name="e">The event arguments.</param>
-	public delegate void FileFailureHandler(object sender, ScanFailureEventArgs e);
+	internal delegate void FileFailureHandler(object sender, ScanFailureEventArgs e);
 
 	#endregion Delegates
 
 	/// <summary>
 	/// FileSystemScanner provides facilities scanning of files and directories.
 	/// </summary>
-	public class FileSystemScanner
+	internal class FileSystemScanner
 	{
 		#region Constructors
 
@@ -276,7 +276,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initialise a new instance of <see cref="FileSystemScanner"></see>
 		/// </summary>
 		/// <param name="filter">The <see cref="PathFilter">file filter</see> to apply when scanning.</param>
-		public FileSystemScanner(string filter)
+		internal FileSystemScanner(string filter)
 		{
 			fileFilter_ = new PathFilter(filter);
 		}
@@ -286,7 +286,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="fileFilter">The <see cref="PathFilter">file filter</see> to apply.</param>
 		/// <param name="directoryFilter">The <see cref="PathFilter"> directory filter</see> to apply.</param>
-		public FileSystemScanner(string fileFilter, string directoryFilter)
+		internal FileSystemScanner(string fileFilter, string directoryFilter)
 		{
 			fileFilter_ = new PathFilter(fileFilter);
 			directoryFilter_ = new PathFilter(directoryFilter);
@@ -296,7 +296,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// Initialise a new instance of <see cref="FileSystemScanner"></see>
 		/// </summary>
 		/// <param name="fileFilter">The file <see cref="IScanFilter">filter</see> to apply.</param>
-		public FileSystemScanner(IScanFilter fileFilter)
+		internal FileSystemScanner(IScanFilter fileFilter)
 		{
 			fileFilter_ = fileFilter;
 		}
@@ -306,7 +306,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="fileFilter">The file <see cref="IScanFilter">filter</see>  to apply.</param>
 		/// <param name="directoryFilter">The directory <see cref="IScanFilter">filter</see>  to apply.</param>
-		public FileSystemScanner(IScanFilter fileFilter, IScanFilter directoryFilter)
+		internal FileSystemScanner(IScanFilter fileFilter, IScanFilter directoryFilter)
 		{
 			fileFilter_ = fileFilter;
 			directoryFilter_ = directoryFilter;
@@ -319,27 +319,27 @@ namespace StrikeLink.Extensions.BZip2
 		/// <summary>
 		/// Delegate to invoke when a directory is processed.
 		/// </summary>
-		public event EventHandler<DirectoryEventArgs> ProcessDirectory;
+		internal event EventHandler<DirectoryEventArgs> ProcessDirectory;
 
 		/// <summary>
 		/// Delegate to invoke when a file is processed.
 		/// </summary>
-		public ProcessFileHandler ProcessFile;
+		internal ProcessFileHandler ProcessFile;
 
 		/// <summary>
 		/// Delegate to invoke when processing for a file has finished.
 		/// </summary>
-		public CompletedFileHandler CompletedFile;
+		internal CompletedFileHandler CompletedFile;
 
 		/// <summary>
 		/// Delegate to invoke when a directory failure is detected.
 		/// </summary>
-		public DirectoryFailureHandler DirectoryFailure;
+		internal DirectoryFailureHandler DirectoryFailure;
 
 		/// <summary>
 		/// Delegate to invoke when a file failure is detected.
 		/// </summary>
-		public FileFailureHandler FileFailure;
+		internal FileFailureHandler FileFailure;
 
 		#endregion Delegates
 
@@ -435,7 +435,7 @@ namespace StrikeLink.Extensions.BZip2
 		/// </summary>
 		/// <param name="directory">The base directory to scan.</param>
 		/// <param name="recurse">True to recurse subdirectories, false to scan a single directory.</param>
-		public void Scan(string directory, bool recurse)
+		internal void Scan(string directory, bool recurse)
 		{
 			alive_ = true;
 			ScanDir(directory, recurse);
