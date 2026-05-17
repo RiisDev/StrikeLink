@@ -44,7 +44,7 @@ namespace StrikeLink.ChatBot
 
 			ConsoleService.CheckCs2UserConfig(consoleServiceConfig.Keybind);
 			
-			string localUsername = GetLocalUsername();
+			string localUsername = SteamService.GetLocalUsername();
 
 			if (consoleServiceConfig.OnTeamChat is not null)
 			{
@@ -102,28 +102,6 @@ namespace StrikeLink.ChatBot
 				throw new InvalidOperationException(error);
 		}
 		
-		private static string GetLocalUsername()
-		{
-			long userId = SteamService.GetCurrentUserId();
-			string steamPath = SteamService.GetSteamPath();
-			string counterStrikeKeybindPath = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
-
-			if (!Directory.Exists(counterStrikeKeybindPath))
-				throw new DirectoryNotFoundException($"Failed to find user consoleServiceConfig path: {counterStrikeKeybindPath}");
-
-			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
-
-			string firstUserKey = Directory
-				.GetFiles(localConfigPath, "cs2_user_convars*.vcfg")
-				.OrderBy(filePath => filePath, StringComparer.OrdinalIgnoreCase)
-				.First();
-
-			ValveCfgReader reader = new(firstUserKey);
-			bool foundBindings = reader.Document.Root.TryGetProperty("convars", out ConfigNode conVars);
-			if (!foundBindings) throw new InvalidOperationException("Cannot find local username (MISSING_CONVARS)");
-
-			return conVars.TryGetProperty("name", out ConfigNode nameNode) ? nameNode.GetString() : throw new InvalidOperationException("Cannot find local username");
-		}
 
 
 		private bool IsProgrammedMessage(string incomingMessage)

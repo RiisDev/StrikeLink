@@ -239,6 +239,37 @@ namespace StrikeLink.Services
 
 			throw new InvalidOperationException("Failed to gather SteamId from log");
 		}
+		
+		/// <summary>
+		/// Gets the local Steam account display name for the current user from the Steam localconfig.vdf.
+		/// </summary>
+		/// <returns>The local Steam account display name.</returns>
+		/// <exception cref="DirectoryNotFoundException">Thrown when the user's Steam config directory (userdata/{userId}/config) cannot be found.</exception>
+		/// <exception cref="FileNotFoundException">Thrown when the localconfig.vdf file cannot be found in the user's Steam config directory.</exception>
+		/// <exception cref="InvalidOperationException">Thrown when the friends configuration or the local user entry within the friends node is missing or malformed.</exception>
+		public static string GetLocalUsername()
+		{
+			long userId = GetCurrentUserId();
+			string steamPath = GetSteamPath();
+			string localConf = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "config");
+
+			if (!Directory.Exists(localConf))
+				throw new DirectoryNotFoundException($"Failed to find user path: {localConf}");
+
+			string localConfigPath = Path.Combine(localConf, "localconfig.vdf");
+
+			if (!File.Exists(localConfigPath))
+				throw new FileNotFoundException($"Failed to find localconfig.vdf: {localConfigPath}");
+
+			ValveCfgReader reader = new(localConfigPath);
+			bool foundBindings = reader.Document.Root.TryGetProperty("friends", out ConfigNode friendsNode);
+			if (!foundBindings) throw new InvalidOperationException("Cannot find local friends config (MISSING_FRIENDS)");
+
+			KeyValuePair<string, ConfigNode> localUser = friendsNode.EnumerateObject().FirstOrDefault(x => x.Key == userId.ToString(CultureInfo.InvariantCulture));
+			if (localUser.Key.IsNullOrEmpty()) throw new InvalidOperationException("Failed to find local user within friends node.");
+
+			return localUser.Value.GetProperty("name").GetString();
+		}
 
 		private static bool TryExtractUserId(string line, out long userId)
 		{

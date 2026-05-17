@@ -203,6 +203,7 @@ namespace StrikeLink.Services
 		private readonly string _consoleLogPath;
 		private readonly string _strikeConsoleTmp;
 		private readonly string _chatCfgLocation;
+		private readonly string _counterStrikePath;
 		private string _downloadingUgcData = string.Empty;
 
 		private int _lastLineIndex;
@@ -226,13 +227,15 @@ namespace StrikeLink.Services
 		{
 			if (!SteamService.TryGetGamePath(730, out string? counterStrikePath) || counterStrikePath.IsNullOrEmpty())
 				throw new DirectoryNotFoundException("Failed to find CS:2 game directory.");
+			
+			_counterStrikePath = counterStrikePath;
 
 			bool conDebug = SteamService.GetGameLaunchOptions(730).Any(x => x == "-condebug");
 			if (!conDebug) throw new InvalidOperationException("CS:2 was not launched with -condebug, console log will not be available.");
 
-			_consoleLogPath = Path.Combine(counterStrikePath, "game", "csgo", "console.log");
+			_consoleLogPath = Path.Combine(_counterStrikePath, "game", "csgo", "console.log");
 			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
-			_chatCfgLocation = Path.Combine(counterStrikePath, "game", "csgo", "cfg", "strike_link.cfg");
+			_chatCfgLocation = Path.Combine(_counterStrikePath, "game", "csgo", "cfg", "strike_link.cfg");
 			_execCfg = config;
 
 			BoundedChannelOptions channelOptions = new(MaxQueueDepth)
@@ -246,6 +249,8 @@ namespace StrikeLink.Services
 			_commandWorker = Task.Run(CommandWorkerLoop);
 
 			StartListening();
+
+			Thread.Sleep(1500);
 		}
 
 		/// <summary>
@@ -292,8 +297,6 @@ namespace StrikeLink.Services
 		/// <exception cref="InvalidOperationException">Thrown when no configuration is provided and no instance configuration is available.</exception>
 		public async Task<Cs2StatusMessage> GetStatus(ConsoleServiceConfig? config = null, CancellationToken ct = default)
 		{
-			ConsoleServiceConfig requiredConsoleServiceConfig = config ?? _execCfg ?? throw new InvalidOperationException("SendConsoleCommand requires either constructor consoleServiceConfig or a parameter consoleServiceConfig.");
-
 			using CancellationTokenSource timeoutCts = new(TimeSpan.FromSeconds(5));
 			using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
 
@@ -306,12 +309,100 @@ namespace StrikeLink.Services
 
 			try
 			{
-				await SendConsoleCommand("status", requiredConsoleServiceConfig, ct).ConfigureAwait(false);
+				await SendConsoleCommand("status", config, ct).ConfigureAwait(false);
 				return await tcs.Task.WaitAsync(linkedCts.Token).ConfigureAwait(false);
 			}
 			finally { OnStatusMessage -= OnOnStatusMessage; }
 
 			void OnOnStatusMessage(Cs2StatusMessage msg) => tcs.TrySetResult(msg);
+		}
+
+		/// <summary>
+		/// Executes a CS2 configuration file by validating its presence and issuing an exec
+		/// console command.
+		/// </summary>
+		/// <remarks>Checks that the cfg file exists under game/csgo/cfg before sending the console command.</remarks>
+		/// <param name="cfgName">Name of the configuration file to execute (including extension) located in the game's cfg directory.</param>
+		/// <param name="config">Optional ConsoleServiceConfig to use; when null, the configured default is used.</param>
+		/// <param name="ct">Cancellation token that can cancel the operation. The operation is also subject to a 5-second timeout combined
+		/// with this token.</param>
+		/// <returns>A Task that represents the asynchronous operation.</returns>
+		/// <exception cref="InvalidOperationException">Thrown when no ConsoleServiceConfig is available from either the parameter or the configured default.</exception>
+		/// <exception cref="FileNotFoundException">Thrown when the specified configuration file does not exist in the game's cfg directory.</exception>
+		public async Task ExecuteCfgFile(string cfgName, ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			string desiredCfgPath = Path.Combine(_counterStrikePath, "game", "csgo", "cfg", cfgName);
+
+			if (!File.Exists(desiredCfgPath))
+				throw new FileNotFoundException($"{desiredCfgPath} does not exist.");
+
+			await SendConsoleCommand($"exec {cfgName}", config, ct).ConfigureAwait(false);
+		}
+
+		/// <summary>
+		/// Gets the name of the currently loaded map from the console status.
+		/// </summary>
+		/// <remarks>Retrieves status via GetStatus and selects the first spawn group with LoadType "mapload".
+		/// Exceptions from status retrieval propagate to the caller; the operation honors the provided cancellation
+		/// token.</remarks>
+		/// <param name="config">Optional console service configuration used to retrieve status; when null, the default configuration is used.</param>
+		/// <param name="ct">Cancellation token to observe while awaiting the operation.</param>
+		/// <returns>A task that resolves to the current map name, or "N/A" if no map is found.</returns>
+		public async Task<string> GetCurrentMap(ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			Cs2StatusMessage statusDump = await GetStatus(config, ct).ConfigureAwait(false);
+			return statusDump.SpawnGroups.FirstOrDefault(x=> x.LoadType == "mapload")?.MapName ?? "N/A";
+		}
+
+		/// <summary>
+		/// Gets the current local Steam user's ping from the CS2 status.
+		/// </summary>
+		/// <remarks>Identifies the local player via SteamService.GetLocalUsername and queries GetStatus to obtain the
+		/// Players list.</remarks>
+		/// <param name="config">Console service configuration used when fetching status, or null to use defaults.</param>
+		/// <param name="ct">Cancellation token to cancel the asynchronous operation.</param>
+		/// <returns>The local user's ping in milliseconds, or -1 if the user is not present in the status.</returns>
+		public async Task<int> GetPing(ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			string currentUsername = SteamService.GetLocalUsername();
+			Cs2StatusMessage statusDump = await GetStatus(config, ct).ConfigureAwait(false);
+			return statusDump.Players.FirstOrDefault(x => x.Name == currentUsername)?.Ping ?? -1;
+		}
+
+		// Doesn't work with console log file
+		private async Task<string> GetCvarValue(string name, ConsoleServiceConfig? config = null, CancellationToken ct = default)
+		{
+			ArgumentException.ThrowIfNullOrWhiteSpace(name);
+
+			if (!ValidCvarNameRegex().IsMatch(name))
+				throw new InvalidOperationException("Invalid CVAR type");
+
+			string consoleDetection = $"[Console] {name} =";
+			using CancellationTokenSource timeoutCts = new(TimeSpan.FromSeconds(5));
+			using CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(ct, timeoutCts.Token);
+
+			TaskCompletionSource<string> tcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+			CancellationTokenRegistration ctr = linkedCts.Token.Register(() => tcs.TrySetCanceled(linkedCts.Token));
+			await using ConfiguredAsyncDisposable _ = ctr.ConfigureAwait(false);
+
+			OnLogReceived += OnLogData;
+
+			try
+			{
+				await SendConsoleCommand(name, config, ct).ConfigureAwait(false);
+				return await tcs.Task.WaitAsync(linkedCts.Token).ConfigureAwait(false);
+			}
+			finally { OnLogReceived -= OnLogData; }
+
+			void OnLogData(string msg)
+			{
+				Debug.WriteLine($"CAUGHT_MSG: {msg}");
+				if (msg.StartsWith(consoleDetection, StringComparison.InvariantCulture))
+				{
+					tcs.TrySetResult(msg[consoleDetection.Length..].Trim());
+				}
+			}
 		}
 
 		private async Task CommandWorkerLoop()
@@ -640,6 +731,10 @@ namespace StrikeLink.Services
 
 		[GeneratedRegex(@"^\[([^\]]+)\]\s+([^:]+):\s+(.+)$", RegexOptions.Singleline)]
 		private static partial Regex ChatRegex();
+
+
+		[GeneratedRegex(@"^[a-z0-9_.]+$")]
+		private static partial Regex ValidCvarNameRegex();
 	}
 
 	/// <summary>
