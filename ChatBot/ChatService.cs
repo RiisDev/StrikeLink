@@ -42,7 +42,7 @@ namespace StrikeLink.ChatBot
 			_ownsConsoleService = console is null;
 			_consoleService = console ?? new ConsoleService();
 
-			CheckCs2UserConfig();
+			ConsoleService.CheckCs2UserConfig(consoleServiceConfig.Keybind);
 			
 			string localUsername = GetLocalUsername();
 
@@ -102,47 +102,6 @@ namespace StrikeLink.ChatBot
 				throw new InvalidOperationException(error);
 		}
 		
-		private void CheckCs2UserConfig()
-		{
-			long userId = SteamService.GetCurrentUserId();
-			string steamPath = SteamService.GetSteamPath();
-			string counterStrikeKeybindPath = Path.Combine(steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
-
-			if (!Directory.Exists(counterStrikeKeybindPath))
-				throw new DirectoryNotFoundException($"Failed to find user consoleServiceConfig path: {counterStrikeKeybindPath}");
-
-			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
-
-			(bool localConfigReady, string localKeybind) = CheckLocalCs2Config(localConfigPath);
-
-			if (!localConfigReady)
-				throw new InvalidOperationException("CS2 user keybind configuration not found. Please configure a keybind for Strike Link in CS2 settings.");
-
-			if (localKeybind != NativeMethods.VirtualKeyToChar[_consoleServiceConfig.Keybind])
-				throw new InvalidOperationException($"CS2 user keybind configuration does not match the configured keybind '{_consoleServiceConfig.Keybind}'. Please update your CS2 keybind configuration accordingly.");
-		}
-		
-		private static (bool, string) CheckLocalCs2Config(string localConfigPath)
-		{
-			string firstUserKey = Directory
-				.GetFiles(localConfigPath, "cs2_user_keys*.vcfg")
-				.OrderBy(filePath => filePath, StringComparer.OrdinalIgnoreCase)
-				.First();
-
-			ValveCfgReader reader = new(firstUserKey);
-			bool foundBindings = reader.Document.Root.TryGetProperty("bindings", out ConfigNode bindings);
-			if (!foundBindings) return (false, "");
-
-			foreach (KeyValuePair<string, ConfigNode> property in bindings.EnumerateObject())
-			{
-				string command = property.Value.GetString();
-				if (command == "exec strike_link.cfg") 
-					return (true, property.Key);
-			}
-
-			return (false, "");
-		}
-
 		private static string GetLocalUsername()
 		{
 			long userId = SteamService.GetCurrentUserId();

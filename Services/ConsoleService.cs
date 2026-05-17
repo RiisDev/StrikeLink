@@ -1,4 +1,5 @@
 ﻿using StrikeLink.ChatBot;
+using StrikeLink.Services.Config;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -263,6 +264,8 @@ namespace StrikeLink.Services
 		public async Task<(string Message, bool Success)> SendConsoleCommand(string command, ConsoleServiceConfig? config = null, CancellationToken ct = default)
 		{
 			ConsoleServiceConfig requiredConsoleServiceConfig = config ?? _execCfg ?? throw new InvalidOperationException("SendConsoleCommand requires either constructor consoleServiceConfig or a parameter consoleServiceConfig.");
+
+			CheckCs2UserConfig(requiredConsoleServiceConfig.Keybind);
 
 			ArgumentException.ThrowIfNullOrWhiteSpace(command);
 
@@ -559,7 +562,62 @@ namespace StrikeLink.Services
 			if (team) OnTeamChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 			else OnGlobalChatMessageReceived?.Invoke(new ChatMessage(username, message, dead));
 		}
-		
+
+		private sealed record Cs2ConfigCache(NativeMethods.VirtualKey Keybind, string ResolvedKey, string ConfigPath);
+		private static Cs2ConfigCache? _cs2ConfigCache;
+
+		internal static void CheckCs2UserConfig(NativeMethods.VirtualKey keybind)
+		{
+			Cs2ConfigCache? existing = Volatile.Read(ref _cs2ConfigCache);
+			if (existing?.Keybind == keybind)
+				return;
+
+			long userId = SteamService.GetCurrentUserId();
+			string steamPath = SteamService.GetSteamPath();
+			string counterStrikeKeybindPath = Path.Combine(
+				steamPath, "userdata", userId.ToString(CultureInfo.InvariantCulture), "730");
+
+			if (!Directory.Exists(counterStrikeKeybindPath))
+				throw new DirectoryNotFoundException(
+					$"Failed to find user consoleServiceConfig path: {counterStrikeKeybindPath}");
+
+			string localConfigPath = Path.Combine(counterStrikeKeybindPath, "local", "cfg");
+
+			(bool localConfigReady, string localKeybind) = CheckLocalCs2Config(localConfigPath);
+
+			if (!localConfigReady)
+				throw new InvalidOperationException(
+					"CS2 user keybind configuration not found. Please configure a keybind for Strike Link in CS2 settings.");
+
+			if (localKeybind != NativeMethods.VirtualKeyToChar[keybind])
+				throw new InvalidOperationException(
+					$"CS2 user keybind configuration does not match the configured keybind '{keybind}'. " +
+					$"Please update your CS2 keybind configuration accordingly.");
+
+			Volatile.Write(ref _cs2ConfigCache, new Cs2ConfigCache(keybind, localKeybind, localConfigPath));
+		}
+
+		private static (bool, string) CheckLocalCs2Config(string localConfigPath)
+		{
+			string firstUserKey = Directory
+				.GetFiles(localConfigPath, "cs2_user_keys*.vcfg")
+				.OrderBy(filePath => filePath, StringComparer.OrdinalIgnoreCase)
+				.First();
+
+			ValveCfgReader reader = new(firstUserKey);
+			bool foundBindings = reader.Document.Root.TryGetProperty("bindings", out ConfigNode bindings);
+			if (!foundBindings) return (false, "");
+
+			foreach (KeyValuePair<string, ConfigNode> property in bindings.EnumerateObject())
+			{
+				string command = property.Value.GetString();
+				if (command == "exec strike_link.cfg")
+					return (true, property.Key);
+			}
+
+			return (false, "");
+		}
+
 		/// <summary>
 		/// Completes the command queue (no new commands accepted), waits for any
 		/// in-flight commands to finish, then cancels the log listener.
