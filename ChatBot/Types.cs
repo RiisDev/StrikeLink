@@ -57,4 +57,7 @@ public record ChatMessage(string Username, string Message, bool Dead);
 /// <param name="OnTeamChat">
 /// Optional callback invoked when a team chat message is received.
 /// </param>
-public record ConsoleServiceConfig(NativeMethods.VirtualKey Keybind, bool IgnoreLocalUser = false, Action<ChatMessage>? OnGlobalChat = null, Action<ChatMessage>? OnTeamChat = null);
+/// <param name="ForceWindowActivation">
+/// When needing to press the keybind, force the CS2 window to be focussed.
+/// </param>
+public record ConsoleServiceConfig(NativeMethods.VirtualKey Keybind, bool IgnoreLocalUser = false, Action<ChatMessage>? OnGlobalChat = null, Action<ChatMessage>? OnTeamChat = null, bool? ForceWindowActivation = false);

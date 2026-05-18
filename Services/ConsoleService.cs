@@ -201,7 +201,6 @@ namespace StrikeLink.Services
 		private readonly StatusData _statusData = new();
 		private readonly ConsoleServiceConfig? _execCfg;
 		private readonly string _consoleLogPath;
-		private readonly string _strikeConsoleTmp;
 		private readonly string _chatCfgLocation;
 		private readonly string _counterStrikePath;
 		private string _downloadingUgcData = string.Empty;
@@ -234,7 +233,6 @@ namespace StrikeLink.Services
 			if (!conDebug) throw new InvalidOperationException("CS:2 was not launched with -condebug, console log will not be available.");
 
 			_consoleLogPath = Path.Combine(_counterStrikePath, "game", "csgo", "console.log");
-			_strikeConsoleTmp = Path.Combine(Path.GetTempPath(), "console_tmp_strikelink.log");
 			_chatCfgLocation = Path.Combine(_counterStrikePath, "game", "csgo", "cfg", "strike_link.cfg");
 			_execCfg = config;
 
@@ -423,9 +421,12 @@ namespace StrikeLink.Services
 				Log("CS2 process not found, skipping call.");
 				return ("CS2 process not found, skipping call.", false);
 			}
-
+			
 			Process csProcess = csProcesses[0];
 
+			if (csProcesses.Length > 1)
+				Log($"Multiple CS2 processes found, targeting first found: {csProcess.Id}");
+			
 			await File.WriteAllTextAsync(_chatCfgLocation, req.Command).ConfigureAwait(false);
 			await Task.Delay(DelayAfterWrite).ConfigureAwait(false);
 
@@ -433,6 +434,9 @@ namespace StrikeLink.Services
 			{
 				if (!NativeMethods.IsProcessActivated(csProcess))
 				{
+					if (req.ConsoleServiceConfig.ForceWindowActivation.HasValue && req.ConsoleServiceConfig.ForceWindowActivation.Value)
+						NativeMethods.SetForegroundWindow(csProcess.MainWindowHandle);
+
 					await Task.Delay(DelayPerRetry).ConfigureAwait(false);
 					continue;
 				}
@@ -492,17 +496,9 @@ namespace StrikeLink.Services
 			{
 				try
 				{
-					File.Copy(_consoleLogPath, _strikeConsoleTmp, overwrite: true);
-
-					FileStream fileStream = new(_strikeConsoleTmp, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, options: FileOptions.Asynchronous | FileOptions.SequentialScan);
-					await using ConfiguredAsyncDisposable stream = fileStream.ConfigureAwait(false);
-					using StreamReader streamReader = new(fileStream);
-					string content = await streamReader.ReadToEndAsync().ConfigureAwait(false);
-
-					return content;
+					return await FileReader.ReadFileAsync(_consoleLogPath).ConfigureAwait(false);
 				}
 				catch (IOException) { await Task.Delay(delayMilliseconds, _cancellationTokenSource?.Token ?? CancellationToken.None).ConfigureAwait(false); }
-				finally { try { File.Delete(_strikeConsoleTmp); } catch (IOException) { } }
 			}
 
 			return string.Empty;

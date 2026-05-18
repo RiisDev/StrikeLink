@@ -144,6 +144,11 @@ namespace StrikeLink.Extensions
 			KeybdEvent((uint)key, 0, 2, 0);
 		}
 
+		[LibraryImport("user32.dll", EntryPoint = "SetForegroundWindow")]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+		internal static partial bool SetForegroundWindow(IntPtr hWnd);
+
 		[LibraryImport("user32.dll", EntryPoint = "keybd_event")]
 		[DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
 		internal static partial void KeybdEvent(uint bVk, uint bScan, uint dwFlags, uint dwExtraInfo);
