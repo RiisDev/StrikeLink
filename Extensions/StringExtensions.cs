@@ -7,6 +7,11 @@ namespace StrikeLink.Extensions
 	{
 		extension(string haystack)
 		{
+			internal int ToInt() => int.TryParse(haystack, out int result) ? result : 0;
+			internal long ToLong() => long.TryParse(haystack, out long result) ? result : 0;
+
+			internal bool In(string var, StringComparison comp = StringComparison.InvariantCulture) => haystack.Contains(var, comp);
+
 			internal string FromBase64()
 			{
 				if (string.IsNullOrEmpty(haystack)) return string.Empty;

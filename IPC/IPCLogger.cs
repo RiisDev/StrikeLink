@@ -15,6 +15,18 @@ namespace StrikeLink.IPC
 	/// <param name="Username">Display name of the user.</param>
 	public record IPCUser(int SteamId3, string Username);
 
+	public record IPCChatMessage(IPCUser User, string Message);
+
+	public record IPCStat(string Stat, string Value);
+
+	public record IPCKDA(int Kills, int Deaths, int Assists);
+
+	public record IPCDeath(IPCUser Killer, string Weapon);
+
+	public record IPCKill(IPCUser Victim, string Weapon);
+
+	public record IPCTimelineEvent(string Text, string SubText, string Type);
+
 	/// <summary>
 	/// Configuration for IPC that specifies whether the Steam client should be started or restarted.
 	/// </summary>
@@ -38,6 +50,26 @@ namespace StrikeLink.IPC
 		/// Occurs when a new console log line is received.
 		/// </summary>
 		public event Action<string>? OnLogReceived;
+		
+		public event Action<(int, int)>? OnScoreChanged;
+
+		public event Action<int>? OnRoundStart;
+
+		public event Action<int>? OnRoundEnd;
+
+		public event Action<IPCChatMessage>? OnChatMessage;
+
+		public event Action<IPCStat>? OnStatChanged;
+
+		public event Action<IPCKDA>? OnKDAChanged;
+
+		public event Action<IPCUser>? OnPlayerDetected;
+
+		public event Action<IPCUser>? OnBombPlanted;
+
+		public event Action<(IPCUser, string)>? OnKill;
+
+		public event Action<(IPCUser, string)>? OnDeath;
 
 		/// <summary>
 		/// Gets a read-only list of match segments.
@@ -45,6 +77,8 @@ namespace StrikeLink.IPC
 		/// <remarks>The returned IReadOnlyList is a read-only wrapper around the internal list; changes to the
 		/// underlying collection are reflected in the returned view.</remarks>
 		public IReadOnlyList<string> MatchSegments => _matchSegments.AsReadOnly();
+
+		private readonly Dictionary<long, IPCUser> _ipcUsers = [];
 
 		private readonly List<string> _matchSegments = [];
 		private readonly CancellationTokenSource? _cancellationTokenSource = new();
@@ -102,7 +136,7 @@ namespace StrikeLink.IPC
 		/// <summary>
 		/// Parses the current match segment and returns a read-only list of IPCUser instances representing the players found.
 		/// </summary>
-		/// <remarks>Snapshots the segment under a lock and uses FilterTextRegex() to extract 'steamId' and
+		/// <remarks>Snapshots the segment under a lock and uses FilterPlayerRegex() to extract 'steamId' and
 		/// 'playerName' groups. Steam IDs are parsed with CultureInfo.InvariantCulture and must be valid integers.</remarks>
 		/// <returns>A read-only list of IPCUser instances parsed from the current match segment; an empty list when not currently in a
 		/// match.</returns>
@@ -115,7 +149,7 @@ namespace StrikeLink.IPC
 
 			if (!_inMatch) return [];
 
-			MatchCollection regexResult = FilterTextRegex().Matches(currentSegment);
+			MatchCollection regexResult = FilterPlayerRegex().Matches(currentSegment);
 			foreach (Match match in regexResult)
 			{
 				if (!match.Success) continue;
@@ -131,7 +165,7 @@ namespace StrikeLink.IPC
 		/// <summary>
 		/// Retrieves a read-only list of IPCUser parsed from the current session log text.
 		/// </summary>
-		/// <remarks>Parses _currentLogText using FilterTextRegex(), expecting named capture groups "steamId" and
+		/// <remarks>Parses _currentLogText using FilterPlayerRegex(), expecting named capture groups "steamId" and
 		/// "playerName". Steam IDs are parsed to int using CultureInfo.InvariantCulture. May throw FormatException or
 		/// OverflowException if a steamId value is not a valid integer.</remarks>
 		/// <returns>A read-only list of IPCUser parsed from the session; empty if no players are found.</returns>
@@ -139,7 +173,7 @@ namespace StrikeLink.IPC
 		{
 			List<IPCUser> ipcUsers = [];
 
-			MatchCollection regexResult = FilterTextRegex().Matches(_currentLogText);
+			MatchCollection regexResult = FilterPlayerRegex().Matches(_currentLogText);
 			
 			foreach (Match match in regexResult)
 			{
@@ -264,7 +298,7 @@ namespace StrikeLink.IPC
 			int segmentStartIndex = -1;
 			for (int lineIndex = logLines.Length - 1; lineIndex >= 0; lineIndex--)
 			{
-				if (!logLines[lineIndex].Contains("IClientTimeline::SetTimelineGameMode( 1, )", StringComparison.InvariantCulture)) continue;
+				if (!logLines[lineIndex].In("IClientTimeline::SetTimelineGameMode( 1, )")) continue;
 				segmentStartIndex = lineIndex;
 				break;
 			}
@@ -275,7 +309,7 @@ namespace StrikeLink.IPC
 			bool matchEnded = false;
 			for (int lineIndex = segmentStartIndex + 1; lineIndex < logLines.Length; lineIndex++)
 			{
-				if (!logLines[lineIndex].Contains("IClientTimeline::SetTimelineGameMode( 3, )", StringComparison.InvariantCulture)) continue;
+				if (!logLines[lineIndex].In("IClientTimeline::SetTimelineGameMode( 3, )")) continue;
 				matchEnded = true;
 				break;
 			}
@@ -294,6 +328,7 @@ namespace StrikeLink.IPC
 			_inMatch = true;
 		}
 
+		private int currentRound = 0;
 		private void ParseLineData(string lineText)
 		{
 			if (_firstRun) return;
@@ -302,18 +337,78 @@ namespace StrikeLink.IPC
 
 			switch (lineText)
 			{
-				case var _ when lineText.Contains("IClientTimeline::SetTimelineGameMode( 1, )", StringComparison.InvariantCulture):
+				case var _ when lineText.In("IClientTimeline::SetTimelineGameMode( 4, )"):
 					_currentMatchSegment.Clear();
 					_inMatch = true;
 					_currentMatchSegment.AppendLine(lineText);
 					break;
-				case var _ when lineText.Contains("IClientTimeline::SetTimelineGameMode( 3, )", StringComparison.InvariantCulture):
+				case var _ when lineText.In("IClientTimeline::SetTimelineGameMode( 4, )"):
 					_currentMatchSegment.AppendLine(lineText);
 					if (!_currentMatchSegment.ToString().IsNullOrEmpty())
 						_matchSegments.Add(_currentMatchSegment.ToString());
 					_currentMatchSegment.Clear();
+					_ipcUsers.Clear();
 					_inMatch = false;
 					break;
+
+				case var _ when lineText.In("IClientUtils::FilterText( 730, 3, [U:1:"):
+					Match playerFound = FilterPlayerRegex().Match(_currentLogText);
+					if (playerFound.Success)
+					{
+						IPCUser user = new (playerFound.Groups["steamId"].Value.ToInt(), playerFound.Groups["playerName"].Value);
+						OnPlayerDetected?.Invoke(user);
+						_ipcUsers.TryAdd(playerFound.Groups["steamId"].Value.ToLong(), user);
+					}
+					break;
+
+				case var _ when lineText.In("IClientTimeline::SetGamePhaseAttribute( \"Score\""):
+					Match scoreFound = ScoreRegex().Match(lineText);
+					if (scoreFound.Success) { 
+						OnRoundEnd?.Invoke(currentRound);
+						OnScoreChanged?.Invoke((scoreFound.Groups["teamScore"].Value.ToInt(), scoreFound.Groups["enemyScore"].Value.ToInt()));
+					}
+					
+					break;
+
+				case var _ when lineText.In("::SetTimelineTooltip( \"Round "):
+					Match roundFound = RoundRegex().Match(lineText);
+					if (roundFound.Success)
+					{
+						currentRound = roundFound.Groups[1].Value.ToInt();
+						OnRoundStart?.Invoke(roundFound.Groups[1].Value.ToInt());
+					}
+					break;
+
+				case var _ when lineText.In("IClientUtils::FilterText( 730, 2, [U:1:"):
+					Match chatData = FilterChatRegex().Match(lineText);
+					if (chatData.Success) OnChatMessage?.Invoke(new IPCChatMessage(GetUserFromId(chatData.Groups["steamId"].Value) ?? new IPCUser(0, "N/A"), chatData.Groups["chatMessage"].Value));
+					break;
+
+				case var _ when lineText.In("IClientUserStats::SetStat"):
+					Match statFound = StatRegex().Match(lineText);
+					if (statFound.Success) OnStatChanged?.Invoke(new IPCStat(statFound.Groups["statName"].Value, statFound.Groups["statValue"].Value));
+					break;
+
+				case var _ when lineText.In("IClientTimeline::SetGamePhaseAttribute( \"K/D/A\""):
+					Match kdaFound = KDARegex().Match(lineText);
+					if (kdaFound.Success) OnKDAChanged?.Invoke(new IPCKDA(kdaFound.Groups["kills"].Value.ToInt(), kdaFound.Groups["deaths"].Value.ToInt(), kdaFound.Groups["assists"].Value.ToInt()));
+					break;
+
+				case var _ when lineText.In("cs2_bomb_plant"):
+					Match bombFound = BombPlantedRegex().Match(lineText);
+					if (bombFound.Success) OnBombPlanted?.Invoke(GetUserFromName(bombFound.Groups[1].Value) ?? new IPCUser(0, "N/A"));
+					break;
+
+				case var _ when lineText.In("cs2_death"):
+					Match deathFound = DeathRegex().Match(lineText);
+					if (deathFound.Success) OnKill?.Invoke((GetUser(deathFound.Groups[1].Value) ?? new IPCUser(0, "N/A"), deathFound.Groups[2].Value));
+					break;
+
+				case var _ when lineText.In("cs2_gun_kill"):
+					Match killFound = KillRegex().Match(lineText);
+					if (killFound.Success) OnKill?.Invoke((GetUser(killFound.Groups[1].Value) ?? new IPCUser(0, "N/A"), killFound.Groups[2].Value));
+					break;
+
 				default:
 					if (_inMatch)
 						_currentMatchSegment.AppendLine(lineText);
@@ -321,7 +416,62 @@ namespace StrikeLink.IPC
 			}
 		}
 
+		private IPCUser? GetUserFromId(long id) { _ipcUsers.TryGetValue(id, out IPCUser? user); return user; }
+		private IPCUser? GetUserFromId(string id) => long.TryParse(id, out long result) ? GetUserFromId(result) : null;
+		private IPCUser? GetUserFromName(string name) => _ipcUsers.Values.FirstOrDefault(user => user.Username.Contains(name, StringComparison.InvariantCulture));
+		private IPCUser? GetUser(object input)
+		{
+			return input switch
+			{
+				long id => GetUserFromId(id),
+				int id => GetUserFromId(id),
+				string value => GetUserFromString(value),
+				_ => throw new InvalidOperationException(
+					$"Unknown input type: {input.GetType()}")
+			};
+		}
+
+		private IPCUser? GetUserFromString(string value)
+		{
+			if (!value.Contains("U:1:", StringComparison.InvariantCulture))
+				return GetUserFromId(value) ?? GetUserFromName(value);
+
+			string steamId = value
+				.Replace("[", "", StringComparison.InvariantCulture)
+				.Replace("]", "", StringComparison.InvariantCulture)
+				.Replace("U:1:", "", StringComparison.InvariantCulture);
+
+			return GetUserFromId(steamId);
+
+		}
+
+
 		[GeneratedRegex("FilterText\\( 730, 3, \\[U:1:(?<steamId>\\d+)\\], \"(?<playerName>[^\"]+)\", \\d+, \\)", RegexOptions.Compiled)]
-		private partial Regex FilterTextRegex();
+		private partial Regex FilterPlayerRegex();
+
+		[GeneratedRegex("FilterText\\( 730, 3, \\[U:1:(?<steamId>\\d+)\\], \"(?<chatMessage>[^\"]+)\", \\d+, \\)", RegexOptions.Compiled)]
+		private partial Regex FilterChatRegex();
+
+		[GeneratedRegex("\"(?<teamScore>\\d{1,3}) : (?<enemyScore>\\d{1,3})\"", RegexOptions.Compiled)]
+		private partial Regex ScoreRegex();
+
+		[GeneratedRegex("\"Round (\\d{1,3})\"", RegexOptions.Compiled)]
+		private partial Regex RoundRegex();
+
+		[GeneratedRegex("\\d, \"(?<statName>.+)\", (?<statValue>.+), \\)", RegexOptions.Compiled)]
+		private partial Regex StatRegex();
+
+		[GeneratedRegex("\"(?<kills>\\d+)\\/(?<deaths>\\d+)\\/(?<assists>\\d+)\"", RegexOptions.Compiled)]
+		private partial Regex KDARegex();
+
+		[GeneratedRegex(", \"(.+) planted the bomb\", ", RegexOptions.Compiled)]
+		private partial Regex BombPlantedRegex();
+
+		[GeneratedRegex("killed by (.+)\", \"with the (.+)\", \"cs2_death\"", RegexOptions.Compiled)]
+		private partial Regex DeathRegex();
+
+		[GeneratedRegex("killed (.+)\", \"with the (.+)\", \"cs2_gun_kill\"", RegexOptions.Compiled)]
+		private partial Regex KillRegex();
 	}
+
 }
