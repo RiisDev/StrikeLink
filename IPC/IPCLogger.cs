@@ -15,16 +15,48 @@ namespace StrikeLink.IPC
 	/// <param name="Username">Display name of the user.</param>
 	public record IPCUser(int SteamId3, string Username);
 
+	/// <summary>
+	/// Represents a chat message received during a CS2 match.
+	/// </summary>
+	/// <param name="User">The player who sent the message.</param>
+	/// <param name="Message">The text content of the message.</param>
 	public record IPCChatMessage(IPCUser User, string Message);
 
+	/// <summary>
+	/// Represents a single career stat key–value pair read from the Steam client.
+	/// </summary>
+	/// <param name="Stat">The name of the stat (for example, <c>total_kills</c>).</param>
+	/// <param name="Value">The raw string value of the stat.</param>
 	public record IPCStat(string Stat, string Value);
 
-	public record IPCKDA(int Kills, int Deaths, int Assists);
+	/// <summary>
+	/// Represents a kill/death/assist score snapshot.
+	/// </summary>
+	/// <param name="Kills">Number of kills.</param>
+	/// <param name="Deaths">Number of deaths.</param>
+	/// <param name="Assists">Number of assists.</param>
+	public record IPCKda(int Kills, int Deaths, int Assists);
 
+	/// <summary>
+	/// Represents a death event, identifying the killer and the weapon used.
+	/// </summary>
+	/// <param name="Killer">The player who caused the death.</param>
+	/// <param name="Weapon">The weapon used to kill the local player.</param>
 	public record IPCDeath(IPCUser Killer, string Weapon);
 
+	/// <summary>
+	/// Represents a kill made by the local player, identifying the victim and the weapon used.
+	/// </summary>
+	/// <param name="Victim">The player who was killed.</param>
+	/// <param name="Weapon">The weapon used to secure the kill.</param>
 	public record IPCKill(IPCUser Victim, string Weapon);
 
+	/// <summary>
+	/// Represents a Steam timeline event emitted by CS2 (for example, <c>cs2_gun_kill</c> or <c>cs2_death</c>).
+	/// </summary>
+	/// <param name="Text">The primary label of the timeline event.</param>
+	/// <param name="SubText">Additional detail text attached to the event.</param>
+	/// <param name="Type">The event type identifier (for example, <c>cs2_gun_kill</c>).</param>
 	public record IPCTimelineEvent(string Text, string SubText, string Type);
 
 	/// <summary>
@@ -51,24 +83,54 @@ namespace StrikeLink.IPC
 		/// </summary>
 		public event Action<string>? OnLogReceived;
 		
+		/// <summary>
+		/// Occurs when the round score changes. The tuple contains <c>(teamScore, enemyScore)</c>.
+		/// </summary>
 		public event Action<(int, int)>? OnScoreChanged;
 
+		/// <summary>
+		/// Occurs when a new round begins. The argument is the round number.
+		/// </summary>
 		public event Action<int>? OnRoundStart;
 
+		/// <summary>
+		/// Occurs when a round ends. The argument is the round number.
+		/// </summary>
 		public event Action<int>? OnRoundEnd;
 
+		/// <summary>
+		/// Occurs when a chat message is received from any player in the match.
+		/// </summary>
 		public event Action<IPCChatMessage>? OnChatMessage;
 
+		/// <summary>
+		/// Occurs when a career stat is read or updated in the Steam client.
+		/// </summary>
 		public event Action<IPCStat>? OnStatChanged;
 
-		public event Action<IPCKDA>? OnKDAChanged;
+		/// <summary>
+		/// Occurs when the local player's kill/death/assist counters change.
+		/// </summary>
+		public event Action<IPCKda>? OnKdaChanged;
 
+		/// <summary>
+		/// Occurs when a player is detected in the current match via Steam's <c>FilterText</c> IPC call.
+		/// </summary>
 		public event Action<IPCUser>? OnPlayerDetected;
 
+		/// <summary>
+		/// Occurs when a player plants the bomb.
+		/// </summary>
 		public event Action<IPCUser>? OnBombPlanted;
 
+		/// <summary>
+		/// Occurs when the local player kills another player. The tuple contains <c>(victim, weapon)</c>.
+		/// </summary>
 		public event Action<(IPCUser, string)>? OnKill;
 
+		/// <summary>
+		/// Occurs when the local player is killed. The tuple contains <c>(killer, weapon)</c>.
+		/// </summary>
 		public event Action<(IPCUser, string)>? OnDeath;
 
 		/// <summary>
@@ -85,6 +147,7 @@ namespace StrikeLink.IPC
 		private readonly StringBuilder _currentMatchSegment = new();
 
 		private int _lastLineIndex;
+		private int _currentRound;
 
 		private string? _lastLineText;
 		private string _currentLogText = "";
@@ -328,7 +391,6 @@ namespace StrikeLink.IPC
 			_inMatch = true;
 		}
 
-		private int currentRound = 0;
 		private void ParseLineData(string lineText)
 		{
 			if (_firstRun) return;
@@ -342,7 +404,7 @@ namespace StrikeLink.IPC
 					_inMatch = true;
 					_currentMatchSegment.AppendLine(lineText);
 					break;
-				case var _ when lineText.In("IClientTimeline::SetTimelineGameMode( 4, )"):
+				case var _ when lineText.In("IClientTimeline::SetTimelineGameMode( 3, )"):
 					_currentMatchSegment.AppendLine(lineText);
 					if (!_currentMatchSegment.ToString().IsNullOrEmpty())
 						_matchSegments.Add(_currentMatchSegment.ToString());
@@ -364,7 +426,7 @@ namespace StrikeLink.IPC
 				case var _ when lineText.In("IClientTimeline::SetGamePhaseAttribute( \"Score\""):
 					Match scoreFound = ScoreRegex().Match(lineText);
 					if (scoreFound.Success) { 
-						OnRoundEnd?.Invoke(currentRound);
+						OnRoundEnd?.Invoke(_currentRound);
 						OnScoreChanged?.Invoke((scoreFound.Groups["teamScore"].Value.ToInt(), scoreFound.Groups["enemyScore"].Value.ToInt()));
 					}
 					
@@ -374,7 +436,7 @@ namespace StrikeLink.IPC
 					Match roundFound = RoundRegex().Match(lineText);
 					if (roundFound.Success)
 					{
-						currentRound = roundFound.Groups[1].Value.ToInt();
+						_currentRound = roundFound.Groups[1].Value.ToInt();
 						OnRoundStart?.Invoke(roundFound.Groups[1].Value.ToInt());
 					}
 					break;
@@ -390,8 +452,8 @@ namespace StrikeLink.IPC
 					break;
 
 				case var _ when lineText.In("IClientTimeline::SetGamePhaseAttribute( \"K/D/A\""):
-					Match kdaFound = KDARegex().Match(lineText);
-					if (kdaFound.Success) OnKDAChanged?.Invoke(new IPCKDA(kdaFound.Groups["kills"].Value.ToInt(), kdaFound.Groups["deaths"].Value.ToInt(), kdaFound.Groups["assists"].Value.ToInt()));
+					Match kdaFound = KdaRegex().Match(lineText);
+					if (kdaFound.Success) OnKdaChanged?.Invoke(new IPCKda(kdaFound.Groups["kills"].Value.ToInt(), kdaFound.Groups["deaths"].Value.ToInt(), kdaFound.Groups["assists"].Value.ToInt()));
 					break;
 
 				case var _ when lineText.In("cs2_bomb_plant"):
@@ -401,7 +463,7 @@ namespace StrikeLink.IPC
 
 				case var _ when lineText.In("cs2_death"):
 					Match deathFound = DeathRegex().Match(lineText);
-					if (deathFound.Success) OnKill?.Invoke((GetUser(deathFound.Groups[1].Value) ?? new IPCUser(0, "N/A"), deathFound.Groups[2].Value));
+					if (deathFound.Success) OnDeath?.Invoke((GetUser(deathFound.Groups[1].Value) ?? new IPCUser(0, "N/A"), deathFound.Groups[2].Value));
 					break;
 
 				case var _ when lineText.In("cs2_gun_kill"):
@@ -462,7 +524,7 @@ namespace StrikeLink.IPC
 		private partial Regex StatRegex();
 
 		[GeneratedRegex("\"(?<kills>\\d+)\\/(?<deaths>\\d+)\\/(?<assists>\\d+)\"", RegexOptions.Compiled)]
-		private partial Regex KDARegex();
+		private partial Regex KdaRegex();
 
 		[GeneratedRegex(", \"(.+) planted the bomb\", ", RegexOptions.Compiled)]
 		private partial Regex BombPlantedRegex();

@@ -82,7 +82,7 @@
 		<Description>StrikeLInk is a modern .NET library for Counter-Strike 2 and Valve ecosystem integration.
 It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
 		<PackageIcon>icon.png</PackageIcon>
-		<Version>1.2.0</Version>
+		<Version>1.3.0</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
