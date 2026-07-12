@@ -5,18 +5,18 @@ Namespace: StrikeLink.DemoParser
 Represents a downloaded CS2 replay payload.
 
 ```csharp
-public sealed class DemoDownloadResult : System.IEquatable`1[[StrikeLink.DemoParser.DemoDownloadResult, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class DemoDownloadResult : System.IAsyncDisposable, System.IDisposable, System.IEquatable`1[[StrikeLink.DemoParser.DemoDownloadResult, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoDownloadResult](./strikelink/demoparser/demodownloadresult.md)<br>
-Implements [IEquatable&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
+Implements [IAsyncDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable), [IDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable), [IEquatable&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
 Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 ## Properties
 
 ### **Stream**
 
-Readable stream positioned at the beginning of the downloaded content.
+Readable stream positioned at the beginning of the decompressed .dem content.
 
 ```csharp
 public Stream Stream { get; set; }
@@ -28,7 +28,7 @@ public Stream Stream { get; set; }
 
 ### **FileName**
 
-Suggested filename for persistence.
+Suggested filename for persistence (always .dem, never .dem.bz2).
 
 ```csharp
 public string FileName { get; set; }
@@ -50,43 +50,61 @@ public string TempFilePath { get; set; }
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-### **IsCompressedBzip2**
-
-True when the payload is a .dem.bz2 archive.
-
-```csharp
-public bool IsCompressedBzip2 { get; set; }
-```
-
-#### Property Value
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
 ## Constructors
 
-### **DemoDownloadResult(Stream, String, String, Boolean)**
+### **DemoDownloadResult(Stream, String, String)**
 
 Represents a downloaded CS2 replay payload.
 
 ```csharp
-public DemoDownloadResult(Stream Stream, string FileName, string TempFilePath, bool IsCompressedBzip2)
+public DemoDownloadResult(Stream Stream, string FileName, string TempFilePath)
 ```
 
 #### Parameters
 
 `Stream` [Stream](https://docs.microsoft.com/en-us/dotnet/api/system.io.stream)<br>
-Readable stream positioned at the beginning of the downloaded content.
+Readable stream positioned at the beginning of the decompressed .dem content.
 
 `FileName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-Suggested filename for persistence.
+Suggested filename for persistence (always .dem, never .dem.bz2).
 
 `TempFilePath` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 Local temp path when persisted to disk; otherwise null.
 
-`IsCompressedBzip2` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-True when the payload is a .dem.bz2 archive.
-
 ## Methods
+
+### **Dispose()**
+
+Releases all resources used by the current instance, including the underlying stream and any associated temporary
+ files.
+
+```csharp
+public void Dispose()
+```
+
+**Remarks:**
+
+Call this method when you are finished using the object to free unmanaged resources and delete
+ any temporary files that may have been created. After calling this method, the object should not be
+ used.
+
+### **DisposeAsync()**
+
+Asynchronously releases the unmanaged resources used by the object and deletes any associated temporary files.
+
+```csharp
+public ValueTask DisposeAsync()
+```
+
+#### Returns
+
+[ValueTask](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask)<br>
+A ValueTask that represents the asynchronous dispose operation.
+
+**Remarks:**
+
+Call this method to clean up resources when the object is no longer needed. After calling
+ DisposeAsync, the object should not be used.
 
 ### **ToString()**
 
@@ -146,10 +164,10 @@ public DemoDownloadResult <Clone>$()
 
 [DemoDownloadResult](./strikelink/demoparser/demodownloadresult.md)<br>
 
-### **Deconstruct(Stream&, String&, String&, Boolean&)**
+### **Deconstruct(Stream&, String&, String&)**
 
 ```csharp
-public void Deconstruct(Stream& Stream, String& FileName, String& TempFilePath, Boolean& IsCompressedBzip2)
+public void Deconstruct(Stream& Stream, String& FileName, String& TempFilePath)
 ```
 
 #### Parameters
@@ -159,5 +177,3 @@ public void Deconstruct(Stream& Stream, String& FileName, String& TempFilePath, 
 `FileName` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
 
 `TempFilePath` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`IsCompressedBzip2` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>

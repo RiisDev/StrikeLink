@@ -5,11 +5,11 @@ Namespace: StrikeLink.ChatBot
 Provides high-level chat orchestration and message delivery services.
 
 ```csharp
-public class ChatService : System.IDisposable
+public class ChatService : System.IAsyncDisposable
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ChatService](./strikelink/chatbot/chatservice.md)<br>
-Implements [IDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.idisposable)<br>
+Implements [IAsyncDisposable](https://docs.microsoft.com/en-us/dotnet/api/system.iasyncdisposable)<br>
 Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
@@ -19,23 +19,26 @@ This service manages the lifecycle of chat interactions and delegates
 
 ## Constructors
 
-### **ChatService(Config)**
+### **ChatService(ConsoleServiceConfig, ConsoleService)**
 
 Initializes a new instance of the [ChatService](./strikelink/chatbot/chatservice.md) class.
 
 ```csharp
-public ChatService(Config config)
+public ChatService(ConsoleServiceConfig consoleServiceConfig, ConsoleService console)
 ```
 
 #### Parameters
 
-`config` [Config](./strikelink/chatbot/config.md)<br>
-The configuration object containing chat service settings and dependencies, [Config](./strikelink/chatbot/config.md)
+`consoleServiceConfig` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)<br>
+The configuration object containing chat service settings and dependencies, [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)
+
+`console` [ConsoleService](./strikelink/services/consoleservice.md)<br>
+A premade instance of the console service
 
 #### Exceptions
 
 [ArgumentNullException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentnullexception)<br>
-Thrown when `config` is `null`.
+Thrown when `consoleServiceConfig` is `null`.
 
 ## Methods
 
@@ -62,30 +65,17 @@ A task that represents the asynchronous send operation.
 [ArgumentNullException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentnullexception)<br>
 Thrown when `message` is `null`.
 
-### **Dispose()**
-
-Releases all resources used by the [ChatService](./strikelink/chatbot/chatservice.md).
-
-```csharp
-public void Dispose()
-```
-
-**Remarks:**
-
-This method suppresses finalization and disposes managed resources.
-
-### **Dispose(Boolean)**
+### **DisposeAsync()**
 
 Releases the unmanaged resources used by the object and optionally releases the managed resources.
 
 ```csharp
-protected void Dispose(bool disposing)
+public ValueTask DisposeAsync()
 ```
 
-#### Parameters
+#### Returns
 
-`disposing` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-true to release both managed and unmanaged resources; false to release only unmanaged resources.
+[ValueTask](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask)<br>
 
 **Remarks:**
 

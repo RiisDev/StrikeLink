@@ -6,7 +6,7 @@ Represents summary statistics and metadata for a completed match, including scor
  identifying information.
 
 ```csharp
-public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
@@ -31,24 +31,24 @@ public TimeSpan Duration { get; set; }
 
 [TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/system.timespan)<br>
 
-### **TerroristScore**
+### **TeamAScore**
 
-The final score achieved by the Terrorist team.
+The final score achieved by Team A.
 
 ```csharp
-public int TerroristScore { get; set; }
+public int TeamAScore { get; set; }
 ```
 
 #### Property Value
 
 [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
-### **CounterTerroristScore**
+### **TeamBScore**
 
-The final score achieved by the Counter-Terrorist team.
+The final score achieved by Team B.
 
 ```csharp
-public int CounterTerroristScore { get; set; }
+public int TeamBScore { get; set; }
 ```
 
 #### Property Value
@@ -78,30 +78,6 @@ public string ServerLocation { get; set; }
 #### Property Value
 
 [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **ServerAddress**
-
-The network address of the server, or null if not available.
-
-```csharp
-public string ServerAddress { get; set; }
-```
-
-#### Property Value
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **ServerPort**
-
-The port number used by the server, or null if not available.
-
-```csharp
-public Nullable<int> ServerPort { get; set; }
-```
-
-#### Property Value
-
-[Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **GameType**
 
@@ -211,15 +187,27 @@ public Nullable<ulong> FocusSteamId { get; set; }
 
 [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
+### **ChatMessages**
+
+Ordered list of chat messages sent in-game.
+
+```csharp
+public IReadOnlyList<DemoChatMessage> ChatMessages { get; set; }
+```
+
+#### Property Value
+
+[IReadOnlyList&lt;DemoChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1)<br>
+
 ## Constructors
 
-### **MatchStats(TimeSpan, Int32, Int32, MatchOutcome, String, String, Nullable&lt;Int32&gt;, String, Nullable&lt;Int32&gt;, Nullable&lt;DateTimeOffset&gt;, String, String, String, String, Nullable&lt;Int32&gt;, Nullable&lt;UInt64&gt;)**
+### **MatchStats(TimeSpan, Int32, Int32, MatchOutcome, String, String, Nullable&lt;Int32&gt;, Nullable&lt;DateTimeOffset&gt;, String, String, String, String, Nullable&lt;Int32&gt;, Nullable&lt;UInt64&gt;, IReadOnlyList&lt;DemoChatMessage&gt;)**
 
 Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
  identifying information.
 
 ```csharp
-public MatchStats(TimeSpan Duration, int TerroristScore, int CounterTerroristScore, MatchOutcome Outcome, string ServerLocation, string ServerAddress, Nullable<int> ServerPort, string GameType, Nullable<int> MaxPlayers, Nullable<DateTimeOffset> Date, string Map, string MatchShareCode, string ServerName, string DemoClientName, Nullable<int> NetworkProtocol, Nullable<ulong> FocusSteamId)
+public MatchStats(TimeSpan Duration, int TeamAScore, int TeamBScore, MatchOutcome Outcome, string ServerLocation, string GameType, Nullable<int> MaxPlayers, Nullable<DateTimeOffset> Date, string Map, string MatchShareCode, string ServerName, string DemoClientName, Nullable<int> NetworkProtocol, Nullable<ulong> FocusSteamId, IReadOnlyList<DemoChatMessage> ChatMessages)
 ```
 
 #### Parameters
@@ -227,23 +215,17 @@ public MatchStats(TimeSpan Duration, int TerroristScore, int CounterTerroristSco
 `Duration` [TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/system.timespan)<br>
 The total duration of the match.
 
-`TerroristScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-The final score achieved by the Terrorist team.
+`TeamAScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The final score achieved by Team A.
 
-`CounterTerroristScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-The final score achieved by the Counter-Terrorist team.
+`TeamBScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+The final score achieved by Team B.
 
 `Outcome` [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)<br>
 The outcome of the match, indicating which team won or if the match was drawn.
 
 `ServerLocation` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The geographic location of the server where the match was played, or null if not available.
-
-`ServerAddress` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The network address of the server, or null if not available.
-
-`ServerPort` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
-The port number used by the server, or null if not available.
 
 `GameType` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 The type or mode of the game played, or null if not specified.
@@ -271,6 +253,9 @@ The network protocol version used by the server, or null if not specified.
 
 `FocusSteamId` [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The Steam ID of the player in focus for this match, or null if not specified.
+
+`ChatMessages` [IReadOnlyList&lt;DemoChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1)<br>
+Ordered list of chat messages sent in-game.
 
 **Remarks:**
 
@@ -336,27 +321,23 @@ public MatchStats <Clone>$()
 
 [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
 
-### **Deconstruct(TimeSpan&, Int32&, Int32&, MatchOutcome&, String&, String&, Nullable`1&, String&, Nullable`1&, Nullable`1&, String&, String&, String&, String&, Nullable`1&, Nullable`1&)**
+### **Deconstruct(TimeSpan&, Int32&, Int32&, MatchOutcome&, String&, String&, Nullable`1&, Nullable`1&, String&, String&, String&, String&, Nullable`1&, Nullable`1&, IReadOnlyList`1&)**
 
 ```csharp
-public void Deconstruct(TimeSpan& Duration, Int32& TerroristScore, Int32& CounterTerroristScore, MatchOutcome& Outcome, String& ServerLocation, String& ServerAddress, Nullable`1& ServerPort, String& GameType, Nullable`1& MaxPlayers, Nullable`1& Date, String& Map, String& MatchShareCode, String& ServerName, String& DemoClientName, Nullable`1& NetworkProtocol, Nullable`1& FocusSteamId)
+public void Deconstruct(TimeSpan& Duration, Int32& TeamAScore, Int32& TeamBScore, MatchOutcome& Outcome, String& ServerLocation, String& GameType, Nullable`1& MaxPlayers, Nullable`1& Date, String& Map, String& MatchShareCode, String& ServerName, String& DemoClientName, Nullable`1& NetworkProtocol, Nullable`1& FocusSteamId, IReadOnlyList`1& ChatMessages)
 ```
 
 #### Parameters
 
 `Duration` [TimeSpan&](https://docs.microsoft.com/en-us/dotnet/api/system.timespan&)<br>
 
-`TerroristScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
+`TeamAScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
 
-`CounterTerroristScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
+`TeamBScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
 
 `Outcome` [MatchOutcome&](./strikelink/demoparser/parsing/matchoutcome&.md)<br>
 
 `ServerLocation` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`ServerAddress` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`ServerPort` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
 
 `GameType` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
 
@@ -375,3 +356,5 @@ public void Deconstruct(TimeSpan& Duration, Int32& TerroristScore, Int32& Counte
 `NetworkProtocol` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
 
 `FocusSteamId` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
+
+`ChatMessages` [IReadOnlyList`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1&)<br>

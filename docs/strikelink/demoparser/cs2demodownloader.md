@@ -3,6 +3,7 @@
 Namespace: StrikeLink.DemoParser
 
 Downloads CS2 demo files directly from replay servers using a match share code.
+ Bzip2-compressed payloads are transparently decompressed before being returned.
 
 ```csharp
 public sealed class Cs2DemoDownloader
@@ -10,11 +11,6 @@ public sealed class Cs2DemoDownloader
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Cs2DemoDownloader](./strikelink/demoparser/cs2demodownloader.md)<br>
 Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
-
-**Remarks:**
-
-This class does not use SteamKit or any external package. It uses the replay URL shape:
- https://replay{tvPort}.valve.net/730/{matchId}_{reservationId}.dem.bz2
 
 ## Constructors
 
@@ -44,7 +40,7 @@ public static Task<Uri> BuildReplayUri(string shareCode)
 
 ### **DownloadToMemoryAsync(String, CancellationToken)**
 
-Downloads the replay into memory and returns a readable stream.
+Downloads the replay into memory, decompressing bzip2 if necessary, and returns a readable stream.
 
 ```csharp
 public static Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, CancellationToken cancellationToken)
@@ -60,26 +56,21 @@ public static Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, C
 
 [Task&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 
-### **DownloadToTempFileAsync(String, Boolean, CancellationToken)**
+### **DownloadToTempFileAsync(String, CancellationToken)**
 
-Downloads the replay into a temp file and returns a file stream.
+Downloads the replay to a temp file, decompressing bzip2 if necessary, and returns a file stream.
+ The [DemoDownloadResult](./strikelink/demoparser/demodownloadresult.md) owns the temp file; dispose it to clean up.
 
 ```csharp
-public static Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, bool deleteFileOnClose, CancellationToken cancellationToken)
+public static Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, CancellationToken cancellationToken)
 ```
 
 #### Parameters
 
 `shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-`deleteFileOnClose` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
 `cancellationToken` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 
 #### Returns
 
 [Task&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
-
-**Remarks:**
-
-Set `deleteFileOnClose` to true when you only need ephemeral storage.

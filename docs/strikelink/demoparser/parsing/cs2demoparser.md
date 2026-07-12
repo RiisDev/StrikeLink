@@ -21,23 +21,6 @@ The parser supports only CS2 Source 2 demo files with the ".dem" extension. It p
  limitations. The parser is designed for single-use per file and is not thread-safe. Dispose the instance after use
  to release file resources.
 
-## Fields
-
-### **EventData**
-
-Provides a mapping of event names to their associated data collections.
-
-```csharp
-public static Dictionary<string, Dictionary<string, object>> EventData;
-```
-
-**Remarks:**
-
-Each key in the outer dictionary represents an event name. The corresponding value is a
- dictionary that maps string keys to dynamic values, allowing storage of arbitrary event-related data. This
- collection is static and read-only; its contents should be initialized at application startup and not modified at
- runtime.
-
 ## Constructors
 
 ### **Cs2DemoParser(FileInfo, DemoAuthorization)**
@@ -61,6 +44,33 @@ The authorization data used to access or decrypt the demo file. May be null if n
 
 [FormatException](https://docs.microsoft.com/en-us/dotnet/api/system.formatexception)<br>
 Thrown if demoFile does not have a ".dem" file extension.
+
+### **Cs2DemoParser(Stream, DemoAuthorization)**
+
+Initializes a new instance of the Cs2DemoParser class for reading and parsing a demo stream using the specified
+ authorization data. Supports [MemoryStream](https://docs.microsoft.com/en-us/dotnet/api/system.io.memorystream), [FileStream](https://docs.microsoft.com/en-us/dotnet/api/system.io.filestream), [BinaryReader](https://docs.microsoft.com/en-us/dotnet/api/system.io.binaryreader) 
+ underlying streams, or any live/network stream source.
+
+```csharp
+public Cs2DemoParser(Stream demoStream, DemoAuthorization authData)
+```
+
+#### Parameters
+
+`demoStream` [Stream](https://docs.microsoft.com/en-us/dotnet/api/system.io.stream)<br>
+A readable stream containing demo data. Must be non-null and readable.
+ For network/live streams, the stream does not need to be seekable.
+
+`authData` [DemoAuthorization](./strikelink/demoparser/demoauthorization.md)<br>
+The authorization data used to access or decrypt the demo. May be null if no authorization is required.
+
+#### Exceptions
+
+[ArgumentNullException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentnullexception)<br>
+Thrown if `demoStream` is null.
+
+[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+Thrown if `demoStream` is not readable.
 
 ## Methods
 

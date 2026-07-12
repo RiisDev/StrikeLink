@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
 
 ```csharp
-public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.2.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)<br>
@@ -71,15 +71,15 @@ public bool IsBot { get; set; }
 
 ### **Team**
 
-The team side the player was assigned to during the match.
+The persistent lineup identity of the player in the match.
 
 ```csharp
-public CsTeamSide Team { get; set; }
+public MatchTeam Team { get; set; }
 ```
 
 #### Property Value
 
-[CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)<br>
+[MatchTeam](./strikelink/demoparser/parsing/matchteam.md)<br>
 
 ### **RoundsWon**
 
@@ -371,12 +371,12 @@ public int BombDefuses { get; set; }
 
 ## Constructors
 
-### **PlayerStats(UInt64, String, Int32, Boolean, CsTeamSide, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, RankSnapshot, Double, MultiKillSummary, Double, Double, TradingStats, ClutchStats, Double, Double, Double, UtilityStats, TeamDamageStats, IReadOnlyList&lt;WeaponStats&gt;, PlayerImpactStats, Int32, Int32)**
+### **PlayerStats(UInt64, String, Int32, Boolean, MatchTeam, Int32, Int32, Int32, Int32, Int32, Int32, Int32, Int32, RankSnapshot, Double, MultiKillSummary, Double, Double, TradingStats, ClutchStats, Double, Double, Double, UtilityStats, TeamDamageStats, IReadOnlyList&lt;WeaponStats&gt;, PlayerImpactStats, Int32, Int32)**
 
 Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
 
 ```csharp
-public PlayerStats(ulong SteamId, string Name, int UserId, bool IsBot, CsTeamSide Team, int RoundsWon, int RoundsLost, int RoundsParticipated, int Kills, int Deaths, int Assists, int UtilityDamage, int MvpCount, RankSnapshot Rank, double Adr, MultiKillSummary MultiKills, double AimRating, double UtilityRating, TradingStats Trading, ClutchStats Clutches, double HeadshotPercentage, double TotalAccuracy, double SprayAccuracy, UtilityStats Utility, TeamDamageStats TeamDamage, IReadOnlyList<WeaponStats> Weapons, PlayerImpactStats Impact, int BombPlants, int BombDefuses)
+public PlayerStats(ulong SteamId, string Name, int UserId, bool IsBot, MatchTeam Team, int RoundsWon, int RoundsLost, int RoundsParticipated, int Kills, int Deaths, int Assists, int UtilityDamage, int MvpCount, RankSnapshot Rank, double Adr, MultiKillSummary MultiKills, double AimRating, double UtilityRating, TradingStats Trading, ClutchStats Clutches, double HeadshotPercentage, double TotalAccuracy, double SprayAccuracy, UtilityStats Utility, TeamDamageStats TeamDamage, IReadOnlyList<WeaponStats> Weapons, PlayerImpactStats Impact, int BombPlants, int BombDefuses)
 ```
 
 #### Parameters
@@ -394,8 +394,8 @@ The in-game user ID assigned to the player during the match.
 Indicates whether the player is a bot. Set to  if the player is an AI-controlled bot;
  otherwise, .
 
-`Team` [CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)<br>
-The team side the player was assigned to during the match.
+`Team` [MatchTeam](./strikelink/demoparser/parsing/matchteam.md)<br>
+The persistent lineup identity of the player in the match.
 
 `RoundsWon` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The number of rounds won by the player's team while the player participated.
@@ -535,10 +535,10 @@ public PlayerStats <Clone>$()
 
 [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)<br>
 
-### **Deconstruct(UInt64&, String&, Int32&, Boolean&, CsTeamSide&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, RankSnapshot&, Double&, MultiKillSummary&, Double&, Double&, TradingStats&, ClutchStats&, Double&, Double&, Double&, UtilityStats&, TeamDamageStats&, IReadOnlyList`1&, PlayerImpactStats&, Int32&, Int32&)**
+### **Deconstruct(UInt64&, String&, Int32&, Boolean&, MatchTeam&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, Int32&, RankSnapshot&, Double&, MultiKillSummary&, Double&, Double&, TradingStats&, ClutchStats&, Double&, Double&, Double&, UtilityStats&, TeamDamageStats&, IReadOnlyList`1&, PlayerImpactStats&, Int32&, Int32&)**
 
 ```csharp
-public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& IsBot, CsTeamSide& Team, Int32& RoundsWon, Int32& RoundsLost, Int32& RoundsParticipated, Int32& Kills, Int32& Deaths, Int32& Assists, Int32& UtilityDamage, Int32& MvpCount, RankSnapshot& Rank, Double& Adr, MultiKillSummary& MultiKills, Double& AimRating, Double& UtilityRating, TradingStats& Trading, ClutchStats& Clutches, Double& HeadshotPercentage, Double& TotalAccuracy, Double& SprayAccuracy, UtilityStats& Utility, TeamDamageStats& TeamDamage, IReadOnlyList`1& Weapons, PlayerImpactStats& Impact, Int32& BombPlants, Int32& BombDefuses)
+public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& IsBot, MatchTeam& Team, Int32& RoundsWon, Int32& RoundsLost, Int32& RoundsParticipated, Int32& Kills, Int32& Deaths, Int32& Assists, Int32& UtilityDamage, Int32& MvpCount, RankSnapshot& Rank, Double& Adr, MultiKillSummary& MultiKills, Double& AimRating, Double& UtilityRating, TradingStats& Trading, ClutchStats& Clutches, Double& HeadshotPercentage, Double& TotalAccuracy, Double& SprayAccuracy, UtilityStats& Utility, TeamDamageStats& TeamDamage, IReadOnlyList`1& Weapons, PlayerImpactStats& Impact, Int32& BombPlants, Int32& BombDefuses)
 ```
 
 #### Parameters
@@ -551,7 +551,7 @@ public void Deconstruct(UInt64& SteamId, String& Name, Int32& UserId, Boolean& I
 
 `IsBot` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
 
-`Team` [CsTeamSide&](./strikelink/demoparser/parsing/csteamside&.md)<br>
+`Team` [MatchTeam&](./strikelink/demoparser/parsing/matchteam&.md)<br>
 
 `RoundsWon` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
 

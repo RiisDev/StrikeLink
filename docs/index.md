@@ -8,9 +8,19 @@
 
 [ChatService](./strikelink/chatbot/chatservice.md)
 
-[Config](./strikelink/chatbot/config.md)
+[ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)
 
 [NewChatMessage](./strikelink/chatbot/newchatmessage.md)
+
+## StrikeLink.Crosshair
+
+[CrosshairColor](./strikelink/crosshair/crosshaircolor.md)
+
+[CrosshairService](./strikelink/crosshair/crosshairservice.md)
+
+[CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)
+
+[CrosshairShareCode](./strikelink/crosshair/crosshairsharecode.md)
 
 ## StrikeLink.DemoParser
 
@@ -26,6 +36,8 @@
 
 ## StrikeLink.DemoParser.Parsing
 
+[ChatType](./strikelink/demoparser/parsing/chattype.md)
+
 [ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)
 
 [Cs2DemoParser](./strikelink/demoparser/parsing/cs2demoparser.md)
@@ -36,9 +48,13 @@
 
 [CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
 
+[DemoChatMessage](./strikelink/demoparser/parsing/demochatmessage.md)
+
 [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)
 
 [MatchStats](./strikelink/demoparser/parsing/matchstats.md)
+
+[MatchTeam](./strikelink/demoparser/parsing/matchteam.md)
 
 [MultiKillSummary](./strikelink/demoparser/parsing/multikillsummary.md)
 
@@ -69,6 +85,10 @@
 ## StrikeLink.Extensions
 
 [NativeMethods](./strikelink/extensions/nativemethods.md)
+
+## StrikeLink.Extensions.BZip2
+
+[IChecksum](./strikelink/extensions/bzip2/ichecksum.md)
 
 ## StrikeLink.GSI
 
@@ -110,9 +130,39 @@
 
 [WinState](./strikelink/gsi/objectstates/winstate.md)
 
+## StrikeLink.IPC
+
+[IPCChatMessage](./strikelink/ipc/ipcchatmessage.md)
+
+[IPCConfig](./strikelink/ipc/ipcconfig.md)
+
+[IPCDeath](./strikelink/ipc/ipcdeath.md)
+
+[IPCKda](./strikelink/ipc/ipckda.md)
+
+[IPCKill](./strikelink/ipc/ipckill.md)
+
+[IPCLogger](./strikelink/ipc/ipclogger.md)
+
+[IPCStat](./strikelink/ipc/ipcstat.md)
+
+[IPCTimelineEvent](./strikelink/ipc/ipctimelineevent.md)
+
+[IPCUser](./strikelink/ipc/ipcuser.md)
+
 ## StrikeLink.Services
 
 [ConsoleService](./strikelink/services/consoleservice.md)
+
+[Cs2StatusMessage](./strikelink/services/cs2statusmessage.md)
+
+[PlayerEntry](./strikelink/services/playerentry.md)
+
+[ServerInfo](./strikelink/services/serverinfo.md)
+
+[SpawnGroup](./strikelink/services/spawngroup.md)
+
+[SteamIdConverter](./strikelink/services/steamidconverter.md)
 
 [SteamService](./strikelink/services/steamservice.md)
 
@@ -138,14 +188,14 @@
 
 ## StrikeLink.Services.WebService
 
-[CoPlayService](./strikelink/services/webservice/coplayservice.md)
-
-[CoPlaySession](./strikelink/services/webservice/coplaysession.md)
-
 [LoginSecureService](./strikelink/services/webservice/loginsecureservice.md)
 
-[SteamPlayer](./strikelink/services/webservice/steamplayer.md)
-
 ## StrikeLink.Services.WebService.SubServices
+
+[CoPlayService](./strikelink/services/webservice/subservices/coplayservice.md)
+
+[CoPlaySession](./strikelink/services/webservice/subservices/coplaysession.md)
+
+[SteamPlayer](./strikelink/services/webservice/subservices/steamplayer.md)
 
 [TokenService](./strikelink/services/webservice/subservices/tokenservice.md)

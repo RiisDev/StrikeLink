@@ -155,3 +155,27 @@ Thrown when the Steam connection log cannot be found.
 
 [InvalidOperationException](https://docs.microsoft.com/en-us/dotnet/api/system.invalidoperationexception)<br>
 Thrown when no valid Steam ID can be extracted from the log file.
+
+### **GetLocalUsername()**
+
+Gets the local Steam account display name for the current user from the Steam localconfig.vdf.
+
+```csharp
+public static string GetLocalUsername()
+```
+
+#### Returns
+
+[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+The local Steam account display name.
+
+#### Exceptions
+
+[DirectoryNotFoundException](https://docs.microsoft.com/en-us/dotnet/api/system.io.directorynotfoundexception)<br>
+Thrown when the user's Steam config directory (userdata/{userId}/config) cannot be found.
+
+[FileNotFoundException](https://docs.microsoft.com/en-us/dotnet/api/system.io.filenotfoundexception)<br>
+Thrown when the localconfig.vdf file cannot be found in the user's Steam config directory.
+
+[InvalidOperationException](https://docs.microsoft.com/en-us/dotnet/api/system.invalidoperationexception)<br>
+Thrown when the friends configuration or the local user entry within the friends node is missing or malformed.

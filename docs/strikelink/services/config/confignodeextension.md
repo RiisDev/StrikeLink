@@ -15,6 +15,8 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 
 ### **GetPath(ConfigNode, String)**
 
+Gets a nested configuration node using a dot-separated path.
+
 ```csharp
 public static ConfigNode GetPath(ConfigNode node, string path)
 ```
@@ -24,10 +26,23 @@ public static ConfigNode GetPath(ConfigNode node, string path)
 `node` [ConfigNode](./strikelink/services/config/confignode.md)<br>
 
 `path` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+A dot-separated property path (for example, `"Software.Valve.Steam"`).
 
 #### Returns
 
 [ConfigNode](./strikelink/services/config/confignode.md)<br>
+The configuration node located at the specified path.
+
+#### Exceptions
+
+[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+Thrown when `path` is `null`, empty, or whitespace.
+
+[InvalidOperationException](https://docs.microsoft.com/en-us/dotnet/api/system.invalidoperationexception)<br>
+Thrown when an intermediate node is not an object.
+
+[KeyNotFoundException](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.keynotfoundexception)<br>
+Thrown when a path segment does not exist.
 
 ### **TryGetPath(ConfigNode, String, ConfigNode&)**
 
