@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using StrikeLink.GSI.ObjectStates;
+using System.Globalization;
 #pragma warning disable IDE0046
 
 namespace StrikeLink.Services
@@ -72,7 +73,9 @@ namespace StrikeLink.Services
 		public static SteamIdConverter FromSteam3(string steam3)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(steam3);
-			uint accountId = uint.Parse(steam3[4..^1], CultureInfo.InvariantCulture);
+			if (!steam3.Contains("u:1:", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Missing required identifier: U:1:");
+			steam3 = steam3.Trim('[').Trim(']');
+			uint accountId = uint.Parse(steam3[4..], CultureInfo.InvariantCulture);
 			return FromAccountId(accountId);
 		}
 
@@ -87,6 +90,7 @@ namespace StrikeLink.Services
 		public static SteamIdConverter FromSteam2(string steam2)
 		{
 			ArgumentException.ThrowIfNullOrEmpty(steam2);
+			if (!steam2.Contains("steam_1:", StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Missing required identifier: STEAM_1:");
 			string[] parts = steam2.Split(':');
 			uint w = uint.Parse(parts[1], CultureInfo.InvariantCulture);
 			uint z = uint.Parse(parts[2], CultureInfo.InvariantCulture);
@@ -111,10 +115,10 @@ namespace StrikeLink.Services
 			if (ulong.TryParse(input, out ulong steam64) && steam64 > Steam64Base)
 				return FromSteam64(steam64).Steam2;
 
-			if (input.StartsWith("[U:1:", StringComparison.Ordinal) && input.EndsWith(']'))
+			if (input.Contains("u:1:", StringComparison.OrdinalIgnoreCase))
 				return FromSteam3(input).Steam2;
 
-			if (input.StartsWith("STEAM_", StringComparison.Ordinal) && input.Count(c => c == ':') == 2)
+			if (input.StartsWith("steam_1:", StringComparison.OrdinalIgnoreCase) && input.Count(c => c == ':') == 2)
 				return FromSteam2(input).Steam2;
 
 			if (uint.TryParse(input, out uint accountId))
