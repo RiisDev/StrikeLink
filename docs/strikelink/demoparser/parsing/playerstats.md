@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
 
 ```csharp
-public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class PlayerStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.PlayerStats, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)<br>

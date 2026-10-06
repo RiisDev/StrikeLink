@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a chat message sent within the demo.
 
 ```csharp
-public sealed class DemoChatMessage : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.DemoChatMessage, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class DemoChatMessage : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.DemoChatMessage, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoChatMessage](./strikelink/demoparser/parsing/demochatmessage.md)<br>

@@ -6,7 +6,7 @@ Represents a snapshot of the current status of a CS2 server, including server in
  group details.
 
 ```csharp
-public class Cs2StatusMessage : System.IEquatable`1[[StrikeLink.Services.Cs2StatusMessage, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class Cs2StatusMessage : System.IEquatable`1[[StrikeLink.Services.Cs2StatusMessage, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Cs2StatusMessage](./strikelink/services/cs2statusmessage.md)<br>

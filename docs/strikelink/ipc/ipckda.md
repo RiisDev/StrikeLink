@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a kill/death/assist score snapshot.
 
 ```csharp
-public class IPCKda : System.IEquatable`1[[StrikeLink.IPC.IPCKda, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCKda : System.IEquatable`1[[StrikeLink.IPC.IPCKda, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCKda](./strikelink/ipc/ipckda.md)<br>

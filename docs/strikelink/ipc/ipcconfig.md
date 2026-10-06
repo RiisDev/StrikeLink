@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Configuration for IPC that specifies whether the Steam client should be started or restarted.
 
 ```csharp
-public class IPCConfig : System.IEquatable`1[[StrikeLink.IPC.IPCConfig, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCConfig : System.IEquatable`1[[StrikeLink.IPC.IPCConfig, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCConfig](./strikelink/ipc/ipcconfig.md)<br>

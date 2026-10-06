@@ -11,11 +11,22 @@ namespace StrikeLink.Crosshair
 	/// The alphabet used is <c>ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789</c>
 	/// (standard Base57 — no <c>I</c>, <c>O</c>, <c>g</c>, or <c>l</c>).
 	/// </remarks>
-	public static partial class CrosshairShareCode
+	internal static partial class CrosshairShareCode
 	{
 		private const string Dictionary = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijkmnopqrstuvwxyz23456789";
 		private const int Base = 57;
 		private const int EncodedLength = 25;
+
+		// Preset RGB values used to recover CrosshairColor from raw R/G/B on decode.
+		// These are CS2's fixed preset colors; anything that doesn't match one of them is Custom.
+		private static readonly (CrosshairColor Color, byte R, byte G, byte B)[] PresetColors =
+		[
+			(CrosshairColor.Red, 255, 0, 0),
+			(CrosshairColor.Green, 0, 255, 0),
+			(CrosshairColor.Yellow, 255, 255, 0),
+			(CrosshairColor.Blue, 0, 0, 255),
+			(CrosshairColor.Cyan, 0, 255, 255),
+		];
 
 		[GeneratedRegex(@"^CSGO(-[A-Za-z0-9]{5}){5}$", RegexOptions.Compiled)]
 		private static partial Regex ShareCodePattern();
@@ -47,6 +58,8 @@ namespace StrikeLink.Crosshair
 				value = value * Base + charIndex;
 			}
 
+			// BigInteger.ToByteArray() is little-endian and may drop a trailing 0x00 sign byte
+			// or come up short; normalize to exactly 18 bytes.
 			byte[] rawBytes = value.ToByteArray();
 			byte[] buffer = new byte[18];
 			Buffer.BlockCopy(rawBytes, 0, buffer, 0, Math.Min(rawBytes.Length, 18));
@@ -91,60 +104,122 @@ namespace StrikeLink.Crosshair
 		public static bool IsValid(string? shareCode) =>
 			!string.IsNullOrWhiteSpace(shareCode) && ShareCodePattern().IsMatch(shareCode);
 
+		/// <remarks>
+		/// Byte layout below is the real CS2/CS:GO crosshair share-code format (verified against
+		/// a known-working reference decoder), NOT an invented scheme:
+		///
+		///   [3]  Gap               sbyte / 10.0
+		///   [4]  OutlineThickness  byte / 2.0
+		///   [5]  CustomColorR      byte
+		///   [6]  CustomColorG      byte
+		///   [7]  CustomColorB      byte
+		///   [8]  Alpha             byte
+		///   [9]  SplitDistance     byte   (dynamic-crosshair field, not exposed by CrosshairSettings — fixed default)
+		///   [11] bit 0x8           DrawOutline
+		///        high nibble       InnerSplitAlpha / 10.0 (not exposed — fixed default)
+		///   [12] low nibble        OuterSplitAlpha / 10.0 (not exposed — fixed default)
+		///        high nibble       SplitSizeRatio / 10.0 (not exposed — fixed default)
+		///   [13] Thickness         byte / 10.0
+		///   [14] low nibble >> 1   Style (not exposed — fixed to Classic Static)
+		///        high nibble 0x1   Dot (center dot)
+		///        high nibble 0x4   UseAlpha
+		///        high nibble 0x8   TStyle
+		///   [15] Size              byte / 10.0
+		///
+		/// Bytes [0..2], [10], [16], [17] are reserved/unconfirmed in every source available to us.
+		/// Color (preset), SniperWidth, and UseWeaponGap are CS2-specific fields with no confirmed
+		/// byte position, so they are packed into those spare bytes below as a best-effort scheme —
+		/// this part is NOT verified against the real game and should be treated as provisional.
+		/// Validate by round-tripping share codes generated in-game with known Sniper Width /
+		/// "scale with weapon" / color-preset values and checking the decoded result matches.
+		/// </remarks>
 		private static byte[] Pack(CrosshairSettings s)
 		{
 			byte[] b = new byte[18];
 
-			b[1] = (byte)(
-				(s.UseAlpha ? 0x80 : 0) |
-				(s.UseWeaponGap ? 0x40 : 0) |
-				(s.TStyle ? 0x20 : 0) |
-				(s.Dot ? 0x10 : 0) |
-				((int)s.Color & 0xF));
+			sbyte gapS = (sbyte)Math.Clamp((int)Math.Round(s.Gap * 10), sbyte.MinValue, sbyte.MaxValue);
+			b[3] = unchecked((byte)gapS);
 
-			b[2] = (byte)Math.Clamp(s.Alpha, 0, 255);
+			b[4] = (byte)Math.Clamp((int)Math.Round(s.OutlineThickness * 2), 0, 255);
 
-			b[3] = (byte)(
-				(Math.Clamp((int)Math.Round(s.SniperWidth), 0, 15) << 4) |
-				Math.Clamp((int)Math.Round(s.OutlineThickness * 2), 0, 15));
+			b[5] = (byte)Math.Clamp(s.CustomColorR, 0, 255);
+			b[6] = (byte)Math.Clamp(s.CustomColorG, 0, 255);
+			b[7] = (byte)Math.Clamp(s.CustomColorB, 0, 255);
+			b[8] = (byte)Math.Clamp(s.Alpha, 0, 255);
 
-			ushort sizeU = (ushort)Math.Clamp((int)Math.Round(s.Size * 10), 0, ushort.MaxValue);
-			b[4] = (byte)(sizeU & 0xFF);
-			b[5] = (byte)(sizeU >> 8);
+			b[9] = 7; // SplitDistance — not modeled; fixed to a reasonable CS2 default.
 
-			short gapS = (short)Math.Clamp((int)Math.Round(s.Gap * 10), short.MinValue, short.MaxValue);
-			b[6] = (byte)(gapS & 0xFF);
-			b[7] = (byte)((gapS >> 8) & 0xFF);
+			b[11] = (byte)(
+				(s.DrawOutline ? 0x8 : 0) |
+				(10 << 4)); // InnerSplitAlpha fixed to 1.0 — not modeled.
 
-			ushort thickU = (ushort)Math.Clamp((int)Math.Round(s.Thickness * 10), 0, ushort.MaxValue);
-			b[8] = (byte)(thickU & 0xFF);
-			b[9] = (byte)(thickU >> 8);
+			b[12] = (byte)(
+				10 |             // OuterSplitAlpha fixed to 1.0 — not modeled.
+				(3 << 4));       // SplitSizeRatio fixed to 0.3 — not modeled.
 
-			b[10] = (byte)(s.DrawOutline ? 1 : 0);
-			b[11] = (byte)Math.Clamp(s.CustomColorR, 0, 255);
-			b[12] = (byte)Math.Clamp(s.CustomColorG, 0, 255);
-			b[13] = (byte)Math.Clamp(s.CustomColorB, 0, 255);
+			b[13] = (byte)Math.Clamp((int)Math.Round(s.Thickness * 10), 0, 255);
+
+			const int classicStatic = 4; // CrosshairStyle.ClassicStatic — fixed, not modeled.
+			b[14] = (byte)(
+				((classicStatic << 1) & 0xF) |
+				((s.Dot ? 0x1 : 0) << 4) |
+				((s.UseAlpha ? 0x4 : 0) << 4) |
+				((s.TStyle ? 0x8 : 0) << 4));
+
+			b[15] = (byte)Math.Clamp((int)Math.Round(s.Size * 10), 0, 255);
+
+			// --- Provisional / unverified packing (see remarks above) ---
+			b[10] = (byte)(
+				(Math.Clamp((int)Math.Round(s.SniperWidth), 0, 15) & 0xF) |
+				(s.UseWeaponGap ? 0x10 : 0));
+
+			b[2] = (byte)((int)s.Color & 0xF);
 
 			return b;
 		}
 
-		private static CrosshairSettings Unpack(byte[] b) => new()
+		private static CrosshairSettings Unpack(byte[] b)
 		{
-			UseAlpha         = (b[1] & 0x80) != 0,
-			UseWeaponGap     = (b[1] & 0x40) != 0,
-			TStyle           = (b[1] & 0x20) != 0,
-			Dot              = (b[1] & 0x10) != 0,
-			Color            = (CrosshairColor)(b[1] & 0xF),
-			Alpha            = b[2],
-			SniperWidth      = (b[3] >> 4) & 0xF,
-			OutlineThickness = (b[3] & 0xF) / 2.0f,
-			Size             = BitConverter.ToUInt16(b, 4) / 10.0f,
-			Gap              = BitConverter.ToInt16(b, 6) / 10.0f,
-			Thickness        = BitConverter.ToUInt16(b, 8) / 10.0f,
-			DrawOutline      = b[10] != 0,
-			CustomColorR     = b[11],
-			CustomColorG     = b[12],
-			CustomColorB     = b[13]
-		};
+			byte rawR = b[5];
+			byte rawG = b[6];
+			byte rawB = b[7];
+
+			// Prefer the color actually encoded in byte[2] (see Pack remarks); fall back to
+			// matching known preset RGB values, then Custom, if that byte looks unset.
+			CrosshairColor color = (CrosshairColor)(b[2] & 0xF);
+			if (!Enum.IsDefined(color))
+			{
+				color = CrosshairColor.Custom;
+				foreach (var preset in PresetColors)
+				{
+					if (preset.R == rawR && preset.G == rawG && preset.B == rawB)
+					{
+						color = preset.Color;
+						break;
+					}
+				}
+			}
+
+			return new CrosshairSettings
+			{
+				Gap = unchecked((sbyte)b[3]) / 10.0f,
+				OutlineThickness = b[4] / 2.0f,
+				CustomColorR = rawR,
+				CustomColorG = rawG,
+				CustomColorB = rawB,
+				Alpha = b[8],
+				DrawOutline = (b[11] & 0x8) != 0,
+				Thickness = b[13] / 10.0f,
+				Dot = ((b[14] >> 4) & 0x1) != 0,
+				UseAlpha = ((b[14] >> 4) & 0x4) != 0,
+				TStyle = ((b[14] >> 4) & 0x8) != 0,
+				Size = b[15] / 10.0f,
+				Color = color,
+
+				// --- Provisional / unverified (see Pack remarks) ---
+				SniperWidth = b[10] & 0xF,
+				UseWeaponGap = (b[10] & 0x10) != 0,
+			};
+		}
 	}
 }

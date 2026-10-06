@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services
 Represents information about a game server, including its version, player counts, status, and reservation details.
 
 ```csharp
-public class ServerInfo : System.IEquatable`1[[StrikeLink.Services.ServerInfo, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class ServerInfo : System.IEquatable`1[[StrikeLink.Services.ServerInfo, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ServerInfo](./strikelink/services/serverinfo.md)<br>

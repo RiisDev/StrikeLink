@@ -56,34 +56,14 @@
 		<EnforceCodeStyleInBuild>False</EnforceCodeStyleInBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Authors>IrisDev</Authors>
-		<PackageReleaseNotes>## New Fatures
-* SteamIdConverter Class, convert and take in any SteamID variant to convert to others
-* ConsoleService now offers ExecuteCfgFile, GetCurrentMap, GetPing, GetCvarValue
-* SteamService now offers GetLocalUsername
-* New log reader via the IPC log file, under IPC/IPCLogger class, check documentation for info
-* Crosshair code generator / reader
-
-## Fixes
-* Fixes bug in Cs2DemoDownloader causing decompression to fail
-* Fixed GSIListener from not using existing config
-* Fixed some objects be missclasses as public/private instead of internal
-* Fixed Cs2Parser from failing to determine winner
-* Fixed Cs2Parser being unable to get player object
-
-## Changes
-* Adjust how Cs2DemoDownlader stores its temp downloads
-* Adjusts demo downloading to detect if its a .bz2 before continuing 
-* Changed ChatService to be IAsyncDisposable
-* Changed ChatService to use underlying ConsoleService for easier upkeep
-* Moved any console based logic to the ConsoleService class
-* Streamlined the way the virtual key is detected
-* Streamlined console execution and parallel issues</PackageReleaseNotes>
+		<PackageReleaseNotes>* Fixed SteamIdConverter
+* Fixed SteamService for linux</PackageReleaseNotes>
 		<PackageProjectUrl>https://github.com/RiisDev/StrikeLink</PackageProjectUrl>
 		<Copyright>IrisDev</Copyright>
 		<Description>StrikeLInk is a modern .NET library for Counter-Strike 2 and Valve ecosystem integration.
 It provides event-driven access to in-game chat, game state updates, Steam client services, CS2 console interaction, and Valve configuration formats using modern C# and .NET.</Description>
 		<PackageIcon>icon.png</PackageIcon>
-		<Version>1.3.0</Version>
+		<Version>1.3.1</Version>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 

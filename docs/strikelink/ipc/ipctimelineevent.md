@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a Steam timeline event emitted by CS2 (for example, `cs2_gun_kill` or `cs2_death`).
 
 ```csharp
-public class IPCTimelineEvent : System.IEquatable`1[[StrikeLink.IPC.IPCTimelineEvent, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCTimelineEvent : System.IEquatable`1[[StrikeLink.IPC.IPCTimelineEvent, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCTimelineEvent](./strikelink/ipc/ipctimelineevent.md)<br>

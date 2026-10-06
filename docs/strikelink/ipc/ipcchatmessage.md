@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a chat message received during a CS2 match.
 
 ```csharp
-public class IPCChatMessage : System.IEquatable`1[[StrikeLink.IPC.IPCChatMessage, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCChatMessage : System.IEquatable`1[[StrikeLink.IPC.IPCChatMessage, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCChatMessage](./strikelink/ipc/ipcchatmessage.md)<br>

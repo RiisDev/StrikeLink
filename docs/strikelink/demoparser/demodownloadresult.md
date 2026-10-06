@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser
 Represents a downloaded CS2 replay payload.
 
 ```csharp
-public sealed class DemoDownloadResult : System.IAsyncDisposable, System.IDisposable, System.IEquatable`1[[StrikeLink.DemoParser.DemoDownloadResult, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class DemoDownloadResult : System.IAsyncDisposable, System.IDisposable, System.IEquatable`1[[StrikeLink.DemoParser.DemoDownloadResult, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoDownloadResult](./strikelink/demoparser/demodownloadresult.md)<br>

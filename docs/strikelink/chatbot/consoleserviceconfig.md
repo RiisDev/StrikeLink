@@ -5,7 +5,7 @@ Namespace: StrikeLink.ChatBot
 Provides configuration options for the [ChatService](./strikelink/chatbot/chatservice.md).
 
 ```csharp
-public class ConsoleServiceConfig : System.IEquatable`1[[StrikeLink.ChatBot.ConsoleServiceConfig, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class ConsoleServiceConfig : System.IEquatable`1[[StrikeLink.ChatBot.ConsoleServiceConfig, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)<br>

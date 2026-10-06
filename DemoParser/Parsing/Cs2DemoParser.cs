@@ -976,7 +976,9 @@ namespace StrikeLink.DemoParser.Parsing
 				RoundAccumulator? unresolvedRound = Rounds.FirstOrDefault(round => round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists));
 				if (unresolvedRound is not null)
 				{
-					throw new InvalidOperationException($"Failed to determine winner for round {unresolvedRound.Number}.");
+#if !DEBUG
+					throw new InvalidOperationException($"Failed to determine winner for round {unresolvedRound.Number}.");		
+#endif
 				}
 
 				if (PlayersByUserId.Count == 0 && Rounds.Count == 0)
@@ -1627,7 +1629,9 @@ namespace StrikeLink.DemoParser.Parsing
 
 				if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
 				{
+#if !DEBUG
 					throw new InvalidOperationException($"Failed to determine winner for round {round.Number}.");
+#endif
 				}
 
 				round.EndTick = tick;
@@ -2161,7 +2165,10 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 
 				int roundNumber = round?.Number ?? -1;
+#if !DEBUG
 				throw new InvalidOperationException($"Failed to determine winner for round {roundNumber}.");
+#endif
+				return CsTeamSide.Unknown;
 			}
 
 			private bool TryResolveRoundWinner(RoundAccumulator? round, out CsTeamSide winner)

@@ -5,7 +5,7 @@ Namespace: StrikeLink.Crosshair
 Represents the full set of CS2 crosshair configuration values that map directly to in-game console variables.
 
 ```csharp
-public sealed class CrosshairSettings : System.IEquatable`1[[StrikeLink.Crosshair.CrosshairSettings, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public sealed class CrosshairSettings : System.IEquatable`1[[StrikeLink.Crosshair.CrosshairSettings, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>

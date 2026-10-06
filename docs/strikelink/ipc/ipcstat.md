@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a single career stat key–value pair read from the Steam client.
 
 ```csharp
-public class IPCStat : System.IEquatable`1[[StrikeLink.IPC.IPCStat, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCStat : System.IEquatable`1[[StrikeLink.IPC.IPCStat, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCStat](./strikelink/ipc/ipcstat.md)<br>

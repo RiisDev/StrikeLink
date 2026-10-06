@@ -14,8 +14,7 @@ namespace StrikeLink.Services
 	/// </summary>
 	public static class SteamService
 	{
-		private const string FlatPackLinux = "~/.var/app/com.valvesoftware.Steam/.local/share/Steam/";
-		private const string BaseLinuxInstall = "~/.local/share/Steam/";
+		private static string LinuxSteamPath { get; set; }
 		private const string SteamSubKey = @"Software\Valve\Steam";
 
 		/// <summary>
@@ -37,11 +36,8 @@ namespace StrikeLink.Services
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
-				if (Directory.Exists(FlatPackLinux))
-					return FlatPackLinux;
-
-				if (Directory.Exists(BaseLinuxInstall))
-					return BaseLinuxInstall;
+				string path = GetLinuxSteamPath();
+				if (Directory.Exists(path)) return path;
 
 				throw new DirectoryNotFoundException("Failed to find steam location");
 			}
@@ -56,6 +52,50 @@ namespace StrikeLink.Services
 			}
 
 			throw new FileNotFoundException("Unable to automatically find steam, (OS_NOT_WINDOWS_LINUX)");
+		}
+
+		private static string GetLinuxSteamPath()
+		{
+			// Only call it once during runtime 
+			if (!string.IsNullOrEmpty(LinuxSteamPath)) return LinuxSteamPath;
+
+			string pathSearchOne = ExecuteBash($"readlink -f {Path.Combine("~", ".steam", "steam")}");
+			if (Directory.Exists(pathSearchOne) && Directory.Exists(Path.Combine(pathSearchOne, "userdata")))
+			{
+				LinuxSteamPath = pathSearchOne;
+				return pathSearchOne;
+			}
+
+			string pathSearchTwo = ExecuteBash($"find '{Environment.GetEnvironmentVariable("HOME")}' -maxdepth 4 -iname '*steam*' -type d 2>/dev/null | head -n 1");
+			if (Directory.Exists(pathSearchTwo) && Directory.Exists(Path.Combine(pathSearchTwo, "userdata")))
+			{
+				LinuxSteamPath = pathSearchTwo;
+				return pathSearchTwo;
+			}
+
+			return "";
+		}
+
+		private static string ExecuteBash(string command)
+		{
+			ProcessStartInfo psi = new()
+			{
+				FileName = "/bin/bash",
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+				CreateNoWindow = true
+			};
+			psi.ArgumentList.Add("-c");
+			psi.ArgumentList.Add(command);
+
+			using Process? proc = Process.Start(psi);
+			if (proc is null) return "";
+
+			string output = proc.StandardOutput.ReadToEnd();
+			proc.WaitForExit();
+
+			return output.Trim();
 		}
 
 		/// <summary>

@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a kill made by the local player, identifying the victim and the weapon used.
 
 ```csharp
-public class IPCKill : System.IEquatable`1[[StrikeLink.IPC.IPCKill, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCKill : System.IEquatable`1[[StrikeLink.IPC.IPCKill, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCKill](./strikelink/ipc/ipckill.md)<br>

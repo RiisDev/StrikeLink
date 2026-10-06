@@ -20,8 +20,6 @@
 
 [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)
 
-[CrosshairShareCode](./strikelink/crosshair/crosshairsharecode.md)
-
 ## StrikeLink.DemoParser
 
 [Cs2DemoDownloader](./strikelink/demoparser/cs2demodownloader.md)

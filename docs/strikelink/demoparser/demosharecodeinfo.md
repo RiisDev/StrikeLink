@@ -5,7 +5,7 @@ Namespace: StrikeLink.DemoParser
 Represents information about a demo match, including its unique identifier, reservation, and TV port.
 
 ```csharp
-public class DemoShareCodeInfo : System.IEquatable`1[[StrikeLink.DemoParser.DemoShareCodeInfo, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class DemoShareCodeInfo : System.IEquatable`1[[StrikeLink.DemoParser.DemoShareCodeInfo, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoShareCodeInfo](./strikelink/demoparser/demosharecodeinfo.md)<br>

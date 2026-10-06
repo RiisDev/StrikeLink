@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services
 Represents a group of spawn entities with associated metadata for a specific map and lump type.
 
 ```csharp
-public class SpawnGroup : System.IEquatable`1[[StrikeLink.Services.SpawnGroup, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class SpawnGroup : System.IEquatable`1[[StrikeLink.Services.SpawnGroup, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [SpawnGroup](./strikelink/services/spawngroup.md)<br>

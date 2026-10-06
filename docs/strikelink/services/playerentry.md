@@ -5,7 +5,7 @@ Namespace: StrikeLink.Services
 Represents a player entry containing connection and status information for a player in a session.
 
 ```csharp
-public class PlayerEntry : System.IEquatable`1[[StrikeLink.Services.PlayerEntry, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class PlayerEntry : System.IEquatable`1[[StrikeLink.Services.PlayerEntry, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [PlayerEntry](./strikelink/services/playerentry.md)<br>

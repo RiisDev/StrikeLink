@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a user used in inter-process communication, containing a Steam account identifier and a username.
 
 ```csharp
-public class IPCUser : System.IEquatable`1[[StrikeLink.IPC.IPCUser, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCUser : System.IEquatable`1[[StrikeLink.IPC.IPCUser, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCUser](./strikelink/ipc/ipcuser.md)<br>

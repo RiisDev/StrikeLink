@@ -5,7 +5,7 @@ Namespace: StrikeLink.IPC
 Represents a death event, identifying the killer and the weapon used.
 
 ```csharp
-public class IPCDeath : System.IEquatable`1[[StrikeLink.IPC.IPCDeath, StrikeLink, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null]]
+public class IPCDeath : System.IEquatable`1[[StrikeLink.IPC.IPCDeath, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
 Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [IPCDeath](./strikelink/ipc/ipcdeath.md)<br>
