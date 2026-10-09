@@ -89,105 +89,15 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="Rounds">A read-only list containing statistics for each round in the match.</param>
 	/// <param name="Warnings">A read-only list of warning messages generated during parsing. The list will be empty if no warnings were
 	/// encountered.</param>
+	/// <param name="ControllerSchema">Every controller property this demo's game build declares (see <see cref="ControllerPropertySchema"/>); empty when the demo has no entity state.
+	/// Compare it across builds to see which raw names changed.</param>
 	public sealed record Cs2DemoParseResult(
 		MatchStats Match,
 		IReadOnlyList<PlayerStats> Players,
 		IReadOnlyList<RoundStats> Rounds,
-		IReadOnlyList<string> Warnings);
+		IReadOnlyList<string> Warnings,
+		IReadOnlyList<ControllerPropertySchema> ControllerSchema);
 
-
-	/// <summary>
-	/// Represents the different chat message formats used in CS.
-	/// </summary>
-	[JsonConverter(typeof(JsonStringEnumConverter<ChatType>))]
-	public enum ChatType
-	{
-		/// <summary>
-		/// Empty
-		/// </summary>
-		None = 0,
-
-		/// <summary>
-		/// [ALL] %s1: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatAll = 1,
-
-		/// <summary>
-		/// [ALL] %s1 [DEAD]: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatAllDead = 2,
-
-		/// <summary>
-		/// [ALL] %s1 [SPEC]: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatAllSpec = 3,
-
-		/// <summary>
-		/// [CT] %s1: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatCt = 10,
-
-		/// <summary>
-		/// [CT] %s1 [DEAD]: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatCtDead = 11,
-
-		/// <summary>
-		/// [CT] %s1 @ %s3: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// %s3 = Location
-		/// </summary>
-		ChatCtLoc = 12,
-
-		/// <summary>
-		/// [T] %s1: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatT = 20,
-
-		/// <summary>
-		/// [T] %s1 [DEAD]: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatTDead = 21,
-
-		/// <summary>
-		/// [T] %s1 @ %s3: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// %s3 = Location
-		/// </summary>
-		ChatTLoc = 22,
-
-		/// <summary>
-		/// [SPEC] %s1: %s2
-		/// %s1 = Player name
-		/// %s2 = Message
-		/// </summary>
-		ChatSpec = 30
-	}
-
-	/// <summary>
-	/// Represents a chat message sent within the demo.
-	/// </summary>
-	/// <param name="ChatType">The Chat type <see cref="ChatType"/></param>
-	/// <param name="Username">The username of the individual</param>
-	/// <param name="Message">The message.</param>
-	/// <param name="Tick">The tick the message was sent on</param>>
-	public sealed record DemoChatMessage(ChatType ChatType, string Username, string Message, int Tick);
 
 	/// <summary>
 	/// Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
@@ -206,8 +116,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="ServerName">The display name of the server, or null if not specified.</param>
 	/// <param name="DemoClientName">The name of the client used to record the match demo, or null if not available.</param>
 	/// <param name="NetworkProtocol">The network protocol version used by the server, or null if not specified.</param>
+	/// <param name="GameBuild">The game build number recorded in the demo header, or null if not specified. Controller property names can change between builds.</param>
 	/// <param name="FocusSteamId">The Steam ID of the player in focus for this match, or null if not specified.</param>
-	/// <param name="ChatMessages">Ordered list of chat messages sent in-game.</param>
 	/// <remarks>Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo</remarks>
 	public sealed record MatchStats(
 		TimeSpan Duration,
@@ -224,7 +134,7 @@ namespace StrikeLink.DemoParser.Parsing
 		string? DemoClientName,
 		int? NetworkProtocol,
 		ulong? FocusSteamId,
-		IReadOnlyList<DemoChatMessage> ChatMessages);
+		int? GameBuild);
 
 	/// <summary>
 	/// Represents a comprehensive snapshot of a player's in-game statistics and performance metrics for a match or series.
@@ -262,6 +172,10 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="Impact">Statistics measuring the player's impact on the match, such as entry kills or opening duels.</param>
 	/// <param name="BombPlants">The number of times the player planted the bomb.</param>
 	/// <param name="BombDefuses">The number of times the player defused the bomb.</param>
+	/// <param name="KastPercentage">Percentage of rounds in which the player got a kill, an assist, survived, or was traded (avenged within 4 seconds).</param>
+	/// <param name="Score">Scoreboard score. Taken from the game's own <c>m_iScore</c> when the demo carries entity state; otherwise estimated from the contribution values (kill 2, assist 1, plant 2, defuse 3/1 plus 1 per living teammate, explosion 1, team kill and suicide -2; objective-kill bonuses are not visible, so the estimate can run slightly low).</param>
+	/// <param name="ControllerProperties">Raw values of the player's controller entity (<c>CCSPlayerController</c>) as last seen in the demo, keyed by dotted property name, for example <c>m_iMVPs</c>, <c>m_pActionTrackingServices.m_iDamage</c>, <c>m_pActionTrackingServices.m_perRoundStats.0003.m_iKills</c> or <c>m_iCompetitiveRanking</c>. Values are <see cref="long"/>, <see cref="ulong"/>, <see cref="bool"/>, <see cref="float"/> (or <c>float[]</c>) and <see cref="string"/>. Empty when the demo has no entity state. The set of names depends on the game build; prefer <paramref name="Controller"/> for the common stats.</param>
+	/// <param name="Controller">Typed, build-tolerant view of the controller (see <see cref="ControllerStats"/>); null when the demo has no entity state.</param>
 	public sealed record PlayerStats(
 		ulong SteamId,
 		string Name,
@@ -291,7 +205,112 @@ namespace StrikeLink.DemoParser.Parsing
 		IReadOnlyList<WeaponStats> Weapons,
 		PlayerImpactStats Impact,
 		int BombPlants,
-		int BombDefuses);
+		int BombDefuses,
+		double KastPercentage,
+		int Score,
+		IReadOnlyDictionary<string, object?> ControllerProperties,
+		ControllerStats? Controller);
+
+	/// <summary>
+	/// Typed view of a player's controller entity (<c>CCSPlayerController</c>) at the end of the match. Each value is looked up through
+	/// <c>ControllerStatResolver</c>, which tolerates property renames between game builds. A value is null when this build's schema
+	/// doesn't have the property at all; a property the schema has but the demo never sent is 0.
+	/// </summary>
+	/// <param name="Score">The scoreboard score.</param>
+	/// <param name="Mvps">Round MVP stars.</param>
+	/// <param name="Kills">Kills as counted by the game (team kills excluded).</param>
+	/// <param name="Deaths">Deaths as counted by the game.</param>
+	/// <param name="Assists">Assists as counted by the game.</param>
+	/// <param name="Damage">Total damage dealt, as counted by the game.</param>
+	/// <param name="UtilityDamage">Damage dealt with grenades and fire.</param>
+	/// <param name="EnemiesFlashed">Enemies flashed.</param>
+	/// <param name="HeadshotKills">Kills that were headshots.</param>
+	/// <param name="Objective">Objective points (plants/defuses).</param>
+	/// <param name="LiveTime">Time alive, in seconds.</param>
+	/// <param name="Enemy3Ks">Rounds with exactly three kills.</param>
+	/// <param name="Enemy4Ks">Rounds with exactly four kills.</param>
+	/// <param name="Enemy5Ks">Rounds with five kills.</param>
+	/// <param name="EnemyKnifeKills">Knife kills.</param>
+	/// <param name="EnemyTaserKills">Zeus kills.</param>
+	/// <param name="EquipmentValue">Summed equipment value at round starts.</param>
+	/// <param name="MoneySaved">Summed money saved across rounds.</param>
+	/// <param name="KillReward">Money earned from kills.</param>
+	/// <param name="CashEarned">Total money earned.</param>
+	/// <param name="Account">Money at the end of the match.</param>
+	/// <param name="TotalCashSpent">Total money spent.</param>
+	/// <param name="Ping">Last reported ping.</param>
+	/// <param name="CompetitiveRanking">Competitive rank value shown on the scoreboard.</param>
+	/// <param name="CompetitiveWins">Competitive wins shown on the scoreboard.</param>
+	/// <param name="CompetitiveRankType">The rank type (for example Premier or Competitive).</param>
+	/// <param name="Clan">Clan tag.</param>
+	/// <param name="CrosshairCode">The crosshair share code.</param>
+	/// <param name="RoundStats">Per-round stats kept by the game, one entry per round the controller reported.</param>
+	public sealed record ControllerStats(
+		int? Score,
+		int? Mvps,
+		int? Kills,
+		int? Deaths,
+		int? Assists,
+		int? Damage,
+		int? UtilityDamage,
+		int? EnemiesFlashed,
+		int? HeadshotKills,
+		int? Objective,
+		int? LiveTime,
+		int? Enemy3Ks,
+		int? Enemy4Ks,
+		int? Enemy5Ks,
+		int? EnemyKnifeKills,
+		int? EnemyTaserKills,
+		int? EquipmentValue,
+		int? MoneySaved,
+		int? KillReward,
+		int? CashEarned,
+		int? Account,
+		int? TotalCashSpent,
+		int? Ping,
+		int? CompetitiveRanking,
+		int? CompetitiveWins,
+		int? CompetitiveRankType,
+		string? Clan,
+		string? CrosshairCode,
+		IReadOnlyList<ControllerRoundStats> RoundStats);
+
+	/// <summary>One round of a controller's per-round stats.</summary>
+	/// <param name="Round">The round number (1-based).</param>
+	/// <param name="Kills">Kills this round.</param>
+	/// <param name="Deaths">Deaths this round.</param>
+	/// <param name="Assists">Assists this round.</param>
+	/// <param name="Damage">Damage dealt this round.</param>
+	/// <param name="HeadshotKills">Headshot kills this round.</param>
+	/// <param name="LiveTime">Seconds alive this round.</param>
+	/// <param name="Objective">Objective points this round.</param>
+	/// <param name="UtilityDamage">Utility damage this round.</param>
+	/// <param name="EnemiesFlashed">Enemies flashed this round.</param>
+	/// <param name="EquipmentValue">Equipment value at the start of the round.</param>
+	/// <param name="MoneySaved">Money saved into the next round.</param>
+	/// <param name="KillReward">Money earned from kills this round.</param>
+	/// <param name="CashEarned">Money earned this round.</param>
+	public sealed record ControllerRoundStats(
+		int Round,
+		int Kills,
+		int Deaths,
+		int Assists,
+		int Damage,
+		int HeadshotKills,
+		int LiveTime,
+		int Objective,
+		int UtilityDamage,
+		int EnemiesFlashed,
+		int EquipmentValue,
+		int MoneySaved,
+		int KillReward,
+		int CashEarned);
+
+	/// <summary>One property of the controller entity as declared by the demo's own schema.</summary>
+	/// <param name="Name">Dotted property name; array elements are written as <c>[]</c>, for example <c>m_pActionTrackingServices.m_perRoundStats.[].m_iKills</c>.</param>
+	/// <param name="Type">The declared network type, for example <c>int32</c> or <c>CUtlSymbolLarge</c>.</param>
+	public sealed record ControllerPropertySchema(string Name, string Type);
 
 	/// <summary>
 	/// Represents a set of impact statistics for a player, including overall match impact and per-side performance

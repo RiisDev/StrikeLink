@@ -1,4 +1,4 @@
-using System.Buffers;
+﻿using System.Buffers;
 // ReSharper disable GrammarMistakeInComment
 #pragma warning disable CA1031
 
@@ -31,6 +31,7 @@ namespace StrikeLink.DemoParser.Parsing
 	internal static class MessageTypeIds
 	{
 		public const int SvcServerInfo = 40;
+		public const int SvcClassInfo = 42;
 		public const int SvcUserMessage = 72;
 		public const int SvcPacketEntities = 55;
 		public const int GeSource1LegacyGameEventList = 205;
@@ -42,7 +43,6 @@ namespace StrikeLink.DemoParser.Parsing
 
 		public const int UmTxtMessage = 124;
 		public const int UmSayText = 117;
-		public const int UmSayText2 = 118;
 		public const int UmSayTextChannel = 119;
 	}
 

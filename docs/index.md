@@ -34,7 +34,6 @@
 
 ## StrikeLink.DemoParser.Parsing
 
-[ChatType](./strikelink/demoparser/parsing/chattype.md)
 
 [ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)
 
@@ -46,7 +45,6 @@
 
 [CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
 
-[DemoChatMessage](./strikelink/demoparser/parsing/demochatmessage.md)
 
 [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)
 
