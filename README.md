@@ -1,66 +1,39 @@
-﻿# StrikeLInk
+﻿# StrikeLink
 
-**StrikeLInk** is a modern, cross-platform **.NET library** for integrating with **Counter-Strike 2** and related Valve ecosystem services.
-It provides structured access to **chat events**, **game state changes**, **client services**, and **Valve configuration formats**, all using modern C# and .NET APIs.
+[![License: MIT](https://img.shields.io/github/license/RiisDev/StrikeLink)](https://github.com/RiisDev/StrikeLink/blob/main/LICENSE)
+[![NuGet](https://img.shields.io/nuget/v/StrikeLink)](https://www.nuget.org/packages/StrikeLink)
+[![NuGet downloads](https://img.shields.io/nuget/dt/StrikeLink?label=downloads)](https://www.nuget.org/packages/StrikeLink)
+[![.NET](https://img.shields.io/badge/.NET-8%20%7C%209%20%7C%2010-512BD4)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/language-C%23-239120)](https://learn.microsoft.com/dotnet/csharp/)
+[![Last commit](https://img.shields.io/github/last-commit/RiisDev/StrikeLink)](https://github.com/RiisDev/StrikeLink/commits)
+[![Support Server](https://img.shields.io/discord/477201632204161025.svg?label=Discord&logo=Discord&colorB=7289da)](https://discord.gg/yyuggrH)
 
-> 📦 Available on **NuGet** as **StrikeLInk**
+## Description
 
-**Documentation**: [https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md](https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md)
+StrikeLink is a .NET library for integrating with Counter-Strike 2 and related Valve ecosystem services. It gives structured access to chat events, game state changes, the CS2 console, Steam client data, Valve configuration formats and demo files, using modern C# and .NET APIs.
 
-![C#](https://img.shields.io/badge/-.NET%208.0-blueviolet?style=for-the-badge&logo=windows&logoColor=white)
-[![Support Server](https://img.shields.io/discord/477201632204161025.svg?label=Discord&logo=Discord&colorB=7289da&style=for-the-badge)](https://discord.gg/yyuggrH)
-![GitHub](https://img.shields.io/github/license/RiisDev/StrikeLink?style=for-the-badge)
-![Nuget All Releases](https://img.shields.io/nuget/dt/StrikeLink?label=Nuget%20Downloads&style=for-the-badge)
+It is built on Windows and has not been tested on Linux.
 
----
+Full API documentation: [docs/index.md](https://github.com/RiisDev/StrikeLink/blob/main/docs/index.md)
 
-## ✨ Features
+### Features
 
-* ✅ Modern **C#** targeting **.NET 8, 9, and 10**
-* 🧩 Event-driven architecture
-* 🎮 Counter-Strike 2 client & console integration
-* 💬 Global & team chat handling
-* 🗺️ Game state tracking (map, player, round)
-* ⚙️ Valve config reader & writer (JSON-styled)
-* 🌍 Cross-platform design *Built on windows, untested on linux*
+- Event-driven services for chat, game state and the CS2 console.
+- Global and team chat handling, including sending messages.
+- Game State Integration listener with map, player and round state events.
+- Steam client helpers: Steam path, game path, launch options, user config and current user.
+- Valve config reader and writer for `.vcfg`, `.cfg`, `.vdf` and `.acf` with JSON-style access.
+- Demo parser: downloads CS2 matches from a share code and parses `.dem` files into match, player and round data, including positions and grenades.
 
----
+### Chat Service
 
-## 📦 Installation
+Access to in-game chat messages and sending.
 
-Install via NuGet:
-
-```bash
-dotnet add package StrikeLInk
-```
-
-Or via the NuGet Package Manager:
-
-```powershell
-Install-Package StrikeLInk
-```
-
----
-
-## 🧠 Core Concepts
-
-StrikeLInk is structured around **services**, **events**, and **state integration**.
-Consumers subscribe to events and invoke methods to interact with the game client.
-
----
-
-## 💬 Chat Service
-
-Provides access to in-game chat messages and sending capabilities.
-
-### Events
-
-* `OnTeamChat`
-* `OnGlobalChat`
-
-### Methods
-
-* `SendChatAsync(NewChatMessage message)`
+| Member | Kind |
+| --- | --- |
+| `OnTeamChat` | Event |
+| `OnGlobalChat` | Event |
+| `SendChatAsync(NewChatMessage message)` | Method |
 
 ```csharp
 public enum ChatChannel
@@ -72,106 +45,136 @@ public enum ChatChannel
 public record NewChatMessage(ChatChannel Channel, string Message);
 ```
 
----
+### Game State Integration
 
-## 🎮 Game State Integration
+Live game state updates, based on [Game State Integration](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration) with help from [this reddit post](https://reddit.com/r/GlobalOffensive/comments/cjhcpy).
 
-Track live game state changes through event-based updates.
+- `GsiListener` raises `OnPostReceived` for every incoming GSI payload.
+- `MapState`, `PlayerState` and `RoundState` events cover map changes, player updates and round transitions.
 
-Based on [GameStateInteraction](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration) with help from [this reddit post](https://reddit.com/r/GlobalOffensive/comments/cjhcpy)
+### Client Services
 
-### Supported State Events
+`SteamService` reads Steam and CS2 client data:
 
-* **Gsi Listener**
-  * Offers a base event `OnPostReceived` for all incoming GSI payloads
+- `GetSteamPath()`
+- `TryGetGamePath(int gameId, out string path)` and `GetGamePath(int gameId)`
+- `GetUserConfig(long? userId)`
+- `GetGameLaunchOptions(int gameId)`
+- `GetCurrentUserId()`
 
-* **Map State**
+`ConsoleService` talks to the CS2 console and listens to runtime events:
 
-  * `MapState` events
-* **Player State**
+- `OnLogReceived`, `OnPlayerConnected`, `OnMapJoined`
+- `OnGlobalChatMessageReceived`, `OnTeamChatMessageReceived`
+- `OnUiStateChanged`, `OnAddonProgress`, `OnAddonFinished`
+- `OnServerJoining`, `OnServerConnected`, `OnServerDisconnected`
 
-  * `PlayerState` events
-* **Round State**
+### Valve Config Reader and Writer
 
-  * `RoundState` events
+A configuration system built around `JsonDocument`-style APIs. It reads and parses `.vcfg`, `.cfg`, `.vdf` and `.acf` files, lets you modify values through structured access, and writes them back to disk.
 
-These events allow real-time reactions to gameplay changes such as round transitions, player updates, and map changes.
+### Demo Parser
 
----
+`Cs2DemoParser` reads CS2 (Source 2) `.dem` files from a file or any readable stream. `Cs2DemoDownloader` can fetch the demo for a match share code first.
 
-## 🧩 Client Services
+```csharp
+using StrikeLink.DemoParser;
+using StrikeLink.DemoParser.Parsing;
 
-### 🟦 SteamService
+DemoAuthorization auth = new(steamId, authCode, matchShareCode, apiKey);
 
-Provides access to Steam and CS2 client data.
+using Cs2DemoParser parser = new(new FileInfo("match.dem"), auth);
+Cs2DemoParseResult result = parser.ParseDemo();
 
-#### Methods
+Console.WriteLine($"{result.Match.Map}: {result.Match.TeamAScore}-{result.Match.TeamBScore} ({result.Match.Outcome})");
+foreach (PlayerStats player in result.Players)
+{
+	Console.WriteLine($"{player.Name} {player.Kills}/{player.Deaths}/{player.Assists} ADR {player.Adr}");
+}
+```
 
-* `GetSteamPath()`
-* `TryGetGamePath(int gameId, out string path)`
-* `GetGamePath(int gameId)`
-* `GetUserConfig(long? userId)`
-* `GetGameLaunchOptions(int gameId)`
-* `GetCurrentUserId()`
+The result contains:
 
----
+- Match: map, duration, score per team, outcome for the authorised Steam ID, game build.
+- Players: kills, deaths, assists, ADR, KAST, multi-kills, trades, clutches, utility, weapons, opening duels, economy, aim stats (counter-strafing, time to damage, first bullet accuracy), a play style role and the game's own scoreboard values.
+- Rounds: winner and side swaps (including overtime), buy types and equipment value per team, every kill and damage event with positions.
+- Replay data per round: player positions, view angles, health and armor sampled every `PositionSampleIntervalTicks` (default 32), grenade flight paths with the thrower, flashes, smoke and fire areas, bomb events and A, B and Mid map zones.
+- Round impact from a win probability model that values each kill by how much it moved the round.
 
-### 🖥️ ConsoleService (CS2 Console Integration)
+Round winners are read from the game's team scores when the demo carries entity state, and inferred from kills and the bomb otherwise. `Cs2DemoParseResult.Warnings` lists anything that could not be resolved. The parser has been checked against demos from game builds 10924 and 10955.
 
-Interact directly with the CS2 console and listen to runtime events.
+## Code Stack
 
-#### Events
+- C# on .NET 8, 9 and 10, with `-windows` targets for the Windows-only services
+- `System.Management` and `System.Security.Cryptography.ProtectedData` (Windows targets only)
+- Hand-written Source 2 demo reader: protobuf and Snappy decoding, game events, string tables and a packet-entity (send table) decoder
+- `xmldoc2md` for the generated API documentation
 
-* `OnLogReceived`
-* `OnPlayerConnected`
-* `OnMapJoined`
-* `OnGlobalChatMessageReceived`
-* `OnTeamChatMessageReceived`
-* `OnUiStateChanged`
-* `OnAddonProgress`
-* `OnAddonFinished`
-* `OnServerJoining`
-* `OnServerConnected`
-* `OnServerDisconnected`
+## Requirements
 
-This service enables advanced automation, monitoring, and addon integration.
+- .NET 8, 9 or 10 SDK
+- Windows for the Steam, console and GSI services
+- Counter-Strike 2 for live integration; demo parsing works on any `.dem` file
+- A Steam Web API key, auth code and match share code only for downloading demos by share code
 
----
+## Quick Start
 
-## ⚙️ Valve Config Reader / Writer
+Install from NuGet:
 
-A flexible configuration system built around **`JsonDocument`-style APIs**.
+```bash
+dotnet add package StrikeLink
+```
 
-### Supported Formats
+```powershell
+Install-Package StrikeLink
+```
 
-* `.vcfg`
-* `.cfg`
-* `.vdf`
-* `.acf`
+Or build from source:
 
-### Capabilities
+```bash
+git clone https://github.com/RiisDev/StrikeLink.git
+cd StrikeLink
+dotnet build
+```
 
-* Read and parse Valve configuration formats
-* Modify values using structured JSON-style access
-* Write configurations back to disk safely
-* Designed for tooling, modding, and automation
+## Build Steps
 
----
+Build every target:
+
+```bash
+dotnet build
+```
+
+Build the Release package. The net8.0 Release build also regenerates the Markdown API documentation in `docs` when the `xmldoc2md` tool is installed:
+
+```bash
+dotnet tool install -g xmldoc2markdown
+dotnet build -c Release
+```
+
+`StrikeLink.Test.Suite` is a console project that parses the demos in its `DemosToCompareCheck` folder and prints the results:
+
+```bash
+dotnet run --project StrikeLink.Test.Suite
+```
 
 ## Credits
 
-* [sneid1/cs2-demo-analyzer](https://github.com/sneid1/cs2-demo-analyzer) (MIT) - used as a reference parser while developing and testing the demo parser. Its output was used to cross-check round data, buy types and player positions, and the A/B/Mid map zone boundaries in `MapZones.cs` come from its source.
+- [sneid1/cs2-demo-analyzer](https://github.com/sneid1/cs2-demo-analyzer) (MIT) - used as a reference parser while developing and testing the demo parser. Its output was used to cross-check round data, buy types and player positions, and the A, B and Mid map zone boundaries in `DemoParser/Parsing/MapZones.cs` come from its source.
+- [Game State Integration](https://developer.valvesoftware.com/wiki/Counter-Strike:_Global_Offensive_Game_State_Integration) on the Valve Developer Community wiki, and [this reddit post](https://reddit.com/r/GlobalOffensive/comments/cjhcpy), for the GSI payload format.
 
---- 
+## AI Disclosure
 
-## Ai Disclosure
+Parts of this project were developed with AI assistance. Below is a summary of where it was used:
 
-> This was made as a hobby project that I use personally to make small little programs for fun, all of my software is free and open source via MIT licensing, if you have a problem with AI do not take it up with me.
+- DemoParser/Parsing - demo and wire decoding, the packet-entity decoder, event handling and the result models, written with AI assistance
+- DemoParser/Parsing/Cs2DemoParser.cs, EntityParser.cs, Models.cs - AI-assisted rework: round winners from team score entities, overtime side swaps, empty round removal, instance baselines, game build 10955 field encodings, positions and view angles, grenade, flash, effect and bomb tracking, buy types, opening duels, roles and aim stats
+- DemoParser/Parsing/WinProbability.cs, MapZones.cs - win probability model, and map zone tables ported from cs2-demo-analyzer
+- Services/WebService/InternalTools/SqlService.cs - written with AI assistance to avoid adding another NuGet package for a simple database query
+- Services/Config - written with AI assistance, for the same reason as SqlService
+- Incode `///summary` statements - base summaries from the built-in Copilot auto complete, then proof read and modified
+- README generation - documentation written with AI assistance based on source code
 
-Some form of AI was used for the following items
+## License
 
-* Readme - I'm notoriously bad at writing readmes, but was proof read and modified after initial creation.
-* Incode ///summary Statements - I use the built in CoPilot summary auto complete to get a base summary which is then proof read and modified.
-* /DemoParser/Parsing - I extensively looked into how to do it properly and couldn't figure it out, so it wrote the files located within. (PS valve please update documentation page).
-* /Services/WebService/SqlService - I didn't want to use further nuget packages when all I needed to do was query a DB. 
-* /Services/Config - Same reason as SqlService
+This project is licensed under the MIT License. See [LICENSE](LICENSE).
