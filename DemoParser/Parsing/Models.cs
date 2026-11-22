@@ -209,7 +209,169 @@ namespace StrikeLink.DemoParser.Parsing
 		double KastPercentage,
 		int Score,
 		IReadOnlyDictionary<string, object?> ControllerProperties,
-		ControllerStats? Controller);
+		ControllerStats? Controller,
+		OpeningDuelStats OpeningDuels,
+		EconomyStats Economy,
+		PlayerRole Role,
+		AimStats Aim);
+
+	/// <summary>Aim measurements taken from shots and the shooter's movement.</summary>
+	/// <param name="CounterStrafeAttempts">Gun shots fired right after moving fast (counter-strafe situations).</param>
+	/// <param name="CounterStrafePercentage">Share of those shots fired while nearly stationary (under 34 units per second).</param>
+	/// <param name="AverageSpeedAtShot">Average horizontal speed at the moment of a gun shot, in units per second.</param>
+	/// <param name="EngagementsWithDamage">Bursts of fire that landed at least one hit.</param>
+	/// <param name="AverageTimeToDamageMs">Average time from the first shot of a burst to its first hit, in milliseconds.</param>
+	/// <param name="FirstBulletAccuracy">Share of bursts whose first bullet hit, as a percentage.</param>
+	public sealed record AimStats(int CounterStrafeAttempts, double CounterStrafePercentage, double AverageSpeedAtShot, int EngagementsWithDamage, double AverageTimeToDamageMs, double FirstBulletAccuracy);
+
+	/// <summary>A position in world coordinates.</summary>
+	public sealed record PlayerPosition(float X, float Y, float Z);
+
+	/// <summary>One sampled moment of one player: where they were, where they looked, and their health.</summary>
+	/// <param name="Tick">Demo tick of the sample.</param>
+	/// <param name="SteamId">The player's Steam ID.</param>
+	/// <param name="Position">World position.</param>
+	/// <param name="Yaw">Horizontal view angle in degrees.</param>
+	/// <param name="Pitch">Vertical view angle in degrees.</param>
+	/// <param name="Health">Health; 0 once dead.</param>
+	/// <param name="Armor">Armor value.</param>
+	/// <param name="Zone">Coarse A, B or Mid region of the map, or none.</param>
+	public sealed record PlayerFrame(int Tick, ulong SteamId, PlayerPosition Position, float Yaw, float Pitch, int Health, int Armor, MapZone Zone = MapZone.None);
+
+	/// <summary>Kind of thrown grenade.</summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<GrenadeType>))]
+	public enum GrenadeType
+	{
+		/// <summary>Not recognised.</summary>
+		Unknown = 0,
+		/// <summary>Smoke grenade.</summary>
+		Smoke,
+		/// <summary>Flashbang.</summary>
+		Flashbang,
+		/// <summary>High explosive grenade.</summary>
+		HighExplosive,
+		/// <summary>Molotov or incendiary grenade.</summary>
+		Fire,
+		/// <summary>Decoy grenade.</summary>
+		Decoy,
+	}
+
+	/// <summary>A point on a grenade's flight path.</summary>
+	/// <param name="Tick">Demo tick.</param>
+	/// <param name="Position">World position.</param>
+	public sealed record GrenadePathPoint(int Tick, PlayerPosition Position);
+
+	/// <summary>One thrown grenade from release to detonation.</summary>
+	/// <param name="Type">Grenade kind.</param>
+	/// <param name="ThrowerSteamId">Steam ID of the thrower, or null when unknown.</param>
+	/// <param name="StartTick">Tick the grenade appeared in the world.</param>
+	/// <param name="EndTick">Tick it detonated or was removed.</param>
+	/// <param name="Path">Sampled positions from release to the last known position (the detonation point).</param>
+	public sealed record GrenadeTrajectory(GrenadeType Type, ulong? ThrowerSteamId, int StartTick, int EndTick, IReadOnlyList<GrenadePathPoint> Path);
+
+	/// <summary>One player being flashed.</summary>
+	/// <param name="Tick">Tick of the flash.</param>
+	/// <param name="ThrowerSteamId">Steam ID of the thrower.</param>
+	/// <param name="VictimSteamId">Steam ID of the blinded player.</param>
+	/// <param name="DurationSeconds">How long the player was blinded.</param>
+	/// <param name="IsTeamFlash">true when thrower and victim are on the same team.</param>
+	public sealed record FlashEffect(int Tick, ulong? ThrowerSteamId, ulong? VictimSteamId, double DurationSeconds, bool IsTeamFlash);
+
+	/// <summary>Kind of lingering area effect.</summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<EffectZoneType>))]
+	public enum EffectZoneType
+	{
+		/// <summary>Smoke cloud.</summary>
+		Smoke,
+		/// <summary>Burning molotov or incendiary area.</summary>
+		Fire,
+	}
+
+	/// <summary>A smoke cloud or fire area that lingered in the world.</summary>
+	/// <param name="Type">Smoke or fire.</param>
+	/// <param name="StartTick">Tick it appeared.</param>
+	/// <param name="EndTick">Tick it ended, or the round end if never seen ending.</param>
+	/// <param name="Position">Centre of the effect.</param>
+	/// <param name="Radius">Approximate radius in world units.</param>
+	public sealed record EffectZone(EffectZoneType Type, int StartTick, int EndTick, PlayerPosition Position, double Radius);
+
+	/// <summary>What happened to the bomb.</summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<BombEventType>))]
+	public enum BombEventType
+	{
+		/// <summary>The bomb was planted.</summary>
+		Planted,
+		/// <summary>The bomb was defused.</summary>
+		Defused,
+		/// <summary>The bomb exploded.</summary>
+		Exploded,
+	}
+
+	/// <summary>A bomb plant, defuse or explosion.</summary>
+	/// <param name="Type">What happened.</param>
+	/// <param name="Tick">Demo tick.</param>
+	/// <param name="SteamId">The planter or defuser; null for an explosion.</param>
+	/// <param name="Position">Where the acting player stood, or null when unavailable.</param>
+	public sealed record BombEvent(BombEventType Type, int Tick, ulong? SteamId, PlayerPosition? Position);
+
+	/// <summary>How a team bought in a round, from the average equipment value per player at round start.</summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<BuyType>))]
+	public enum BuyType
+	{
+		/// <summary>Equipment values were not available (the demo has no entity state).</summary>
+		Unknown = 0,
+		/// <summary>First round of a half.</summary>
+		Pistol,
+		/// <summary>Average equipment value under 1000.</summary>
+		Eco,
+		/// <summary>Average equipment value from 1000 to 1999.</summary>
+		Force,
+		/// <summary>Average equipment value from 2000 to 3499.</summary>
+		Half,
+		/// <summary>Average equipment value of 3500 or more.</summary>
+		Full,
+	}
+
+	/// <summary>The playstyle that dominated a player's match.</summary>
+	[JsonConverter(typeof(JsonStringEnumConverter<PlayerRole>))]
+	public enum PlayerRole
+	{
+		/// <summary>Too few rounds to classify.</summary>
+		Unclassified = 0,
+		/// <summary>Takes and dies in T-side opening duels.</summary>
+		Entry,
+		/// <summary>Contributes mostly through flashes.</summary>
+		Support,
+		/// <summary>Survives CT-side rounds.</summary>
+		Anchor,
+		/// <summary>Frequently trades or is traded.</summary>
+		Trade,
+		/// <summary>Frequently wins clutches.</summary>
+		Closer,
+		/// <summary>No single tendency stands out.</summary>
+		Hybrid,
+	}
+
+	/// <summary>Results split by how the player's team and the opposition bought.</summary>
+	/// <param name="PistolRounds">Pistol rounds played.</param>
+	/// <param name="PistolWins">Pistol rounds won.</param>
+	/// <param name="EcoRounds">Rounds where the player's team bought Eco or Force.</param>
+	/// <param name="EcoWins">Eco or Force rounds won.</param>
+	/// <param name="FullBuyRounds">Rounds where the player's team bought Half or Full.</param>
+	/// <param name="FullBuyWins">Half or Full rounds won.</param>
+	/// <param name="EcoKills">Kills made while the player's team was on an Eco or Force buy against a Half or Full buy.</param>
+	/// <param name="AntiEcoKills">Kills made on a Half or Full buy against an Eco or Force buy.</param>
+	public sealed record EconomyStats(int PistolRounds, int PistolWins, int EcoRounds, int EcoWins, int FullBuyRounds, int FullBuyWins, int EcoKills, int AntiEcoKills);
+
+	/// <summary>
+	/// Opening duels: the first kill of each round (team kills and suicides excluded).
+	/// </summary>
+	/// <param name="Kills">Rounds where the player got the opening kill.</param>
+	/// <param name="Deaths">Rounds where the player was the opening victim.</param>
+	/// <param name="WinRate">Kills as a percentage of all opening duels the player was in.</param>
+	/// <param name="KillsTraded">Opening kills where the player was then killed by an enemy of the victim's team within the trade window (the opening kill was traded back).</param>
+	/// <param name="DeathsTraded">Opening deaths that a teammate avenged within the trade window.</param>
+	public sealed record OpeningDuelStats(int Kills, int Deaths, double WinRate, int KillsTraded, int DeathsTraded);
 
 	/// <summary>
 	/// Typed view of a player's controller entity (<c>CCSPlayerController</c>) at the end of the match. Each value is looked up through
@@ -350,11 +512,9 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="Assists">The number of assists credited to the player in the round. Must be zero or greater.</param>
 	/// <param name="Deaths">The number of times the player died in the round. Must be zero or greater.</param>
 	/// <param name="Damage">The total amount of damage dealt by the player in the round. Must be zero or greater.</param>
-	/// <param name="WinProbability">The probability, as a value between 0.0 and 1.0, that the player's team would win the round at the start of the
-	/// round.</param>
-	/// <param name="RoundImpact">A calculated value representing the player's overall impact on the round, based on various performance metrics.</param>
-	/// <param name="RoundRating">A rating value summarizing the player's performance in the round, typically normalized for comparison across
-	/// rounds.</param>
+	/// <param name="WinProbability">The player's side's chance of winning the round at round start, as a percentage, from the alive-count model (about 49 for T and 51 for CT).</param>
+	/// <param name="RoundImpact">Win probability the player added or lost this round, in percentage points. Each kill adds the gain in the killing side's round win probability (alive counts, bomb state) and costs the victim the same; an assist earns a quarter of the gain. Can be negative.</param>
+	/// <param name="RoundRating">Round impact centred on 50 and clamped to 0 to 100.</param>
 	public sealed record RoundImpactSnapshot(
 		int RoundNumber,
 		CsTeamSide Side,
@@ -564,6 +724,15 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="TeamBSide">The side Team B played on for this round.</param>
 	/// <param name="Kills">A read-only list of all kill events that occurred during the round. Never null.</param>
 	/// <param name="Damage">A read-only list of all damage events that occurred during the round. Never null.</param>
+	/// <param name="TeamAEquipmentValue">Average equipment value per Team A player at round start, or 0 when unavailable.</param>
+	/// <param name="TeamBEquipmentValue">Average equipment value per Team B player at round start, or 0 when unavailable.</param>
+	/// <param name="Frames">Player positions sampled through the round (see <see cref="Cs2DemoParser.PositionSampleIntervalTicks"/>); empty when the demo has no entity state or sampling is off.</param>
+	/// <param name="Grenades">Every grenade thrown this round with its flight path (empty without entity state).</param>
+	/// <param name="Flashes">Every player blinded this round.</param>
+	/// <param name="EffectZones">Smoke clouds and fire areas this round.</param>
+	/// <param name="BombEvents">Plant, defuse and explosion events this round.</param>
+	/// <param name="TeamABuy">How Team A bought this round.</param>
+	/// <param name="TeamBBuy">How Team B bought this round.</param>
 	public sealed record RoundStats(
 		int RoundNumber,
 		int StartTick,
@@ -574,7 +743,16 @@ namespace StrikeLink.DemoParser.Parsing
 		CsTeamSide TeamASide,
 		CsTeamSide TeamBSide,
 		IReadOnlyList<RoundKillEvent> Kills,
-		IReadOnlyList<RoundDamageEvent> Damage);
+		IReadOnlyList<RoundDamageEvent> Damage,
+		int TeamAEquipmentValue,
+		int TeamBEquipmentValue,
+		BuyType TeamABuy,
+		BuyType TeamBBuy,
+		IReadOnlyList<PlayerFrame> Frames,
+		IReadOnlyList<GrenadeTrajectory> Grenades,
+		IReadOnlyList<FlashEffect> Flashes,
+		IReadOnlyList<EffectZone> EffectZones,
+		IReadOnlyList<BombEvent> BombEvents);
 
 	/// <summary>
 	/// Represents a kill event that occurred during a round, including details about the participants, weapon used, and
@@ -595,6 +773,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="IsWallBang">true if the kill was performed through a wall or other penetrable surface; otherwise, false.</param>
 	/// <param name="ThroughSmoke">true if the kill occurred through smoke; otherwise, false.</param>
 	/// <param name="AttackerBlind">true if the attacker was blinded at the time of the kill; otherwise, false.</param>
+	/// <param name="KillerPosition">The killer's position at the kill, or null when unavailable.</param>
+	/// <param name="VictimPosition">The victim's position at the kill, or null when unavailable.</param>
 	public sealed record RoundKillEvent(
 		int Tick,
 		ulong? KillerSteamId,
@@ -609,7 +789,9 @@ namespace StrikeLink.DemoParser.Parsing
 		bool IsTrade,
 		bool IsWallBang,
 		bool ThroughSmoke,
-		bool AttackerBlind);
+		bool AttackerBlind,
+		PlayerPosition? KillerPosition = null,
+		PlayerPosition? VictimPosition = null);
 
 	/// <summary>
 	/// Represents a damage event that occurred during a round, including information about the attacker, victim, weapon
@@ -625,6 +807,8 @@ namespace StrikeLink.DemoParser.Parsing
 	/// <param name="HealthDamage">The amount of health damage inflicted on the victim.</param>
 	/// <param name="ArmorDamage">The amount of armor damage inflicted on the victim.</param>
 	/// <param name="IsFriendlyFire">true if the damage was caused by a teammate; otherwise, false.</param>
+	/// <param name="AttackerPosition">The attacker's position at the hit, or null when unavailable.</param>
+	/// <param name="VictimPosition">The victim's position at the hit, or null when unavailable.</param>
 	public sealed record RoundDamageEvent(
 		int Tick,
 		ulong? AttackerSteamId,
@@ -635,7 +819,9 @@ namespace StrikeLink.DemoParser.Parsing
 		int Damage,
 		int HealthDamage,
 		int ArmorDamage,
-		bool IsFriendlyFire);
+		bool IsFriendlyFire,
+		PlayerPosition? AttackerPosition = null,
+		PlayerPosition? VictimPosition = null);
 
 	/// <summary>
 	/// Provides extension methods for converting mutable collection types to their read-only counterparts.

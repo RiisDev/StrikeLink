@@ -6,12 +6,12 @@ Represents summary statistics and metadata for a completed match, including scor
  identifying information.
 
 ```csharp
-public sealed class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
+public sealed record class MatchStats : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.MatchStats, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
-Implements [IEquatable&lt;MatchStats&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
+Implements [IEquatable&lt;MatchStats&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
 
@@ -24,43 +24,43 @@ Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via
 The total duration of the match.
 
 ```csharp
-public TimeSpan Duration { get; set; }
+public TimeSpan Duration { get; init; }
 ```
 
 #### Property Value
 
-[TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/system.timespan)<br>
+[TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan)<br>
 
 ### **TeamAScore**
 
 The final score achieved by Team A.
 
 ```csharp
-public int TeamAScore { get; set; }
+public int TeamAScore { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **TeamBScore**
 
 The final score achieved by Team B.
 
 ```csharp
-public int TeamBScore { get; set; }
+public int TeamBScore { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Outcome**
 
 The outcome of the match, indicating which team won or if the match was drawn.
 
 ```csharp
-public MatchOutcome Outcome { get; set; }
+public MatchOutcome Outcome { get; init; }
 ```
 
 #### Property Value
@@ -72,289 +72,191 @@ public MatchOutcome Outcome { get; set; }
 The geographic location of the server where the match was played, or null if not available.
 
 ```csharp
-public string ServerLocation { get; set; }
+public string? ServerLocation { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **GameType**
 
 The type or mode of the game played, or null if not specified.
 
 ```csharp
-public string GameType { get; set; }
+public string? GameType { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **MaxPlayers**
 
 The maximum number of players allowed on the server during the match, or null if not specified.
 
 ```csharp
-public Nullable<int> MaxPlayers { get; set; }
+public int? MaxPlayers { get; init; }
 ```
 
 #### Property Value
 
-[Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+[Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **Date**
 
 The date and time when the match occurred, or null if not available.
 
 ```csharp
-public Nullable<DateTimeOffset> Date { get; set; }
+public DateTimeOffset? Date { get; init; }
 ```
 
 #### Property Value
 
-[Nullable&lt;DateTimeOffset&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+[DateTimeOffset?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **Map**
 
 The name of the map on which the match was played, or null if not specified.
 
 ```csharp
-public string Map { get; set; }
+public string? Map { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **MatchShareCode**
 
 A shareable code that uniquely identifies the match, or null if not available.
 
 ```csharp
-public string MatchShareCode { get; set; }
+public string? MatchShareCode { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **ServerName**
 
 The display name of the server, or null if not specified.
 
 ```csharp
-public string ServerName { get; set; }
+public string? ServerName { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **DemoClientName**
 
 The name of the client used to record the match demo, or null if not available.
 
 ```csharp
-public string DemoClientName { get; set; }
+public string? DemoClientName { get; init; }
 ```
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 ### **NetworkProtocol**
 
 The network protocol version used by the server, or null if not specified.
 
 ```csharp
-public Nullable<int> NetworkProtocol { get; set; }
+public int? NetworkProtocol { get; init; }
 ```
 
 #### Property Value
 
-[Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+[Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ### **FocusSteamId**
 
 The Steam ID of the player in focus for this match, or null if not specified.
 
 ```csharp
-public Nullable<ulong> FocusSteamId { get; set; }
+public ulong? FocusSteamId { get; init; }
 ```
 
 #### Property Value
 
-[Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+[UInt64?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
-### **ChatMessages**
+### **GameBuild**
 
-Ordered list of chat messages sent in-game.
+The game build number recorded in the demo header, or null if not specified. Controller property names can change between builds.
 
 ```csharp
-public IReadOnlyList<DemoChatMessage> ChatMessages { get; set; }
+public int? GameBuild { get; init; }
 ```
 
 #### Property Value
 
-[IReadOnlyList&lt;DemoChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1)<br>
+[Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 
 ## Constructors
 
-### **MatchStats(TimeSpan, Int32, Int32, MatchOutcome, String, String, Nullable&lt;Int32&gt;, Nullable&lt;DateTimeOffset&gt;, String, String, String, String, Nullable&lt;Int32&gt;, Nullable&lt;UInt64&gt;, IReadOnlyList&lt;DemoChatMessage&gt;)**
+### **MatchStats(TimeSpan, Int32, Int32, MatchOutcome, String, String, Int32?, DateTimeOffset?, String, String, String, String, Int32?, UInt64?, Int32?)**
 
 Represents summary statistics and metadata for a completed match, including scores, duration, server details, and
  identifying information.
 
 ```csharp
-public MatchStats(TimeSpan Duration, int TeamAScore, int TeamBScore, MatchOutcome Outcome, string ServerLocation, string GameType, Nullable<int> MaxPlayers, Nullable<DateTimeOffset> Date, string Map, string MatchShareCode, string ServerName, string DemoClientName, Nullable<int> NetworkProtocol, Nullable<ulong> FocusSteamId, IReadOnlyList<DemoChatMessage> ChatMessages)
+public MatchStats(TimeSpan Duration, int TeamAScore, int TeamBScore, MatchOutcome Outcome, string? ServerLocation, string? GameType, int? MaxPlayers, DateTimeOffset? Date, string? Map, string? MatchShareCode, string? ServerName, string? DemoClientName, int? NetworkProtocol, ulong? FocusSteamId, int? GameBuild)
 ```
 
 #### Parameters
 
-`Duration` [TimeSpan](https://docs.microsoft.com/en-us/dotnet/api/system.timespan)<br>
+`Duration` [TimeSpan](https://learn.microsoft.com/en-us/dotnet/api/system.timespan)<br>
 The total duration of the match.
 
-`TeamAScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`TeamAScore` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The final score achieved by Team A.
 
-`TeamBScore` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`TeamBScore` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The final score achieved by Team B.
 
 `Outcome` [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)<br>
 The outcome of the match, indicating which team won or if the match was drawn.
 
-`ServerLocation` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`ServerLocation` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 The geographic location of the server where the match was played, or null if not available.
 
-`GameType` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`GameType` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 The type or mode of the game played, or null if not specified.
 
-`MaxPlayers` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`MaxPlayers` [Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The maximum number of players allowed on the server during the match, or null if not specified.
 
-`Date` [Nullable&lt;DateTimeOffset&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`Date` [DateTimeOffset?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The date and time when the match occurred, or null if not available.
 
-`Map` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`Map` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 The name of the map on which the match was played, or null if not specified.
 
-`MatchShareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`MatchShareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 A shareable code that uniquely identifies the match, or null if not available.
 
-`ServerName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`ServerName` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 The display name of the server, or null if not specified.
 
-`DemoClientName` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`DemoClientName` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
 The name of the client used to record the match demo, or null if not available.
 
-`NetworkProtocol` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`NetworkProtocol` [Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The network protocol version used by the server, or null if not specified.
 
-`FocusSteamId` [Nullable&lt;UInt64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`FocusSteamId` [UInt64?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The Steam ID of the player in focus for this match, or null if not specified.
 
-`ChatMessages` [IReadOnlyList&lt;DemoChatMessage&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1)<br>
-Ordered list of chat messages sent in-game.
+`GameBuild` [Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+The game build number recorded in the demo header, or null if not specified. Controller property names can change between builds.
 
 **Remarks:**
 
 Date may be incorrect as it is pulled from FileInfo if it fails to be parsed via demo
-
-## Methods
-
-### **ToString()**
-
-```csharp
-public string ToString()
-```
-
-#### Returns
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **GetHashCode()**
-
-```csharp
-public int GetHashCode()
-```
-
-#### Returns
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **Equals(Object)**
-
-```csharp
-public bool Equals(object obj)
-```
-
-#### Parameters
-
-`obj` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **Equals(MatchStats)**
-
-```csharp
-public bool Equals(MatchStats other)
-```
-
-#### Parameters
-
-`other` [MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **&lt;Clone&gt;$()**
-
-```csharp
-public MatchStats <Clone>$()
-```
-
-#### Returns
-
-[MatchStats](./strikelink/demoparser/parsing/matchstats.md)<br>
-
-### **Deconstruct(TimeSpan&, Int32&, Int32&, MatchOutcome&, String&, String&, Nullable`1&, Nullable`1&, String&, String&, String&, String&, Nullable`1&, Nullable`1&, IReadOnlyList`1&)**
-
-```csharp
-public void Deconstruct(TimeSpan& Duration, Int32& TeamAScore, Int32& TeamBScore, MatchOutcome& Outcome, String& ServerLocation, String& GameType, Nullable`1& MaxPlayers, Nullable`1& Date, String& Map, String& MatchShareCode, String& ServerName, String& DemoClientName, Nullable`1& NetworkProtocol, Nullable`1& FocusSteamId, IReadOnlyList`1& ChatMessages)
-```
-
-#### Parameters
-
-`Duration` [TimeSpan&](https://docs.microsoft.com/en-us/dotnet/api/system.timespan&)<br>
-
-`TeamAScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`TeamBScore` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`Outcome` [MatchOutcome&](./strikelink/demoparser/parsing/matchoutcome&.md)<br>
-
-`ServerLocation` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`GameType` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`MaxPlayers` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
-
-`Date` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
-
-`Map` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`MatchShareCode` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`ServerName` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`DemoClientName` [String&](https://docs.microsoft.com/en-us/dotnet/api/system.string&)<br>
-
-`NetworkProtocol` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
-
-`FocusSteamId` [Nullable`1&](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1&)<br>
-
-`ChatMessages` [IReadOnlyList`1&](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1&)<br>

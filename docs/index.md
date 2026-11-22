@@ -34,8 +34,21 @@
 
 ## StrikeLink.DemoParser.Parsing
 
+[AimStats](./strikelink/demoparser/parsing/aimstats.md)
+
+[BombEvent](./strikelink/demoparser/parsing/bombevent.md)
+
+[BombEventType](./strikelink/demoparser/parsing/bombeventtype.md)
+
+[BuyType](./strikelink/demoparser/parsing/buytype.md)
 
 [ClutchStats](./strikelink/demoparser/parsing/clutchstats.md)
+
+[ControllerPropertySchema](./strikelink/demoparser/parsing/controllerpropertyschema.md)
+
+[ControllerRoundStats](./strikelink/demoparser/parsing/controllerroundstats.md)
+
+[ControllerStats](./strikelink/demoparser/parsing/controllerstats.md)
 
 [Cs2DemoParser](./strikelink/demoparser/parsing/cs2demoparser.md)
 
@@ -45,6 +58,23 @@
 
 [CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)
 
+[EconomyStats](./strikelink/demoparser/parsing/economystats.md)
+
+[EffectZone](./strikelink/demoparser/parsing/effectzone.md)
+
+[EffectZoneType](./strikelink/demoparser/parsing/effectzonetype.md)
+
+[FlashEffect](./strikelink/demoparser/parsing/flasheffect.md)
+
+[GrenadePathPoint](./strikelink/demoparser/parsing/grenadepathpoint.md)
+
+[GrenadeTrajectory](./strikelink/demoparser/parsing/grenadetrajectory.md)
+
+[GrenadeType](./strikelink/demoparser/parsing/grenadetype.md)
+
+[MapZone](./strikelink/demoparser/parsing/mapzone.md)
+
+[MapZones](./strikelink/demoparser/parsing/mapzones.md)
 
 [MatchOutcome](./strikelink/demoparser/parsing/matchoutcome.md)
 
@@ -54,7 +84,15 @@
 
 [MultiKillSummary](./strikelink/demoparser/parsing/multikillsummary.md)
 
+[OpeningDuelStats](./strikelink/demoparser/parsing/openingduelstats.md)
+
+[PlayerFrame](./strikelink/demoparser/parsing/playerframe.md)
+
 [PlayerImpactStats](./strikelink/demoparser/parsing/playerimpactstats.md)
+
+[PlayerPosition](./strikelink/demoparser/parsing/playerposition.md)
+
+[PlayerRole](./strikelink/demoparser/parsing/playerrole.md)
 
 [PlayerStats](./strikelink/demoparser/parsing/playerstats.md)
 

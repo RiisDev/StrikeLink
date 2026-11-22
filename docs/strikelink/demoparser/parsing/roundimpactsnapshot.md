@@ -5,12 +5,12 @@ Namespace: StrikeLink.DemoParser.Parsing
 Represents a snapshot of a player's impact and performance metrics for a single round in a match.
 
 ```csharp
-public sealed class RoundImpactSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundImpactSnapshot, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
+public sealed record class RoundImpactSnapshot : System.IEquatable`1[[StrikeLink.DemoParser.Parsing.RoundImpactSnapshot, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)<br>
-Implements [IEquatable&lt;RoundImpactSnapshot&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)<br>
+Implements [IEquatable&lt;RoundImpactSnapshot&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 ## Properties
 
@@ -19,19 +19,19 @@ Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/ap
 The number of the round within the match. Must be a positive integer.
 
 ```csharp
-public int RoundNumber { get; set; }
+public int RoundNumber { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Side**
 
 The team side the player was on during the round.
 
 ```csharp
-public CsTeamSide Side { get; set; }
+public CsTeamSide Side { get; init; }
 ```
 
 #### Property Value
@@ -44,98 +44,96 @@ A value indicating whether the player's team won the round. Set to  if the round
  otherwise, .
 
 ```csharp
-public bool Won { get; set; }
+public bool Won { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 
 ### **Kills**
 
 The number of kills achieved by the player in the round. Must be zero or greater.
 
 ```csharp
-public int Kills { get; set; }
+public int Kills { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Assists**
 
 The number of assists credited to the player in the round. Must be zero or greater.
 
 ```csharp
-public int Assists { get; set; }
+public int Assists { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Deaths**
 
 The number of times the player died in the round. Must be zero or greater.
 
 ```csharp
-public int Deaths { get; set; }
+public int Deaths { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **Damage**
 
 The total amount of damage dealt by the player in the round. Must be zero or greater.
 
 ```csharp
-public int Damage { get; set; }
+public int Damage { get; init; }
 ```
 
 #### Property Value
 
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **WinProbability**
 
-The probability, as a value between 0.0 and 1.0, that the player's team would win the round at the start of the
- round.
+The player's side's chance of winning the round at round start, as a percentage, from the alive-count model (about 49 for T and 51 for CT).
 
 ```csharp
-public double WinProbability { get; set; }
+public double WinProbability { get; init; }
 ```
 
 #### Property Value
 
-[Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
 ### **RoundImpact**
 
-A calculated value representing the player's overall impact on the round, based on various performance metrics.
+Win probability the player added or lost this round, in percentage points. Each kill adds the gain in the killing side's round win probability (alive counts, bomb state) and costs the victim the same; an assist earns a quarter of the gain. Can be negative.
 
 ```csharp
-public double RoundImpact { get; set; }
+public double RoundImpact { get; init; }
 ```
 
 #### Property Value
 
-[Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
 ### **RoundRating**
 
-A rating value summarizing the player's performance in the round, typically normalized for comparison across
- rounds.
+Round impact centred on 50 and clamped to 0 to 100.
 
 ```csharp
-public double RoundRating { get; set; }
+public double RoundRating { get; init; }
 ```
 
 #### Property Value
 
-[Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
 ## Constructors
 
@@ -149,123 +147,33 @@ public RoundImpactSnapshot(int RoundNumber, CsTeamSide Side, bool Won, int Kills
 
 #### Parameters
 
-`RoundNumber` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`RoundNumber` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The number of the round within the match. Must be a positive integer.
 
 `Side` [CsTeamSide](./strikelink/demoparser/parsing/csteamside.md)<br>
 The team side the player was on during the round.
 
-`Won` [Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+`Won` [Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 A value indicating whether the player's team won the round. Set to  if the round was won;
  otherwise, .
 
-`Kills` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`Kills` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The number of kills achieved by the player in the round. Must be zero or greater.
 
-`Assists` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`Assists` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The number of assists credited to the player in the round. Must be zero or greater.
 
-`Deaths` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`Deaths` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The number of times the player died in the round. Must be zero or greater.
 
-`Damage` [Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+`Damage` [Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 The total amount of damage dealt by the player in the round. Must be zero or greater.
 
-`WinProbability` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-The probability, as a value between 0.0 and 1.0, that the player's team would win the round at the start of the
- round.
+`WinProbability` [Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
+The player's side's chance of winning the round at round start, as a percentage, from the alive-count model (about 49 for T and 51 for CT).
 
-`RoundImpact` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A calculated value representing the player's overall impact on the round, based on various performance metrics.
+`RoundImpact` [Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
+Win probability the player added or lost this round, in percentage points. Each kill adds the gain in the killing side's round win probability (alive counts, bomb state) and costs the victim the same; an assist earns a quarter of the gain. Can be negative.
 
-`RoundRating` [Double](https://docs.microsoft.com/en-us/dotnet/api/system.double)<br>
-A rating value summarizing the player's performance in the round, typically normalized for comparison across
- rounds.
-
-## Methods
-
-### **ToString()**
-
-```csharp
-public string ToString()
-```
-
-#### Returns
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **GetHashCode()**
-
-```csharp
-public int GetHashCode()
-```
-
-#### Returns
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **Equals(Object)**
-
-```csharp
-public bool Equals(object obj)
-```
-
-#### Parameters
-
-`obj` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **Equals(RoundImpactSnapshot)**
-
-```csharp
-public bool Equals(RoundImpactSnapshot other)
-```
-
-#### Parameters
-
-`other` [RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **&lt;Clone&gt;$()**
-
-```csharp
-public RoundImpactSnapshot <Clone>$()
-```
-
-#### Returns
-
-[RoundImpactSnapshot](./strikelink/demoparser/parsing/roundimpactsnapshot.md)<br>
-
-### **Deconstruct(Int32&, CsTeamSide&, Boolean&, Int32&, Int32&, Int32&, Int32&, Double&, Double&, Double&)**
-
-```csharp
-public void Deconstruct(Int32& RoundNumber, CsTeamSide& Side, Boolean& Won, Int32& Kills, Int32& Assists, Int32& Deaths, Int32& Damage, Double& WinProbability, Double& RoundImpact, Double& RoundRating)
-```
-
-#### Parameters
-
-`RoundNumber` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`Side` [CsTeamSide&](./strikelink/demoparser/parsing/csteamside&.md)<br>
-
-`Won` [Boolean&](https://docs.microsoft.com/en-us/dotnet/api/system.boolean&)<br>
-
-`Kills` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`Assists` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`Deaths` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`Damage` [Int32&](https://docs.microsoft.com/en-us/dotnet/api/system.int32&)<br>
-
-`WinProbability` [Double&](https://docs.microsoft.com/en-us/dotnet/api/system.double&)<br>
-
-`RoundImpact` [Double&](https://docs.microsoft.com/en-us/dotnet/api/system.double&)<br>
-
-`RoundRating` [Double&](https://docs.microsoft.com/en-us/dotnet/api/system.double&)<br>
+`RoundRating` [Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
+Round impact centred on 50 and clamped to 0 to 100.

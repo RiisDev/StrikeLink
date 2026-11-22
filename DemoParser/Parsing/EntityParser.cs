@@ -20,9 +20,31 @@ internal sealed class EntityParser
 	];
 
 	internal const string ControllerClassName = "CCSPlayerController";
+	internal const string TeamClassName = "CCSTeam";
+	internal const string PawnClassName = "CCSPlayerPawn";
+
+	/// <summary>Thrown grenade entities, tracked for their flight path.</summary>
+	private static readonly HashSet<string> ProjectileClassNames =
+		["CSmokeGrenadeProjectile", "CFlashbangProjectile", "CHEGrenadeProjectile", "CMolotovProjectile", "CDecoyProjectile"];
+
+	/// <summary>The only pawn properties decoded: position (cell plus offset), view angles, health and armor.</summary>
+	private static readonly HashSet<string> PawnProperties =
+	[
+		"CBodyComponent.m_cellX", "CBodyComponent.m_cellY", "CBodyComponent.m_cellZ",
+		"CBodyComponent.m_vecX", "CBodyComponent.m_vecY", "CBodyComponent.m_vecZ",
+		"m_angEyeAngles", "m_iHealth", "m_ArmorValue",
+	];
+
+	private static readonly HashSet<string> ProjectileProperties =
+	[
+		"CBodyComponent.m_cellX", "CBodyComponent.m_cellY", "CBodyComponent.m_cellZ",
+		"CBodyComponent.m_vecX", "CBodyComponent.m_vecY", "CBodyComponent.m_vecZ",
+		"m_hThrower", "m_hOwnerEntity",
+	];
 
 	private readonly Dictionary<string, Serializer> _serializers = [];
 	private readonly Dictionary<int, ClassInfo> _classes = [];
+	private readonly Dictionary<int, byte[]> _baselines = [];
 	private readonly Dictionary<int, Entity> _entities = [];
 	private readonly List<FieldPath> _pathCache = [];
 	private int _classIdBits;
@@ -32,8 +54,26 @@ internal sealed class EntityParser
 	/// <summary>(entity index, property name, value, true while the entity is being created)</summary>
 	public Action<int, string, object?, bool>? OnControllerProperty { get; set; }
 
+	/// <summary>(entity index, property name, value) for every property of the CCSTeam entities (team number and score).</summary>
+	public Action<int, string, object?>? OnTeamProperty { get; set; }
+
+	/// <summary>(entity index, property name, value) for the pawn properties in <see cref="PawnProperties"/>.</summary>
+	public Action<int, string, object?>? OnPawnProperty { get; set; }
+
+	/// <summary>(entity index, class name) when a thrown grenade entity is created.</summary>
+	public Action<int, string>? OnProjectileCreated { get; set; }
+
+	/// <summary>(entity index, property name, value) for the thrown grenade properties in <see cref="ProjectileProperties"/>.</summary>
+	public Action<int, string, object?>? OnProjectileProperty { get; set; }
+
+	/// <summary>Raised with the entity index when a thrown grenade entity is deleted (it detonated or expired).</summary>
+	public Action<int>? OnProjectileRemoved { get; set; }
+
 	/// <summary>Raised when a player controller entity is created, before its properties are reported.</summary>
 	public Action<int>? OnControllerCreated { get; set; }
+
+	/// <summary>An instance baseline: the default field values a new entity of a class starts from.</summary>
+	public void SetBaseline(int classId, byte[] data) => _baselines[classId] = data;
 
 	public void SetMaxClasses(int maxClasses) => _classIdBits = 32 - System.Numerics.BitOperations.LeadingZeroCount((uint)Math.Max(maxClasses, 1));
 
@@ -239,6 +279,17 @@ internal sealed class EntityParser
 						OnControllerCreated?.Invoke(index);
 					}
 
+					// Fields equal to the baseline are never sent, so positions need it for their default cells.
+					if (entity.Class.IsProjectile)
+					{
+						OnProjectileCreated?.Invoke(index, classInfo.Name);
+					}
+
+					if ((entity.Class.IsPawn || entity.Class.IsProjectile || classInfo.Name == ControllerClassName) && _baselines.TryGetValue(classId, out byte[]? baseline))
+					{
+						ReadFields(new EntityReader(baseline), entity, created: true);
+					}
+
 					ReadFields(reader, entity, created: true);
 				}
 				else
@@ -258,7 +309,10 @@ internal sealed class EntityParser
 			}
 			else if ((cmd & 2) != 0)
 			{
-				_entities.Remove(index);
+				if (_entities.Remove(index, out Entity? removed) && removed.Class.IsProjectile)
+				{
+					OnProjectileRemoved?.Invoke(index);
+				}
 			}
 		}
 	}
@@ -272,7 +326,7 @@ internal sealed class EntityParser
 
 		Serializer serializer = _serializers.GetValueOrDefault(classInfo.Name)
 			?? throw new InvalidDataException($"no serializer for class {classInfo.Name}");
-		classInfo.Resolved = new ClassSerializer(serializer, classInfo.Name == ControllerClassName);
+		classInfo.Resolved = new ClassSerializer(serializer, classInfo.Name is ControllerClassName or TeamClassName or PawnClassName || ProjectileClassNames.Contains(classInfo.Name)) { IsTeam = classInfo.Name == TeamClassName, IsPawn = classInfo.Name == PawnClassName, IsProjectile = ProjectileClassNames.Contains(classInfo.Name) };
 		return classInfo.Resolved;
 	}
 
@@ -348,12 +402,31 @@ internal sealed class EntityParser
 			FieldDecoder decoder = cls.Serializer.GetDecoder(path, 0, entity.Poly)
 				?? throw new InvalidDataException($"no serializer for polymorphic pointer at field path {path} (desynced bitstream)");
 
+			string? pawnName = null;
+			if (cls.IsPawn || cls.IsProjectile)
+			{
+				pawnName = cls.NameOf(path, entity.Poly);
+				reader.Capture = (cls.IsPawn ? PawnProperties : ProjectileProperties).Contains(pawnName);
+			}
+
 			object? value = decoder.Decode(reader);
 
 			if (value is PolyUpdate poly)
 			{
 				entity.Poly ??= [];
 				entity.Poly[poly.Id] = poly.Serializer;
+			}
+			else if (cls.IsPawn)
+			{
+				if (value is not null && pawnName is not null && PawnProperties.Contains(pawnName)) OnPawnProperty?.Invoke(entity.Index, pawnName, value);
+			}
+			else if (cls.IsProjectile)
+			{
+				if (value is not null && pawnName is not null && ProjectileProperties.Contains(pawnName)) OnProjectileProperty?.Invoke(entity.Index, pawnName, value);
+			}
+			else if (cls.IsTeam && value is not null)
+			{
+				OnTeamProperty?.Invoke(entity.Index, cls.NameOf(path, entity.Poly), value);
 			}
 			else if (cls.Capture && value is not null && OnControllerProperty is { } report)
 			{
@@ -385,6 +458,12 @@ internal sealed class EntityParser
 
 		/// <summary>True when this class's property values are decoded and reported (player controllers).</summary>
 		public bool Capture { get; } = capture;
+
+		public bool IsTeam { get; init; }
+
+		public bool IsPawn { get; init; }
+
+		public bool IsProjectile { get; init; }
 
 		/// <summary>Dotted property name of a field path, cached for the common shallow paths.</summary>
 		public string NameOf(FieldPath path, Dictionary<int, Serializer?>? poly)
@@ -1003,12 +1082,26 @@ internal sealed class EntityParser
 			_ => null,
 		};
 
+		/// <summary>Integers sent at a fixed bit width instead of as a varint (new in game build 10955 for enum fields).</summary>
+		private static FieldDecoder? FixedWidth(Field field) => field.Encoder switch
+		{
+			"fixed8" => Of(static r => (ulong)r.ReadBits(8)),
+			"fixed16" => Of(static r => (ulong)r.ReadBits(16)),
+			"fixed32" => Of(static r => (ulong)r.ReadBits(32)),
+			_ => null,
+		};
+
 		public static FieldDecoder Find(Field field)
 		{
 			string baseType = field.FieldType.BaseType;
 			if (FromFactory(baseType, field) is { } fromFactory)
 			{
 				return fromFactory;
+			}
+
+			if (FixedWidth(field) is { } fixedWidth)
+			{
+				return fixedWidth;
 			}
 
 			if (field.VarName == "m_iClip1")
@@ -1022,7 +1115,7 @@ internal sealed class EntityParser
 		public static FieldDecoder FindByGenericType(Field field)
 		{
 			string baseType = field.FieldType.GenericType!.BaseType;
-			return FromFactory(baseType, field) ?? ByType.GetValueOrDefault(baseType) ?? Unsigned;
+			return FromFactory(baseType, field) ?? FixedWidth(field) ?? ByType.GetValueOrDefault(baseType) ?? Unsigned;
 		}
 
 		private static FieldDecoder Float(Field field)
@@ -1099,29 +1192,35 @@ internal sealed class EntityParser
 			{
 				return Of(static r =>
 				{
-					bool hasX = r.ReadBool();
-					bool hasY = r.ReadBool();
-					bool hasZ = r.ReadBool();
-					for (int i = 0; i < (hasX ? 1 : 0) + (hasY ? 1 : 0) + (hasZ ? 1 : 0); i++)
+					bool[] present = [r.ReadBool(), r.ReadBool(), r.ReadBool()];
+					// An absent component keeps its previous value, which the consumer sees as NaN.
+					float[]? angles = r.Capture ? [float.NaN, float.NaN, float.NaN] : null;
+					for (int i = 0; i < 3; i++)
 					{
-						r.ReadBits(20);
+						if (!present[i]) continue;
+
+						uint raw = r.ReadBits(20);
+						if (angles is not null) angles[i] = raw * (360f / (1 << 20));
 					}
 
-					return null;
+					return angles;
 				});
 			}
 
 			if (field.BitCount is { } bits and not 0)
 			{
 				int width = bits >= 32 ? 32 : bits;
+				float scale = 360f / (width >= 32 ? 4294967296f : 1u << width);
 				return Of(r =>
 				{
+					float[]? angles = r.Capture ? new float[3] : null;
 					for (int i = 0; i < 3; i++)
 					{
-						r.ReadBits(width);
+						uint raw = r.ReadBits(width);
+						if (angles is not null) angles[i] = raw * scale;
 					}
 
-					return null;
+					return angles;
 				});
 			}
 

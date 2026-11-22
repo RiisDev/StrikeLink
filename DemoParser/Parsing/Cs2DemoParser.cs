@@ -20,17 +20,27 @@ namespace StrikeLink.DemoParser.Parsing
 	/// Provides functionality to parse and extract structured data from Counter-Strike 2 (CS2) demo files, producing
 	/// match, player, and round statistics from the legacy Source 2 demo format.
 	/// </summary>
-	/// <remarks>The parser supports only CS2 Source 2 demo files with the ".dem" extension. It processes the demo
-	/// file using legacy event and string table data, without relying on packet-entity or send-table decoding. Some
-	/// advanced statistics are not available due to these
-	/// limitations. The parser is designed for single-use per file and is not thread-safe. Dispose the instance after use
-	/// to release file resources.</remarks>
+	/// <remarks>The parser supports only CS2 Source 2 demo files with the ".dem" extension. It combines game events
+	/// and string tables with packet-entity decoding (send tables, class info and entity state) to resolve controller
+	/// properties. If entity decoding fails fatally, entity tracking is disabled and parsing continues with event data
+	/// only, so entity-derived statistics may be missing. The parser is designed for single-use per file and is not
+	/// thread-safe. Dispose the instance after use to release file resources.</remarks>
 	public sealed class Cs2DemoParser : IDisposable
 	{
 		/// <summary>
 		/// Releases all resources used by the <see cref="Cs2DemoParser"/>.
 		/// </summary>
 		public void Dispose() => _fileStream?.Dispose();
+
+		/// <summary>
+		/// Ticks between the player position samples recorded into <see cref="RoundStats.Frames"/> (default 32, about half a second at 64 tick).
+		/// Lower values give a smoother replay track and a larger result; 0 turns sampling off.
+		/// </summary>
+		public int PositionSampleIntervalTicks
+		{
+			get => _state.PositionSampleIntervalTicks;
+			set => _state.PositionSampleIntervalTicks = value;
+		}
 
 		private const uint CompressedFlag = 64;
 
@@ -242,6 +252,20 @@ namespace StrikeLink.DemoParser.Parsing
 			foreach (ProtoFieldValue tableValue in message.GetValues(1))
 			{
 				ProtoMessage table = tableValue.GetMessage();
+				if (table.TryGetString(1, out string? name) && string.Equals(name, "instancebaseline", StringComparison.Ordinal))
+				{
+					foreach (ProtoFieldValue baselineValue in table.GetValues(2))
+					{
+						ProtoMessage baseline = baselineValue.GetMessage();
+						if (baseline.TryGetString(1, out string? classKey) && int.TryParse(classKey, out int classId) && baseline.TryGetBytes(2, out byte[]? baselineData) && baselineData is { Length: > 0 })
+						{
+							state.RunEntities(entities => entities.SetBaseline(classId, baselineData), fatal: false);
+						}
+					}
+
+					continue;
+				}
+
 				if (!table.TryGetString(1, out string? tableName) || !string.Equals(tableName, "userinfo", StringComparison.Ordinal))
 				{
 					continue;
@@ -327,6 +351,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 				case MessageTypeIds.SvcPacketEntities:
 					state.RunEntities(entities => entities.OnPacketEntities(payload), fatal: false);
+					state.SamplePositions();
 					break;
 
 				case MessageTypeIds.CsUmServerRankUpdate:
@@ -491,6 +516,7 @@ namespace StrikeLink.DemoParser.Parsing
 			}
 
 			int eventTick = message.TryGetInt32(4, out int serverTick) ? serverTick : state.CurrentFrameTick;
+			if (serverTick > 0) state.ObserveServerTick(serverTick);
 			
 			state.ObserveEventName(descriptor.Name);
 			state.HandleGameEvent(descriptor.Name, eventTick, data);
@@ -595,6 +621,24 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private int HalfTimeRoundNumber { get; set; }
 
+			/// <summary>
+			/// Side swaps that have happened by the start of <paramref name="round"/>: one at halftime, then (after a regulation tie) one at
+			/// the start of each overtime half after the first. Overtime halves are three rounds long.
+			/// </summary>
+			private int SwapsThrough(int round)
+			{
+				if (HalfTimeRoundNumber <= 0) return 0;
+
+				int swaps = round > HalfTimeRoundNumber ? 1 : 0;
+				int overtimeSwap = (2 * HalfTimeRoundNumber) + 4;
+				if (round >= overtimeSwap) swaps += 1 + ((round - overtimeSwap) / 3);
+				return swaps;
+			}
+
+			/// <summary>True when the side a player holds at the end of the match is the opposite of the side they held in this round.</summary>
+			private bool IsFlippedFromFinal(int round)
+				=> HalfTimeRoundNumber > 0 && Rounds.Count > 0 && ((SwapsThrough(Rounds[^1].Number) - SwapsThrough(round)) & 1) == 1;
+
 			// Players that spawned since the last round started; they become that round's participants.
 			private HashSet<int> SpawnedSinceRoundStart { get; } = [];
 
@@ -651,7 +695,326 @@ namespace StrikeLink.DemoParser.Parsing
 			{
 				OnControllerCreated = index => _controllers[index] = new ControllerInfo(),
 				OnControllerProperty = HandleControllerProperty,
+				OnTeamProperty = HandleTeamProperty,
+				OnPawnProperty = HandlePawnProperty,
+				OnProjectileCreated = HandleProjectileCreated,
+				OnProjectileProperty = HandleProjectileProperty,
+				OnProjectileRemoved = HandleProjectileRemoved,
 			};
+
+			private readonly Dictionary<int, PawnState> _pawns = [];
+			private int _lastPositionSampleTick = -1;
+
+			/// <summary>Ticks between position samples; 0 turns sampling off.</summary>
+			public int PositionSampleIntervalTicks { get; set; } = 32;
+
+			private sealed class PawnState
+			{
+				// Cells equal to the instance baseline are never sent; 32 is only the fallback when a demo has no baseline.
+				public long CellX = 32, CellY = 32, CellZ = 32;
+				public float VecX, VecY, VecZ, Pitch, Yaw;
+				public int Health, Armor;
+				public bool HasPosition;
+
+				// Motion: the position at the end of the previous update tick, and recent horizontal speeds, for counter-strafe checks.
+				public int UpdateTick = -1, PrevTick = -1;
+				public float PrevX, PrevY, LastSpeed;
+				public readonly Queue<(int Tick, float Speed)> History = new();
+			}
+
+			private void HandlePawnProperty(int entityIndex, string property, object? value)
+			{
+				if (MatchEndTick != 0 || value is null) return;
+
+				if (!_pawns.TryGetValue(entityIndex, out PawnState? pawn)) pawn = _pawns[entityIndex] = new PawnState();
+
+				int tick = CurrentFrameTick;
+				if (pawn.UpdateTick < 0) pawn.UpdateTick = tick;
+				else if (tick != pawn.UpdateTick && pawn.HasPosition) CommitPawnMotion(pawn, tick);
+
+				if (ApplyPositionProperty(pawn, property, value)) return;
+
+				switch (property)
+				{
+					case "m_iHealth": pawn.Health = (int)WholeNumber(value); break;
+					case "m_ArmorValue": pawn.Armor = (int)WholeNumber(value); break;
+					case "m_angEyeAngles" when value is float[] { Length: >= 2 } angles:
+						// The wire angle is offset by 180 degrees (checked against movement heading and Go's replay positions).
+						if (!float.IsNaN(angles[0])) pawn.Pitch = NormalizeAngle(angles[0] + 180f);
+						if (!float.IsNaN(angles[1])) pawn.Yaw = NormalizeAngle(angles[1] + 180f);
+						break;
+				}
+			}
+
+			private static long WholeNumber(object value) => value switch { long l => l, ulong u => (long)u, int i => i, uint u => u, _ => 0 };
+
+			/// <summary>Applies a world-position property (cell or in-cell offset) shared by pawns and projectiles; false for any other property.</summary>
+			private static bool ApplyPositionProperty(PawnState state, string property, object value)
+			{
+				switch (property)
+				{
+					case "CBodyComponent.m_cellX": state.CellX = WholeNumber(value); state.HasPosition = true; return true;
+					case "CBodyComponent.m_cellY": state.CellY = WholeNumber(value); return true;
+					case "CBodyComponent.m_cellZ": state.CellZ = WholeNumber(value); return true;
+					case "CBodyComponent.m_vecX": state.VecX = value is float x ? x : 0; state.HasPosition = true; return true;
+					case "CBodyComponent.m_vecY": state.VecY = value is float y ? y : 0; return true;
+					case "CBodyComponent.m_vecZ": state.VecZ = value is float z ? z : 0; return true;
+					default: return false;
+				}
+			}
+
+			/// <summary>Closes out the previous update tick: records the speed it implies and remembers where the pawn was.</summary>
+			private void CommitPawnMotion(PawnState pawn, int tick)
+			{
+				PlayerPosition now = ToWorld(pawn);
+				if (pawn.PrevTick >= 0 && pawn.UpdateTick > pawn.PrevTick)
+				{
+					float seconds = (pawn.UpdateTick - pawn.PrevTick) * (TickIntervalSeconds > 0 ? (float)TickIntervalSeconds : 1f / 64f);
+					float speed = MathF.Sqrt(((now.X - pawn.PrevX) * (now.X - pawn.PrevX)) + ((now.Y - pawn.PrevY) * (now.Y - pawn.PrevY))) / seconds;
+
+					// Respawns and teleports look like absurd speeds.
+					if (speed < 1500f)
+					{
+						pawn.LastSpeed = speed;
+						pawn.History.Enqueue((pawn.UpdateTick, speed));
+						while (pawn.History.Count > 0 && pawn.History.Peek().Tick < pawn.UpdateTick - 128) pawn.History.Dequeue();
+					}
+				}
+
+				(pawn.PrevX, pawn.PrevY, pawn.PrevTick, pawn.UpdateTick) = (now.X, now.Y, pawn.UpdateTick, tick);
+			}
+
+			/// <summary>Horizontal speed now, and the fastest speed in the half second before; entities only update when they change, so a stale pawn is standing still.</summary>
+			private static (float Now, float Recent) SpeedOf(PawnState pawn, int tick)
+			{
+				float now = tick - pawn.UpdateTick > 3 ? 0 : pawn.LastSpeed;
+				float recent = pawn.History.Where(h => h.Tick >= tick - 24).Select(static h => h.Speed).DefaultIfEmpty(0).Max();
+				return (now, Math.Max(now, recent));
+			}
+
+			private sealed class ProjectileState
+			{
+				public GrenadeType Type;
+				public readonly PawnState Position = new();
+				public ulong? Thrower;
+				public int StartTick;
+				public RoundAccumulator? Round;
+				public readonly List<GrenadePathPoint> Path = [];
+				public int LastPathTick = int.MinValue / 2;
+			}
+
+			private readonly Dictionary<int, ProjectileState> _projectiles = [];
+
+			/// <summary>Grenade throws seen as weapon_fire events, used to name a thrower when the entity never reports one.</summary>
+			private readonly List<GrenadeThrow> _grenadeThrows = [];
+
+			private sealed class GrenadeThrow(int tick, ulong steamId, GrenadeType type, PlayerPosition? position)
+			{
+				public int Tick { get; } = tick;
+				public PlayerPosition? Position { get; } = position;
+				public ulong SteamId { get; } = steamId;
+				public GrenadeType Type { get; } = type;
+				public bool Claimed { get; set; }
+			}
+
+			private static GrenadeType GrenadeTypeOf(string weapon) => weapon switch
+			{
+				"smokegrenade" => GrenadeType.Smoke,
+				"flashbang" => GrenadeType.Flashbang,
+				"hegrenade" => GrenadeType.HighExplosive,
+				"molotov" or "incgrenade" => GrenadeType.Fire,
+				"decoy" => GrenadeType.Decoy,
+				_ => GrenadeType.Unknown,
+			};
+
+			/// <summary>
+			/// Pairs a grenade with the unclaimed throw of its kind whose event lines up best with the entity appearing (a few ticks later).
+			/// A grenade with a known thrower only considers that player's throws.
+			/// </summary>
+			private ulong? ClaimThrow(ProjectileState projectile)
+			{
+				const int typicalLag = -7;
+				GrenadeThrow? best = null;
+				foreach (GrenadeThrow candidate in _grenadeThrows)
+				{
+					if (candidate.Claimed || candidate.Type != projectile.Type) continue;
+					if (projectile.Thrower is { } known && candidate.SteamId != known) continue;
+
+					int gap = candidate.Tick - projectile.StartTick;
+					if (Math.Abs(gap) <= 96 && (best is null || Math.Abs(gap - typicalLag) < Math.Abs(best.Tick - projectile.StartTick - typicalLag))) best = candidate;
+				}
+
+				if (best is null) return null;
+
+				best.Claimed = true;
+				return best.SteamId;
+			}
+
+			private void HandleProjectileCreated(int entityIndex, string className)
+			{
+				if (MatchEndTick != 0) return;
+
+				GrenadeType type = className switch
+				{
+					"CSmokeGrenadeProjectile" => GrenadeType.Smoke,
+					"CFlashbangProjectile" => GrenadeType.Flashbang,
+					"CHEGrenadeProjectile" => GrenadeType.HighExplosive,
+					"CMolotovProjectile" => GrenadeType.Fire,
+					"CDecoyProjectile" => GrenadeType.Decoy,
+					_ => GrenadeType.Unknown,
+				};
+				_projectiles[entityIndex] = new ProjectileState { Type = type, StartTick = GameTick, Round = CurrentRound };
+			}
+
+			private void HandleProjectileProperty(int entityIndex, string property, object? value)
+			{
+				if (MatchEndTick != 0 || value is null || !_projectiles.TryGetValue(entityIndex, out ProjectileState? projectile)) return;
+
+				// A path point is written one update late so it never holds a half-applied position.
+				int tick = CurrentFrameTick;
+				if (projectile.Position.UpdateTick < 0) projectile.Position.UpdateTick = tick;
+				else if (tick != projectile.Position.UpdateTick)
+				{
+					AddPathPoint(projectile, projectile.Position.UpdateTick + _serverTickOffset);
+					projectile.Position.UpdateTick = tick;
+				}
+
+				if (ApplyPositionProperty(projectile.Position, property, value)) return;
+
+				// Both handles name the throwing pawn; some grenades only ever send the owner.
+				if (property is "m_hThrower" or "m_hOwnerEntity" && projectile.Thrower is null && value is ulong handle && handle != uint.MaxValue && handle != 0xFFFFFF)
+				{
+					projectile.Thrower = PlayerOfPawnIndex((int)(handle & 0x3FFF))?.SteamId;
+					if (projectile.Thrower is not null) ClaimThrow(projectile);
+				}
+			}
+
+			private void AddPathPoint(ProjectileState projectile, int tick)
+			{
+				if (!projectile.Position.HasPosition || tick - projectile.LastPathTick < 4) return;
+
+				projectile.LastPathTick = tick;
+				projectile.Path.Add(new GrenadePathPoint(tick, ToWorld(projectile.Position)));
+			}
+
+			private void HandleProjectileRemoved(int entityIndex)
+			{
+				if (!_projectiles.Remove(entityIndex, out ProjectileState? projectile) || MatchEndTick != 0) return;
+
+				// Grenades whose entity named a thrower already claimed their throw; the rest take what is left.
+				if (projectile.Thrower is null) projectile.Thrower = ClaimThrow(projectile);
+				_grenadeThrows.RemoveAll(t => t.Tick < GameTick - 2048);
+				projectile.LastPathTick = int.MinValue / 2;
+				AddPathPoint(projectile, GameTick);
+				if (projectile.Path.Count > 0 && projectile.Round is not null)
+				{
+					projectile.Round.Grenades.Add(new GrenadeTrajectory(projectile.Type, projectile.Thrower, projectile.StartTick, GameTick, projectile.Path));
+				}
+			}
+
+			private PlayerAccumulator? PlayerOfPawnIndex(int pawnIndex)
+			{
+				foreach ((int index, ControllerInfo controller) in _controllers)
+				{
+					if (controller.Properties.GetValueOrDefault("m_hPlayerPawn") is ulong handle && (int)(handle & 0x3FFF) == pawnIndex)
+					{
+						return PlayersByEntitySlot.GetValueOrDefault(index - 1) ?? ResolvePlayerBySteamId(controller.SteamId);
+					}
+				}
+
+				return null;
+			}
+
+			private readonly Dictionary<int, (EffectZoneType Type, int StartTick, PlayerPosition Position, RoundAccumulator Round)> _openEffects = [];
+
+			private void OpenEffect(EffectZoneType type, int tick, IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				if (CurrentRound is null) return;
+
+				PlayerPosition position = new(GetFloatValue(data, "x"), GetFloatValue(data, "y"), GetFloatValue(data, "z"));
+				_openEffects[GetIntValue(data, "entityid")] = (type, tick, position, CurrentRound);
+			}
+
+			private void CloseEffect(int tick, IReadOnlyDictionary<string, GameEventValue> data)
+			{
+				if (_openEffects.Remove(GetIntValue(data, "entityid"), out var effect)) AddEffect(effect, tick);
+			}
+
+			// Approximate in-game radii.
+			private static void AddEffect((EffectZoneType Type, int StartTick, PlayerPosition Position, RoundAccumulator Round) effect, int endTick)
+				=> effect.Round.EffectZones.Add(new EffectZone(effect.Type, effect.StartTick, endTick, effect.Position, effect.Type == EffectZoneType.Smoke ? 144 : 120));
+
+			private static float NormalizeAngle(float degrees) => degrees > 180f ? degrees - 360f : degrees;
+
+			/// <summary>The pawn entity the player currently controls, via the controller's pawn handle.</summary>
+			private PawnState? PawnOf(PlayerAccumulator? player)
+			{
+				if (player is null) return null;
+
+				foreach ((int index, ControllerInfo controller) in _controllers)
+				{
+					// A controller may never report its steam id, but its entity index is always player slot + 1.
+					bool isPlayer = (controller.SteamId != 0 && controller.SteamId == player.SteamId) || PlayersByEntitySlot.GetValueOrDefault(index - 1) == player;
+					if (!isPlayer) continue;
+					if (controller.Properties.GetValueOrDefault("m_hPlayerPawn") is not ulong handle || handle == uint.MaxValue || handle == 0xFFFFFF) continue;
+
+					if (_pawns.GetValueOrDefault((int)(handle & 0x3FFF)) is { HasPosition: true } pawn) return pawn;
+				}
+
+				return null;
+			}
+
+			// Cells are 512 units apart, with offsets that can run past 512, and the world origin sits at -16384.
+			private static PlayerPosition ToWorld(PawnState pawn) => new(
+				(pawn.CellX * 512f) - 16384f + pawn.VecX,
+				(pawn.CellY * 512f) - 16384f + pawn.VecY,
+				(pawn.CellZ * 512f) - 16384f + pawn.VecZ);
+
+			private PlayerPosition? PositionOf(PlayerAccumulator? player) => PawnOf(player) is { } pawn ? ToWorld(pawn) : null;
+
+			/// <summary>Records one frame per tracked player into the open round once enough ticks have passed since the last sample.</summary>
+			public void SamplePositions()
+			{
+				int tick = GameTick;
+				if (PositionSampleIntervalTicks <= 0 || CurrentRound is null || CurrentRound.StatsFinalized || MatchEndTick != 0 || tick - _lastPositionSampleTick < PositionSampleIntervalTicks) return;
+
+				_lastPositionSampleTick = tick;
+				foreach (PlayerAccumulator player in PlayersByUserId.Values)
+				{
+					if (PawnOf(player) is not { } pawn) continue;
+
+					PlayerPosition position = ToWorld(pawn);
+					CurrentRound.Frames.Add(new PlayerFrame(tick, player.SteamId, position, pawn.Yaw, pawn.Pitch, pawn.Health, pawn.Armor, MapZones.Find(MapName, position)));
+				}
+			}
+
+			private readonly Dictionary<int, int> _teamNumByEntity = [];
+			private readonly Dictionary<int, int> _teamScoreByEntity = [];
+
+			/// <summary>
+			/// The game's T and CT team entities each count their round wins, so a +1 on one of them names the winner of the round that
+			/// just ended. This is authoritative; the kill/bomb inference is only the fallback when the demo has no entity state.
+			/// </summary>
+			private void HandleTeamProperty(int entityIndex, string property, object? value)
+			{
+				if (MatchEndTick != 0 || value is null) return;
+
+				long number = value switch { long l => l, ulong u => (long)u, int i => i, _ => -1 };
+				if (property == "m_iTeamNum")
+				{
+					_teamNumByEntity[entityIndex] = (int)number;
+					return;
+				}
+
+				if (property != "m_iScore") return;
+
+				int previous = _teamScoreByEntity.GetValueOrDefault(entityIndex);
+				_teamScoreByEntity[entityIndex] = (int)number;
+				if (number != previous + 1 || !_teamNumByEntity.TryGetValue(entityIndex, out int team) || team is not (2 or 3)) return;
+
+				RoundAccumulator? round = CurrentRound ?? Rounds.LastOrDefault();
+				if (round is not null && round.EventWinner is null) round.EventWinner = (CsTeamSide)team;
+			}
 
 			private void HandleControllerProperty(int entityIndex, string property, object? value, bool created)
 			{
@@ -698,6 +1061,14 @@ namespace StrikeLink.DemoParser.Parsing
 			}
 
 			public int CurrentFrameTick { get; private set; }
+
+			private int _serverTickOffset;
+
+			/// <summary>Events carry the server tick while entity updates only know the demo frame tick; this keeps the two in step.</summary>
+			public void ObserveServerTick(int serverTick) => _serverTickOffset = serverTick - CurrentFrameTick;
+
+			/// <summary>The current moment in the same tick domain as game events (kills, rounds).</summary>
+			private int GameTick => CurrentFrameTick + _serverTickOffset;
 
 			// Event tick of the match-end panel; anything after it (post-match deaths/damage) is ignored.
 			private int MatchEndTick { get; set; }
@@ -841,27 +1212,8 @@ namespace StrikeLink.DemoParser.Parsing
 				&& round is { BombExploded: false, PlanterUserId: null, DefuserUserId: null, Participants.Count: 0 };
 
 
-			/// <summary>
-			/// Provides a mapping of event names to their associated data collections.
-			/// </summary>
-			/// <remarks>Each key in the outer dictionary represents an event name. The corresponding value is a
-			/// dictionary that maps string keys to dynamic values, allowing storage of arbitrary event-related data. This
-			/// collection is static and read-only; its contents should be initialized at application startup and not modified at
-			/// runtime.</remarks>
-			private static Dictionary<string, List<(int Tick, Dictionary<string, GameEventValue> Data)>> EventData { get; } = [];
-
-
 			public void HandleGameEvent(string name, int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
-				if (!EventData.TryGetValue(name, out List<(int Tick, Dictionary<string, GameEventValue> Data)>? list))
-				{
-					list = [];
-					EventData[name] = list;
-				}
-
-				Dictionary<string, GameEventValue> copiedData = new(data);
-				list.Add((tick, copiedData));
-
 				ObserveTrackedEventSample(name, data);
 
 				switch (name)
@@ -889,7 +1241,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 					case "round_officially_ended":
 					{
-							CsTeamSide winner = GetRoundWinnerFromEvent(data);
+							CsTeamSide winner = CurrentRound?.EventWinner ?? GetRoundWinnerFromEvent(data);
 							if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists) && TryResolveRoundWinnerFromScoreboard(data, out CsTeamSide scoreWinner))
 							{
 								winner = scoreWinner;
@@ -941,8 +1293,17 @@ namespace StrikeLink.DemoParser.Parsing
 					case "player_blind":
 						if (EnsureTrackedRound())
 						{
-							HandlePlayerBlind(data);
+							HandlePlayerBlind(tick, data);
 						}
+						break;
+
+					case "smokegrenade_detonate":
+						OpenEffect(EffectZoneType.Smoke, tick, data);
+						break;
+
+					case "smokegrenade_expired":
+					case "inferno_expire":
+						CloseEffect(tick, data);
 						break;
 
 					case "flashbang_detonate":
@@ -954,6 +1315,7 @@ namespace StrikeLink.DemoParser.Parsing
 						break;
 
 					case "inferno_startburn":
+						OpenEffect(EffectZoneType.Fire, tick, data);
 						IncrementUtilityCount(data, WeaponKind.Molotov);
 						break;
 
@@ -963,6 +1325,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 					case "bomb_exploded":
 						HandleBombExploded();
+						CurrentRound?.BombEvents.Add(new BombEvent(BombEventType.Exploded, tick, null, null));
 						break;
 
 					case "bomb_planted":
@@ -973,6 +1336,8 @@ namespace StrikeLink.DemoParser.Parsing
 							{
 								player.BombPlants++;
 								CurrentRound!.PlanterUserId = player.UserId;
+								CurrentRound.PlantTick = tick;
+								CurrentRound.BombEvents.Add(new BombEvent(BombEventType.Planted, tick, player.SteamId, PositionOf(player)));
 							}
 							else
 							{
@@ -989,6 +1354,7 @@ namespace StrikeLink.DemoParser.Parsing
 							{
 								player.BombDefuses++;
 								CurrentRound!.DefuserUserId = player.UserId;
+								CurrentRound.BombEvents.Add(new BombEvent(BombEventType.Defused, tick, player.SteamId, PositionOf(player)));
 							}
 							else
 							{
@@ -1242,8 +1608,42 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 			}
 
+			/// <summary>
+			/// Drops rounds that never saw a kill or damage event (a round_start that fired before the real round, or one after the
+			/// match ended). Left in, they shift every later round number and the halftime split by one.
+			/// </summary>
+			private void PruneEmptyRounds()
+			{
+				int removedBeforeHalf = 0;
+				for (int i = Rounds.Count - 1; i >= 0; i--)
+				{
+					RoundAccumulator round = Rounds[i];
+					if (round.Kills.Count != 0 || round.Damage.Count != 0) continue;
+
+					if (HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber) removedBeforeHalf++;
+					Rounds.RemoveAt(i);
+				}
+
+				int number = 0;
+				Dictionary<int, int> renumbered = [];
+				foreach (RoundAccumulator round in Rounds)
+				{
+					renumbered[round.Number] = ++number;
+					round.Number = number;
+				}
+
+				HalfTimeRoundNumber -= removedBeforeHalf;
+				int[] deferred = [.. _deferredRoundWinnerWarnings];
+				_deferredRoundWinnerWarnings.Clear();
+				foreach (int old in deferred)
+				{
+					if (renumbered.TryGetValue(old, out int now)) _deferredRoundWinnerWarnings.Add(now);
+				}
+			}
+
 			public Cs2DemoParseResult BuildResult()
 			{
+				PruneEmptyRounds();
 				ReconcileTeamEvents();
 				CountRoundsParticipated();
 				CountMultiKills();
@@ -1278,7 +1678,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 				foreach (RoundAccumulator round in Rounds)
 				{
-					round.Winner = InferRoundWinner(round) ?? round.Winner;
+					// The winner read from the game's team scores is authoritative; inference is only the fallback.
+					round.Winner = round.EventWinner ?? InferRoundWinner(round) ?? round.Winner;
 					switch (round.Winner)
 					{
 						case CsTeamSide.Unknown:
@@ -1299,7 +1700,7 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 
 					// Update per-player RoundsWon/RoundsLost accounting for halftime side swap
-					bool roundIsFirstHalf = HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber;
+					bool roundIsFirstHalf = IsFlippedFromFinal(round.Number);
 					foreach (PlayerAccumulator player in PlayersByUserId.Values.Where(static p => p.Team is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
 					{
 						// In first half, teams are swapped relative to current assignment
@@ -1323,14 +1724,6 @@ namespace StrikeLink.DemoParser.Parsing
 					AddWarning($"Round {roundNumber} winner could not be resolved from events or inference.");
 				}
 				_deferredRoundWinnerWarnings.Clear();
-
-				RoundAccumulator? unresolvedRound = Rounds.FirstOrDefault(round => round.Winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists));
-				if (unresolvedRound is not null)
-				{
-#if !DEBUG
-					throw new InvalidOperationException($"Failed to determine winner for round {unresolvedRound.Number}.");		
-#endif
-				}
 
 				if (PlayersByUserId.Count == 0 && Rounds.Count == 0)
 				{
@@ -1450,17 +1843,135 @@ namespace StrikeLink.DemoParser.Parsing
 					teamASide,
 					teamBSide,
 					new ReadOnlyCollection<RoundKillEvent>(round.Kills),
-					new ReadOnlyCollection<RoundDamageEvent>(round.Damage));
+					new ReadOnlyCollection<RoundDamageEvent>(round.Damage),
+					GetRoundEconomy(round).TeamAEquipment,
+					GetRoundEconomy(round).TeamBEquipment,
+					GetRoundEconomy(round).TeamABuy,
+					GetRoundEconomy(round).TeamBBuy,
+					new ReadOnlyCollection<PlayerFrame>(round.Frames),
+					new ReadOnlyCollection<GrenadeTrajectory>(round.Grenades),
+					new ReadOnlyCollection<FlashEffect>(BuildFlashes(round)),
+					new ReadOnlyCollection<EffectZone>(round.EffectZones),
+					new ReadOnlyCollection<BombEvent>(round.BombEvents));
+			}
+
+			private List<FlashEffect> BuildFlashes(RoundAccumulator round)
+			{
+				List<FlashEffect> flashes = [];
+				foreach ((int tick, int? attackerId, int victimId, float duration) in round.Flashes)
+				{
+					PlayerAccumulator? attacker = attackerId is { } a ? PlayersByUserId.GetValueOrDefault(a) : null;
+					PlayerAccumulator? victim = PlayersByUserId.GetValueOrDefault(victimId);
+					bool team = attacker is not null && victim is not null && attacker.UserId != victim.UserId
+						&& ResolvePlayerRoundSide(attacker, round) == ResolvePlayerRoundSide(victim, round);
+					flashes.Add(new FlashEffect(tick, attacker?.SteamId, victim?.SteamId, Math.Round(duration, 2), team));
+				}
+
+				return flashes;
+			}
+
+			private readonly Dictionary<int, RoundEconomy> _economyByRound = [];
+
+			private RoundEconomy GetRoundEconomy(RoundAccumulator round)
+			{
+				if (_economyByRound.TryGetValue(round.Number, out RoundEconomy cached)) return cached;
+
+				CsTeamSide teamASide = GetTeamASideForRound(round.Number);
+				int AverageEquipment(CsTeamSide side)
+				{
+					List<int> values = [];
+					foreach (PlayerAccumulator player in PlayersByUserId.Values)
+					{
+						if (ResolvePlayerRoundSide(player, round) != side) continue;
+						ControllerRoundStats? stats = player.ControllerStats?.RoundStats.FirstOrDefault(r => r.Round == round.Number);
+						if (stats is not null) values.Add(stats.EquipmentValue);
+					}
+
+					return values.Count == 0 ? 0 : (int)values.Average();
+				}
+
+				bool isPistol = round.Number == 1 || round.Number == (HalfTimeRoundNumber > 0 ? HalfTimeRoundNumber + 1 : 13);
+				static BuyType Classify(int average, bool pistol) => average <= 0 ? BuyType.Unknown
+					: pistol ? BuyType.Pistol
+					: average >= 3500 ? BuyType.Full
+					: average >= 2000 ? BuyType.Half
+					: average >= 1000 ? BuyType.Force
+					: BuyType.Eco;
+
+				int teamA = AverageEquipment(teamASide);
+				int teamB = AverageEquipment(GetOppositeTeamSide(teamASide));
+				RoundEconomy economy = new(teamA, teamB, Classify(teamA, isPistol), Classify(teamB, isPistol));
+				_economyByRound[round.Number] = economy;
+				return economy;
+			}
+
+			private readonly record struct RoundEconomy(int TeamAEquipment, int TeamBEquipment, BuyType TeamABuy, BuyType TeamBBuy);
+
+			private EconomyStats BuildEconomy(PlayerAccumulator player)
+			{
+				int pistol = 0, pistolWins = 0, eco = 0, ecoWins = 0, full = 0, fullWins = 0, ecoKills = 0, antiEcoKills = 0;
+				static bool IsLow(BuyType b) => b is BuyType.Eco or BuyType.Force;
+				static bool IsHigh(BuyType b) => b is BuyType.Half or BuyType.Full;
+
+				foreach (RoundAccumulator round in Rounds)
+				{
+					if (!round.Participants.Contains(player.UserId)) continue;
+
+					CsTeamSide side = ResolvePlayerRoundSide(player, round);
+					if (side is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)) continue;
+
+					RoundEconomy economy = GetRoundEconomy(round);
+					bool isTeamA = side == GetTeamASideForRound(round.Number);
+					BuyType own = isTeamA ? economy.TeamABuy : economy.TeamBBuy;
+					BuyType enemy = isTeamA ? economy.TeamBBuy : economy.TeamABuy;
+					bool won = round.Winner == side;
+
+					if (own == BuyType.Pistol) { pistol++; if (won) pistolWins++; }
+					else if (IsLow(own)) { eco++; if (won) ecoWins++; }
+					else if (IsHigh(own)) { full++; if (won) fullWins++; }
+
+					int kills = round.Kills.Count(k => k.KillerSteamId == player.SteamId && !k.IsTeamKill);
+					if (IsLow(own) && IsHigh(enemy)) ecoKills += kills;
+					if (IsHigh(own) && IsLow(enemy)) antiEcoKills += kills;
+				}
+
+				return new EconomyStats(pistol, pistolWins, eco, ecoWins, full, fullWins, ecoKills, antiEcoKills);
+			}
+
+			private static PlayerRole ClassifyRole(PlayerAccumulator player, List<RoundImpactSnapshot> snapshots, int tOpenings)
+			{
+				int rounds = snapshots.Count;
+				if (rounds < 5) return PlayerRole.Unclassified;
+
+				int tRounds = snapshots.Count(r => r.Side == CsTeamSide.Terrorists);
+				int ctRounds = snapshots.Count(r => r.Side == CsTeamSide.CounterTerrorists);
+				int ctSurvived = snapshots.Count(r => r.Side == CsTeamSide.CounterTerrorists && r.Deaths == 0);
+
+				double clutchRate = player.ClutchAttempts == 0 ? 0 : (double)player.ClutchWins / rounds;
+
+				// ponytail: baselines are rough per-round averages, not fit to a demo corpus; refit if roles look skewed
+				Dictionary<PlayerRole, double> scores = new()
+				{
+					[PlayerRole.Entry] = tRounds == 0 ? 0 : Math.Clamp(tOpenings / (double)tRounds / 0.35, 0, 2),
+					[PlayerRole.Support] = Math.Clamp(Math.Max(0, player.PlayersFlashed - player.TeamFlashes) / (double)rounds / 1.0, 0, 2),
+					[PlayerRole.Anchor] = ctRounds == 0 ? 0 : Math.Clamp(ctSurvived / (double)ctRounds / 0.55, 0, 2),
+					[PlayerRole.Trade] = Math.Clamp((player.TradeKills + player.TradedDeaths) / (double)rounds / 0.30, 0, 2),
+					[PlayerRole.Closer] = Math.Clamp(clutchRate / 0.08, 0, 2),
+				};
+
+				KeyValuePair<PlayerRole, double>[] ranked = [.. scores.OrderByDescending(static e => e.Value)];
+				return ranked[0].Value < 0.4 || ranked[0].Value - ranked[1].Value < 0.15 ? PlayerRole.Hybrid : ranked[0].Key;
 			}
 
 			private PlayerStats BuildPlayer(PlayerAccumulator player)
 			{
 				int roundsPlayed = Math.Max(player.RoundsParticipated, 1);
-				double adr = player.DamageDealt / (double)roundsPlayed;
+				double adr = (player.ControllerStats?.Damage ?? player.DamageDealt) / (double)roundsPlayed;
 				double hsPct = player.Kills == 0 ? 0 : player.HeadshotKills * 100d / player.Kills;
 				double totalAccuracy = player.Shots == 0 ? 0 : player.Hits * 100d / player.Shots;
 				double sprayAccuracy = player.SprayShots == 0 ? 0 : player.SprayHits * 100d / player.SprayShots;
 				List<RoundImpactSnapshot> roundSnapshots = BuildRoundImpactSnapshots(player);
+				OpeningDuelStats openingDuels = BuildOpeningDuels(player, out int tOpenings);
 				PlayerImpactStats impact = BuildPlayerImpact(roundSnapshots);
 
 				double aimRating = Math.Clamp(
@@ -1551,8 +2062,51 @@ namespace StrikeLink.DemoParser.Parsing
 					KastPercentage: player.RoundsParticipated == 0 ? 0 : Math.Round(player.KastRounds * 100d / player.RoundsParticipated, 2),
 					Score: player.ControllerStats?.Score ?? player.Score,
 					ControllerProperties: new ReadOnlyDictionary<string, object?>(player.Controller),
-					Controller: player.ControllerStats
+					Controller: player.ControllerStats,
+					OpeningDuels: openingDuels,
+					Economy: BuildEconomy(player),
+					Role: ClassifyRole(player, roundSnapshots, tOpenings),
+					Aim: new AimStats(
+						player.CounterStrafeAttempts,
+						player.CounterStrafeAttempts == 0 ? 0 : Math.Round(player.CounterStrafeProper * 100d / player.CounterStrafeAttempts, 2),
+						player.GunShots == 0 ? 0 : Math.Round(player.GunSpeedSum / player.GunShots, 2),
+						player.EngagementsWithDamage,
+						player.EngagementsWithDamage == 0 ? 0 : Math.Round(player.TimeToDamageTicks * (TickIntervalSeconds > 0 ? TickIntervalSeconds : 1d / 64) * 1000d / player.EngagementsWithDamage, 1),
+						player.Engagements == 0 ? 0 : Math.Round(player.FirstBulletHits * 100d / player.Engagements, 2))
 					);
+			}
+
+			private OpeningDuelStats BuildOpeningDuels(PlayerAccumulator player, out int tOpenings)
+			{
+				tOpenings = 0;
+				int kills = 0, deaths = 0, killsTraded = 0, deathsTraded = 0;
+				int window = GetTradeWindowTicks();
+
+				foreach (RoundAccumulator round in Rounds)
+				{
+					RoundKillEvent? opening = round.Kills.FirstOrDefault(k => !k.IsTeamKill && k.KillerSteamId is not null && k.KillerSteamId != k.VictimSteamId);
+					if (opening is null) continue;
+
+					bool isKiller = opening.KillerSteamId == player.SteamId;
+					if (!isKiller && opening.VictimSteamId != player.SteamId) continue;
+
+					if (ResolvePlayerRoundSide(player, round) == CsTeamSide.Terrorists) tOpenings++;
+
+					bool traded = round.Kills.Any(k => k.IsTrade && k.VictimSteamId == opening.KillerSteamId && k.Tick > opening.Tick && k.Tick - opening.Tick <= window);
+					if (isKiller)
+					{
+						kills++;
+						if (traded) killsTraded++;
+					}
+					else
+					{
+						deaths++;
+						if (traded) deathsTraded++;
+					}
+				}
+
+				int total = kills + deaths;
+				return new OpeningDuelStats(kills, deaths, total == 0 ? 0 : Math.Round(kills * 100d / total, 2), killsTraded, deathsTraded);
 			}
 
 			private MatchTeam ResolvePlayerMatchTeam(PlayerAccumulator player, IReadOnlyList<RoundImpactSnapshot> roundSnapshots)
@@ -1593,6 +2147,63 @@ namespace StrikeLink.DemoParser.Parsing
 				};
 			}
 
+			private readonly Dictionary<int, (Dictionary<ulong, double> Impact, double TerroristStart)> _impactByRound = [];
+
+			/// <summary>
+			/// Win probability each player added or lost in a round (as a 0..1 fraction): a kill adds the killing side's gain in round win
+			/// probability and costs the victim the same, and the assister gets a quarter of the gain on top.
+			/// </summary>
+			private Dictionary<ulong, double> GetRoundWinProbabilityImpact(RoundAccumulator round, out double terroristStart)
+			{
+				if (_impactByRound.TryGetValue(round.Number, out var cached))
+				{
+					terroristStart = cached.TerroristStart;
+					return cached.Impact;
+				}
+
+				int tAlive = 0, ctAlive = 0;
+				foreach (PlayerAccumulator participant in PlayersByUserId.Values.Where(p => round.Participants.Contains(p.UserId)))
+				{
+					CsTeamSide side = ResolvePlayerRoundSide(participant, round);
+					if (side == CsTeamSide.Terrorists) tAlive++;
+					else if (side == CsTeamSide.CounterTerrorists) ctAlive++;
+				}
+
+				terroristStart = WinProbability.Terrorists(tAlive, ctAlive, false);
+				Dictionary<ulong, double> impact = [];
+				void Add(ulong? steamId, double value)
+				{
+					if (steamId is { } id) impact[id] = impact.GetValueOrDefault(id) + value;
+				}
+
+				bool planted = false;
+				foreach (RoundKillEvent kill in round.Kills.OrderBy(static k => k.Tick))
+				{
+					if (!planted && round.PlantTick is { } plantTick && kill.Tick >= plantTick) planted = true;
+
+					PlayerAccumulator? victim = PlayersByUserId.Values.FirstOrDefault(p => p.SteamId == kill.VictimSteamId);
+					CsTeamSide victimSide = victim is null ? CsTeamSide.Unknown : ResolvePlayerRoundSide(victim, round);
+					double before = WinProbability.Terrorists(tAlive, ctAlive, planted);
+
+					if (victimSide == CsTeamSide.Terrorists) tAlive--;
+					else if (victimSide == CsTeamSide.CounterTerrorists) ctAlive--;
+					else continue;
+
+					double after = WinProbability.Terrorists(tAlive, ctAlive, planted);
+					double victimSideLoss = victimSide == CsTeamSide.Terrorists ? before - after : after - before;
+
+					Add(kill.VictimSteamId, -victimSideLoss);
+					if (!kill.IsTeamKill && kill.KillerSteamId != kill.VictimSteamId)
+					{
+						Add(kill.KillerSteamId, victimSideLoss);
+						Add(kill.AssisterSteamId, victimSideLoss * 0.25d);
+					}
+				}
+
+				_impactByRound[round.Number] = (impact, terroristStart);
+				return impact;
+			}
+
 			private List<RoundImpactSnapshot> BuildRoundImpactSnapshots(PlayerAccumulator player)
 			{
 				List<RoundImpactSnapshot> snapshots = [];
@@ -1619,25 +2230,10 @@ namespace StrikeLink.DemoParser.Parsing
 
 					bool won = round.Winner is not null && round.Winner == side;
 
-					double roundImpact = Math.Clamp(
-						(kills * 24d) +
-						(assists * 12d) +
-						(Math.Min(damage, 160) / 160d * 26d) +
-						(deaths == 0 ? 10d : 0d) +
-						(won ? 8d : -4d),
-						0,
-						100);
-
-					double winProbability = Math.Clamp(
-						0.45d +
-						(kills * 0.09d) +
-						(assists * 0.04d) +
-						(Math.Min(damage, 180) / 180d * 0.22d) +
-						(deaths == 0 ? 0.08d : -0.03d),
-						0.01d,
-						0.99d);
-
-					double roundRating = Math.Clamp((roundImpact * 0.7d) + (winProbability * 100d * 0.3d), 0, 100);
+					Dictionary<ulong, double> impactBySteam = GetRoundWinProbabilityImpact(round, out double terroristStart);
+					double roundImpact = Math.Round(impactBySteam.GetValueOrDefault(player.SteamId) * 100d, 2);
+					double winProbability = side == CsTeamSide.Terrorists ? terroristStart : 1 - terroristStart;
+					double roundRating = Math.Clamp(50d + roundImpact, 0, 100);
 
 					snapshots.Add(new RoundImpactSnapshot(
 						RoundNumber: round.Number,
@@ -1648,7 +2244,7 @@ namespace StrikeLink.DemoParser.Parsing
 						Deaths: deaths,
 						Damage: damage,
 						WinProbability: Math.Round(winProbability * 100d, 2),
-						RoundImpact: Math.Round(roundImpact, 2),
+						RoundImpact: roundImpact,
 						RoundRating: Math.Round(roundRating, 2)));
 				}
 
@@ -1708,7 +2304,7 @@ namespace StrikeLink.DemoParser.Parsing
 					return sideAtStart;
 				}
 
-				bool isFirstHalf = HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber;
+				bool isFirstHalf = IsFlippedFromFinal(round.Number);
 				return !isFirstHalf ? player.Team : player.Team switch
 				{
 					CsTeamSide.Terrorists => CsTeamSide.CounterTerrorists,
@@ -1994,6 +2590,12 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 
 				round.StatsFinalized = true;
+				foreach (int key in _openEffects.Where(e => e.Value.Round == round).Select(static e => e.Key).ToList())
+				{
+					AddEffect(_openEffects[key], tick);
+					_openEffects.Remove(key);
+				}
+
 				round.EndTick = tick;
 				round.Duration = GetDuration(round.StartTick, tick);
 				round.CompleteShotSequences();
@@ -2009,9 +2611,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 				if (winner is not (CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists))
 				{
-#if !DEBUG
-					throw new InvalidOperationException($"Failed to determine winner for round {round.Number}.");
-#endif
+					AddWarning($"Round {round.Number} ended without a resolvable winner.");
 				}
 
 				round.Winner = winner;
@@ -2187,7 +2787,9 @@ namespace StrikeLink.DemoParser.Parsing
 					IsTrade: isTrade,
 					IsWallBang: penetrated > 0,
 					ThroughSmoke: throughSmoke,
-					AttackerBlind: attackerBlind
+					AttackerBlind: attackerBlind,
+					KillerPosition: PositionOf(killer),
+					VictimPosition: PositionOf(victim)
 					)
 				);
 
@@ -2201,11 +2803,8 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private bool TryResolveTrade(PlayerAccumulator? killer, PlayerAccumulator victim, int tick)
 			{
-				if (killer is null || CurrentRound is null)
-				{
-					AddWarning($"Failed to resolve trade | KILLER: {killer == null} | CURRENT_ROUND: {CurrentRound == null} | {Serialize(victim)}");
-					return false;
-				}
+				// World kills and kills outside a live round can't be trades.
+				if (killer is null || CurrentRound is null) return false;
 
 				for (int i = 0; i < CurrentRound.PendingTrades.Count; i++)
 				{
@@ -2319,7 +2918,7 @@ namespace StrikeLink.DemoParser.Parsing
 					}
 				}
 
-				CurrentRound?.RegisterHit(attacker.UserId);
+				CurrentRound?.RegisterHit(attacker.UserId, tick, weapon);
 				CurrentRound?.Damage.Add(new RoundDamageEvent(
 					Tick: tick,
 					AttackerSteamId: attacker.SteamId,
@@ -2330,7 +2929,9 @@ namespace StrikeLink.DemoParser.Parsing
 					Damage: damage,
 					HealthDamage: damage,
 					ArmorDamage: armorDamage,
-					IsFriendlyFire: friendlyFire));
+					IsFriendlyFire: friendlyFire,
+					AttackerPosition: PositionOf(attacker),
+					VictimPosition: PositionOf(victim)));
 			}
 
 			private void HandleWeaponFire(int tick, IReadOnlyDictionary<string, GameEventValue> data)
@@ -2347,9 +2948,25 @@ namespace StrikeLink.DemoParser.Parsing
 				player.Shots++;
 				player.Weapon(weapon).Shots++;
 				CurrentRound.RegisterShot(player.UserId, tick, player, weapon, GetSprayGapTicks());
+
+				if (GrenadeTypeOf(weapon) != GrenadeType.Unknown) _grenadeThrows.Add(new GrenadeThrow(tick, player.SteamId, GrenadeTypeOf(weapon), PositionOf(player)));
+
+				if (!ClassifyWeapon(weapon).IsUtility && weapon is not ("taser" or "c4") && !weapon.Contains("knife", StringComparison.OrdinalIgnoreCase) && PawnOf(player) is { } pawn)
+				{
+					(float now, float recent) = SpeedOf(pawn, tick - _serverTickOffset);
+					player.GunShots++;
+					player.GunSpeedSum += now;
+
+					// A shot right after fast movement is a counter-strafe test; accuracy is only restored below about 34 units per second.
+					if (recent > 110f)
+					{
+						player.CounterStrafeAttempts++;
+						if (now < 34f) player.CounterStrafeProper++;
+					}
+				}
 			}
 
-			private void HandlePlayerBlind(IReadOnlyDictionary<string, GameEventValue> data)
+			private void HandlePlayerBlind(int tick, IReadOnlyDictionary<string, GameEventValue> data)
 			{
 				PlayerAccumulator? victim = ResolvePlayerFromCandidates(data, "userid", "userid_pawn", "victim");
 				if (victim is null)
@@ -2361,6 +2978,7 @@ namespace StrikeLink.DemoParser.Parsing
 				victim.TimesFlashed++;
 
 				PlayerAccumulator? attacker = ResolvePlayerFromCandidates(data, "attacker", "attacker_pawn");
+				CurrentRound?.Flashes.Add((tick, attacker?.UserId, victim.UserId, GetFloatValue(data, "blind_duration")));
 				if (attacker is null || attacker.UserId == victim.UserId) return;
 
 				attacker.PlayersFlashed++;
@@ -2505,7 +3123,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 			private CsTeamSide GetTeamASideForRound(int roundNumber)
 			{
-				bool isSecondHalf = HalfTimeRoundNumber > 0 && roundNumber > HalfTimeRoundNumber;
+				bool isSecondHalf = (SwapsThrough(roundNumber) & 1) == 1;
 				return isSecondHalf ? CsTeamSide.CounterTerrorists : CsTeamSide.Terrorists;
 			}
 
@@ -2519,15 +3137,17 @@ namespace StrikeLink.DemoParser.Parsing
 					return inferred;
 				}
 
-				int roundNumber = round?.Number ?? -1;
-#if !DEBUG
-				throw new InvalidOperationException($"Failed to determine winner for round {roundNumber}.");
-#endif
 				return CsTeamSide.Unknown;
 			}
 
 			private bool TryResolveRoundWinner(RoundAccumulator? round, out CsTeamSide winner)
 			{
+				if (round?.EventWinner is { } fromEntities)
+				{
+					winner = fromEntities;
+					return true;
+				}
+
 				CsTeamSide? inferred = InferRoundWinner(round);
 				if (inferred is CsTeamSide.Terrorists or CsTeamSide.CounterTerrorists)
 				{
@@ -2558,7 +3178,7 @@ namespace StrikeLink.DemoParser.Parsing
 				}
 				
 				// Determine if this is a first-half round (teams are swapped relative to current assignments)
-				bool isFirstHalf = HalfTimeRoundNumber > 0 && round.Number <= HalfTimeRoundNumber;
+				bool isFirstHalf = IsFlippedFromFinal(round.Number);
 
 				// Primary: use Alive tracking with PlayerSideAtStart (teams captured at round start)
 				// For rounds where sideSnapshot was filled, use it. Other-wise use current teams (halftime-adjusted).
@@ -2745,6 +3365,9 @@ namespace StrikeLink.DemoParser.Parsing
 				       ?? ResolvePlayerBySteamId(GetUInt64Value(data, "assister_xuid"));
 			}
 
+			private static float GetFloatValue(IReadOnlyDictionary<string, GameEventValue> data, string key)
+				=> data.TryGetValue(key, out GameEventValue value) ? value.AsSingle() : 0;
+
 			private static int GetIntValue(IReadOnlyDictionary<string, GameEventValue> data, string key)
 				=> data.TryGetValue(key, out GameEventValue value) ? value.AsInt32() : 0;
 
@@ -2901,6 +3524,16 @@ namespace StrikeLink.DemoParser.Parsing
 					_ => 0,
 				};
 
+			public float AsSingle()
+				=> Value switch
+				{
+					float floatValue => floatValue,
+					double doubleValue => (float)doubleValue,
+					int intValue => intValue,
+					long longValue => longValue,
+					_ => 0,
+				};
+
 			public string? AsString() => Value as string;
 
 			public bool AsBool()
@@ -2989,6 +3622,22 @@ namespace StrikeLink.DemoParser.Parsing
 			/// <summary>Typed, build-tolerant view of <see cref="Controller"/>.</summary>
 			public ControllerStats? ControllerStats { get; set; }
 
+			public int Engagements { get; set; }
+
+			public int EngagementsWithDamage { get; set; }
+
+			public int FirstBulletHits { get; set; }
+
+			public long TimeToDamageTicks { get; set; }
+
+			public int CounterStrafeAttempts { get; set; }
+
+			public int CounterStrafeProper { get; set; }
+
+			public double GunSpeedSum { get; set; }
+
+			public int GunShots { get; set; }
+
 			public int TradeKills { get; set; }
 
 			public int TradeOpportunities { get; set; }
@@ -3054,7 +3703,7 @@ namespace StrikeLink.DemoParser.Parsing
 
 		private sealed class RoundAccumulator(int number, int startTick, bool isSynthetic)
 		{
-			public int Number { get; } = number;
+			public int Number { get; set; } = number;
 
 			public int StartTick { get; } = startTick;
 
@@ -3063,6 +3712,9 @@ namespace StrikeLink.DemoParser.Parsing
 			public bool IsSynthetic { get; } = isSynthetic;
 
 			public CsTeamSide? Winner { get; set; }
+
+			/// <summary>Winner read from the game's team score entities; null when the demo has no entity state.</summary>
+			public CsTeamSide? EventWinner { get; set; }
 
 			public TimeSpan? Duration { get; set; }
 
@@ -3081,6 +3733,16 @@ namespace StrikeLink.DemoParser.Parsing
 
 			public List<RoundKillEvent> Kills { get; } = [];
 
+			public List<PlayerFrame> Frames { get; } = [];
+
+			public List<GrenadeTrajectory> Grenades { get; } = [];
+
+			public List<(int Tick, int? AttackerUserId, int VictimUserId, float Duration)> Flashes { get; } = [];
+
+			public List<EffectZone> EffectZones { get; } = [];
+
+			public List<BombEvent> BombEvents { get; } = [];
+
 			public List<RoundDamageEvent> Damage { get; } = [];
 
 			public List<TradeWindow> PendingTrades { get; } = [];
@@ -3088,6 +3750,8 @@ namespace StrikeLink.DemoParser.Parsing
 			public int? ExplicitMvpUserId { get; set; }
 
 			public int? PlanterUserId { get; set; }
+
+			public int? PlantTick { get; set; }
 
 			public int? DefuserUserId { get; set; }
 
@@ -3109,11 +3773,11 @@ namespace StrikeLink.DemoParser.Parsing
 				sequence.RecordShot(tick);
 			}
 
-			public void RegisterHit(int userId)
+			public void RegisterHit(int userId, int tick, string weapon)
 			{
 				if (ShotSequences.TryGetValue(userId, out ShotSequence? sequence))
 				{
-					sequence.RecordHit();
+					sequence.RecordHit(tick, weapon);
 				}
 			}
 
@@ -3151,10 +3815,32 @@ namespace StrikeLink.DemoParser.Parsing
 				Shots++;
 			}
 
-			public void RecordHit() => Hits++;
+			private int FirstHitTick { get; set; } = -1;
+
+			public void RecordHit(int tick, string weapon)
+			{
+				Hits++;
+				if (FirstHitTick < 0 && string.Equals(Weapon, weapon, StringComparison.OrdinalIgnoreCase)) FirstHitTick = tick;
+			}
+
+			// Knives, the zeus and the bomb aren't aimed fire.
+			private static bool IsGun(string weapon)
+				=> weapon is not ("hegrenade" or "flashbang" or "smokegrenade" or "decoy" or "molotov" or "incgrenade" or "inferno" or "taser" or "c4")
+				   && !weapon.Contains("knife", StringComparison.OrdinalIgnoreCase);
 
 			public void Commit(PlayerAccumulator player)
 			{
+				if (IsGun(Weapon))
+				{
+					player.Engagements++;
+					if (FirstHitTick >= 0)
+					{
+						player.EngagementsWithDamage++;
+						player.TimeToDamageTicks += FirstHitTick - StartTick;
+						if (FirstHitTick == StartTick) player.FirstBulletHits++;
+					}
+				}
+
 				if (Shots < 4) return;
 
 				player.SprayShots += Shots;

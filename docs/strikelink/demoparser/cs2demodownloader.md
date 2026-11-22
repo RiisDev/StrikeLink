@@ -9,8 +9,8 @@ Downloads CS2 demo files directly from replay servers using a match share code.
 public sealed class Cs2DemoDownloader
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [Cs2DemoDownloader](./strikelink/demoparser/cs2demodownloader.md)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [Cs2DemoDownloader](./strikelink/demoparser/cs2demodownloader.md)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 ## Constructors
 
@@ -27,34 +27,34 @@ public Cs2DemoDownloader()
 Builds the replay URL from a CS2 share code.
 
 ```csharp
-public static Task<Uri> BuildReplayUri(string shareCode)
+public static async Task<Uri> BuildReplayUri(string shareCode)
 ```
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 #### Returns
 
-[Task&lt;Uri&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+[Task&lt;Uri&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 
 ### **DownloadToMemoryAsync(String, CancellationToken)**
 
 Downloads the replay into memory, decompressing bzip2 if necessary, and returns a readable stream.
 
 ```csharp
-public static Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, CancellationToken cancellationToken)
+public static async Task<DemoDownloadResult> DownloadToMemoryAsync(string shareCode, CancellationToken cancellationToken = null)
 ```
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-`cancellationToken` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
+`cancellationToken` [CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 
 #### Returns
 
-[Task&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+[Task&lt;DemoDownloadResult&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 
 ### **DownloadToTempFileAsync(String, CancellationToken)**
 
@@ -62,15 +62,15 @@ Downloads the replay to a temp file, decompressing bzip2 if necessary, and retur
  The [DemoDownloadResult](./strikelink/demoparser/demodownloadresult.md) owns the temp file; dispose it to clean up.
 
 ```csharp
-public static Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, CancellationToken cancellationToken)
+public static async Task<DemoDownloadResult> DownloadToTempFileAsync(string shareCode, CancellationToken cancellationToken = null)
 ```
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
-`cancellationToken` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
+`cancellationToken` [CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 
 #### Returns
 
-[Task&lt;DemoDownloadResult&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+[Task&lt;DemoDownloadResult&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>

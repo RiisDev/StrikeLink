@@ -156,6 +156,12 @@ A flexible configuration system built around **`JsonDocument`-style APIs**.
 * Write configurations back to disk safely
 * Designed for tooling, modding, and automation
 
+---
+
+## Credits
+
+* [sneid1/cs2-demo-analyzer](https://github.com/sneid1/cs2-demo-analyzer) (MIT) - used as a reference parser while developing and testing the demo parser. Its output was used to cross-check round data, buy types and player positions, and the A/B/Mid map zone boundaries in `MapZones.cs` come from its source.
+
 --- 
 
 ## Ai Disclosure

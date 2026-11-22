@@ -8,8 +8,8 @@ Provides a mapping of competitive rank IDs to their corresponding display names 
 public static class CsRankNames
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CsRankNames](./strikelink/demoparser/parsing/csranknames.md)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [CsRankNames](./strikelink/demoparser/parsing/csranknames.md)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
 
@@ -34,20 +34,20 @@ The dictionary contains predefined rank names indexed by integer values. The map
 
 ## Methods
 
-### **GetName(Nullable&lt;Int32&gt;)**
+### **GetName(Int32?)**
 
 Retrieves the name associated with the specified rank identifier.
 
 ```csharp
-public static string GetName(Nullable<int> rankId)
+public static string GetName(int? rankId)
 ```
 
 #### Parameters
 
-`rankId` [Nullable&lt;Int32&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`rankId` [Int32?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The identifier of the rank to look up. If null, the method returns "Unknown".
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The name corresponding to the specified rank identifier if found; otherwise, "Unknown".

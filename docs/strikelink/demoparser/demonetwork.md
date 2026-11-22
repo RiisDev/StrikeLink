@@ -9,8 +9,8 @@ Provides network operations for retrieving and managing CS:GO match share codes 
 public class DemoNetwork
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoNetwork](./strikelink/demoparser/demonetwork.md)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [DemoNetwork](./strikelink/demoparser/demonetwork.md)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
 
@@ -47,12 +47,12 @@ This class encapsulates HTTP communication with the Steam Web API to obtain matc
 Retrieves the most recent valid match share code available for the authenticated user.
 
 ```csharp
-public Task<string> GetMatchShareCode()
+public async Task<string?> GetMatchShareCode()
 ```
 
 #### Returns
 
-[Task&lt;String&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
+[Task&lt;String&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1)<br>
 A string containing the latest valid match share code, or null if no valid code is found.
 
 **Remarks:**
@@ -71,7 +71,7 @@ public static DemoShareCodeInfo DecodeShareCode(string shareCode)
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The share code string to decode. Must be in the standard CS:GO share code format and contain only valid
  characters.
 
@@ -82,7 +82,7 @@ A DemoMatchInfo object containing the match ID, reservation ID, and TV port extr
 
 #### Exceptions
 
-[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+[ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
 Thrown if shareCode is not in a valid format or contains invalid characters.
 
 ### **EncodeShareCode(DemoShareCodeInfo)**
@@ -100,5 +100,5 @@ The match information to encode. Cannot be null.
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 A string containing the encoded share code representing the provided match information.

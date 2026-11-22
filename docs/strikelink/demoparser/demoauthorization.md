@@ -9,8 +9,8 @@ Represents the authorization credentials required to access match data using a S
 public class DemoAuthorization
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [DemoAuthorization](./strikelink/demoparser/demoauthorization.md)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [DemoAuthorization](./strikelink/demoparser/demoauthorization.md)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
 
@@ -30,7 +30,7 @@ public long SteamId { get; set; }
 
 #### Property Value
 
-[Int64](https://docs.microsoft.com/en-us/dotnet/api/system.int64)<br>
+[Int64](https://learn.microsoft.com/en-us/dotnet/api/system.int64)<br>
 
 **Remarks:**
 
@@ -47,7 +47,7 @@ public string AuthCode { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 **Remarks:**
 
@@ -65,7 +65,7 @@ public string MatchShareCode { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 **Remarks:**
 
@@ -82,7 +82,7 @@ public string ApiKey { get; set; }
 
 #### Property Value
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 
 **Remarks:**
 
@@ -103,14 +103,14 @@ public DemoAuthorization(long steamId, string authCode, string matchShareCode, s
 
 #### Parameters
 
-`steamId` [Int64](https://docs.microsoft.com/en-us/dotnet/api/system.int64)<br>
+`steamId` [Int64](https://learn.microsoft.com/en-us/dotnet/api/system.int64)<br>
 The unique 64-bit Steam identifier associated with the user.
 
-`authCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`authCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The authorization code used to authenticate the user or session. Cannot be null.
 
-`matchShareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`matchShareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The share code representing the specific match to authorize. Cannot be null.
 
-`apiKey` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
+`apiKey` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
 The steam developer API key. Cannot be null,
