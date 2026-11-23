@@ -2,202 +2,318 @@
 
 Namespace: StrikeLink.Crosshair
 
-Represents the full set of CS2 crosshair configuration values that map directly to in-game console variables.
+CS2 crosshair configuration, one property per console variable, in the units the game and the
+ `CS...` share code use (lengths, thickness and gap are whole pixels).
 
 ```csharp
-public sealed class CrosshairSettings : System.IEquatable`1[[StrikeLink.Crosshair.CrosshairSettings, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
+public sealed record class CrosshairSettings : System.IEquatable`1[[StrikeLink.Crosshair.CrosshairSettings, StrikeLink, Version=1.3.1.0, Culture=neutral, PublicKeyToken=null]]
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
-Implements [IEquatable&lt;CrosshairSettings&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
-
-**Remarks:**
-
-This record is used with [CrosshairShareCode](./strikelink/crosshair/crosshairsharecode.md) to encode and decode `CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`
- share codes, and with [CrosshairService](./strikelink/crosshair/crosshairservice.md) to apply, read, and export crosshair settings.
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
+Implements [IEquatable&lt;CrosshairSettings&gt;](https://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 ## Properties
 
-### **Size**
+### **Style**
 
-Gets the crosshair size (`cl_crosshairsize`). Default is `2.0`.
+`cl_crosshairstyle`. 0-31 fits the share code.
 
 ```csharp
-public float Size { get; set; }
+public CrosshairStyle Style { get; init; }
 ```
 
 #### Property Value
 
-[Single](https://docs.microsoft.com/en-us/dotnet/api/system.single)<br>
+[CrosshairStyle](./strikelink/crosshair/crosshairstyle.md)<br>
 
-### **Gap**
+### **FollowRecoil**
 
-Gets the crosshair gap (`cl_crosshairgap`). Negative values bring lines closer together. Default is `-3.0`.
+`cl_crosshair_recoil`.
 
 ```csharp
-public float Gap { get; set; }
+public bool FollowRecoil { get; init; }
 ```
 
 #### Property Value
 
-[Single](https://docs.microsoft.com/en-us/dotnet/api/system.single)<br>
-
-### **Thickness**
-
-Gets the crosshair line thickness (`cl_crosshairthickness`). Default is `0.5`.
-
-```csharp
-public float Thickness { get; set; }
-```
-
-#### Property Value
-
-[Single](https://docs.microsoft.com/en-us/dotnet/api/system.single)<br>
-
-### **Alpha**
-
-Gets the crosshair alpha transparency (`cl_crosshairalpha`). Range 0–255. Default is `200`.
-
-```csharp
-public int Alpha { get; set; }
-```
-
-#### Property Value
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **Color**
-
-Gets the preset crosshair color (`cl_crosshaircolor`). Default is [CrosshairColor.Green](./strikelink/crosshair/crosshaircolor.md#green).
-
-```csharp
-public CrosshairColor Color { get; set; }
-```
-
-#### Property Value
-
-[CrosshairColor](./strikelink/crosshair/crosshaircolor.md)<br>
-
-### **CustomColorR**
-
-Gets the custom red channel (`cl_crosshaircolor_r`). Used when [CrosshairSettings.Color](./strikelink/crosshair/crosshairsettings.md#color) is [CrosshairColor.Custom](./strikelink/crosshair/crosshaircolor.md#custom). Range 0–255.
-
-```csharp
-public int CustomColorR { get; set; }
-```
-
-#### Property Value
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **CustomColorG**
-
-Gets the custom green channel (`cl_crosshaircolor_g`). Used when [CrosshairSettings.Color](./strikelink/crosshair/crosshairsettings.md#color) is [CrosshairColor.Custom](./strikelink/crosshair/crosshaircolor.md#custom). Range 0–255.
-
-```csharp
-public int CustomColorG { get; set; }
-```
-
-#### Property Value
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **CustomColorB**
-
-Gets the custom blue channel (`cl_crosshaircolor_b`). Used when [CrosshairSettings.Color](./strikelink/crosshair/crosshairsettings.md#color) is [CrosshairColor.Custom](./strikelink/crosshair/crosshaircolor.md#custom). Range 0–255.
-
-```csharp
-public int CustomColorB { get; set; }
-```
-
-#### Property Value
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
+[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 
 ### **Dot**
 
-Gets a value indicating whether the center dot is shown (`cl_crosshairdot`). Default is `false`.
+`cl_crosshairdot`.
 
 ```csharp
-public bool Dot { get; set; }
+public bool Dot { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+### **Length**
+
+`cl_crosshair_length` in pixels, 0-255.
+
+```csharp
+public int Length { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Thickness**
+
+`cl_crosshair_thickness` in pixels, 0-32.
+
+```csharp
+public int Thickness { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Gap**
+
+`cl_crosshair_gap` in pixels, -3840 to 3840.
+
+```csharp
+public int Gap { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Outline**
+
+`cl_crosshair_drawoutline`.
+
+```csharp
+public CrosshairOutline Outline { get; init; }
+```
+
+#### Property Value
+
+[CrosshairOutline](./strikelink/crosshair/crosshairoutline.md)<br>
+
+### **OutlineRed**
+
+`cl_crosshairoutline_r`, 0-255.
+
+```csharp
+public int OutlineRed { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **OutlineGreen**
+
+`cl_crosshairoutline_g`, 0-255.
+
+```csharp
+public int OutlineGreen { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **OutlineBlue**
+
+`cl_crosshairoutline_b`, 0-255.
+
+```csharp
+public int OutlineBlue { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **OutlineAlpha**
+
+`cl_crosshairoutline_a`, 0-255.
+
+```csharp
+public int OutlineAlpha { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Red**
+
+`cl_crosshaircolor_r`, 0-255.
+
+```csharp
+public int Red { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Green**
+
+`cl_crosshaircolor_g`, 0-255.
+
+```csharp
+public int Green { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Blue**
+
+`cl_crosshaircolor_b`, 0-255.
+
+```csharp
+public int Blue { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **Alpha**
+
+`cl_crosshaircolor_a`, 0-255.
+
+```csharp
+public int Alpha { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ### **TStyle**
 
-Gets a value indicating whether the crosshair uses T-style (no top line) (`cl_crosshair_t`). Default is `false`.
+`cl_crosshair_t`.
 
 ```csharp
-public bool TStyle { get; set; }
+public bool TStyle { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
 
-### **DrawOutline**
+### **SplitDistance**
 
-Gets a value indicating whether an outline is drawn around the crosshair lines (`cl_crosshair_drawoutline`). Default is `false`.
+`cl_crosshair_dynamic_splitdist`, 0-127.
 
 ```csharp
-public bool DrawOutline { get; set; }
+public int SplitDistance { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
-### **OutlineThickness**
+### **InnerSplitAlpha**
 
-Gets the outline thickness (`cl_crosshair_outlinethickness`). Range 0.0–3.0. Default is `1.0`.
+`cl_crosshair_dynamic_splitalpha_innermod`, 0-1 in 0.01 steps.
 
 ```csharp
-public float OutlineThickness { get; set; }
+public double InnerSplitAlpha { get; init; }
 ```
 
 #### Property Value
 
-[Single](https://docs.microsoft.com/en-us/dotnet/api/system.single)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
-### **UseAlpha**
+### **OuterSplitAlpha**
 
-Gets a value indicating whether alpha transparency is applied (`cl_crosshairusealpha`). Default is `true`.
+`cl_crosshair_dynamic_splitalpha_outermod`, 0.3-1 in 0.01 steps.
 
 ```csharp
-public bool UseAlpha { get; set; }
+public double OuterSplitAlpha { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
-### **UseWeaponGap**
+### **SplitSizeRatio**
 
-Gets a value indicating whether the crosshair gap scales with the equipped weapon (`cl_crosshairgap_useweaponvalue`). Default is `false`.
+`cl_crosshair_dynamic_maxdist_splitratio`, 0-1 in 0.01 steps.
 
 ```csharp
-public bool UseWeaponGap { get; set; }
+public double SplitSizeRatio { get; init; }
 ```
 
 #### Property Value
 
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
+
+### **SpreadLimit**
+
+`cl_crosshair_dynamic_spread_limit`, 0-255.
+
+```csharp
+public int SpreadLimit { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **ScreenHeight**
+
+`cl_crosshair_screen_height`, 240-65535.
+
+```csharp
+public int ScreenHeight { get; init; }
+```
+
+#### Property Value
+
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
+
+### **ScopeDotUsesCrosshairColor**
+
+`cl_ironsight_usecrosshaircolor`.
+
+```csharp
+public bool ScopeDotUsesCrosshairColor { get; init; }
+```
+
+#### Property Value
+
+[Boolean](https://learn.microsoft.com/en-us/dotnet/api/system.boolean)<br>
+
+### **ScopeDotScale**
+
+`cl_ironsight_dot_scale`, 0.1-2 in 0.01 steps.
+
+```csharp
+public double ScopeDotScale { get; init; }
+```
+
+#### Property Value
+
+[Double](https://learn.microsoft.com/en-us/dotnet/api/system.double)<br>
 
 ### **SniperWidth**
 
-Gets the sniper scope crosshair width (`cl_crosshair_sniper_width`). Default is `1.0`.
+`cl_crosshair_sniper_width`. Applied through [CrosshairService.ApplySettingsAsync(CrosshairSettings, ConsoleServiceConfig, CancellationToken)](./strikelink/crosshair/crosshairservice.md#applysettingsasynccrosshairsettings-consoleserviceconfig-cancellationtoken) only, the share code does not carry it.
 
 ```csharp
-public float SniperWidth { get; set; }
+public int SniperWidth { get; init; }
 ```
 
 #### Property Value
 
-[Single](https://docs.microsoft.com/en-us/dotnet/api/system.single)<br>
+[Int32](https://learn.microsoft.com/en-us/dotnet/api/system.int32)<br>
 
 ## Constructors
 
@@ -206,63 +322,3 @@ public float SniperWidth { get; set; }
 ```csharp
 public CrosshairSettings()
 ```
-
-## Methods
-
-### **ToString()**
-
-```csharp
-public string ToString()
-```
-
-#### Returns
-
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-
-### **GetHashCode()**
-
-```csharp
-public int GetHashCode()
-```
-
-#### Returns
-
-[Int32](https://docs.microsoft.com/en-us/dotnet/api/system.int32)<br>
-
-### **Equals(Object)**
-
-```csharp
-public bool Equals(object obj)
-```
-
-#### Parameters
-
-`obj` [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **Equals(CrosshairSettings)**
-
-```csharp
-public bool Equals(CrosshairSettings other)
-```
-
-#### Parameters
-
-`other` [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
-
-#### Returns
-
-[Boolean](https://docs.microsoft.com/en-us/dotnet/api/system.boolean)<br>
-
-### **&lt;Clone&gt;$()**
-
-```csharp
-public CrosshairSettings <Clone>$()
-```
-
-#### Returns
-
-[CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>

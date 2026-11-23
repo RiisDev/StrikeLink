@@ -1,111 +1,107 @@
 namespace StrikeLink.Crosshair
 {
-	/// <summary>
-	/// Represents the preset color options available for a CS2 crosshair.
-	/// </summary>
-	public enum CrosshairColor
+	/// <summary>Value of <c>cl_crosshairstyle</c>. Numbering matches the share code style field.</summary>
+	public enum CrosshairStyle
 	{
-		/// <summary>Red.</summary>
-		Red = 0,
+		DynamicCross = 0,
+		DynamicCircle = 1,
+		DynamicCrossClassic = 2,
+		StaticCircle = 3,
+		StaticCross = 4,
+		ShotFeedback = 5,
+		DotOnly = 6,
+		DynamicQuadrant = 7,
+		StaticSquare = 8,
+		StaticQuadrant = 9
+	}
 
-		/// <summary>Green (default).</summary>
-		Green = 1,
-
-		/// <summary>Yellow.</summary>
-		Yellow = 2,
-
-		/// <summary>Blue.</summary>
-		Blue = 3,
-
-		/// <summary>Cyan.</summary>
-		Cyan = 4,
-
-		/// <summary>Custom RGB color defined by <see cref="CrosshairSettings.CustomColorR"/>, <see cref="CrosshairSettings.CustomColorG"/>, and <see cref="CrosshairSettings.CustomColorB"/>.</summary>
-		Custom = 5
+	/// <summary>Value of <c>cl_crosshair_drawoutline</c>.</summary>
+	public enum CrosshairOutline
+	{
+		Off = 0,
+		On = 1,
+		Half = 2
 	}
 
 	/// <summary>
-	/// Represents the full set of CS2 crosshair configuration values that map directly to in-game console variables.
+	/// CS2 crosshair configuration, one property per console variable, in the units the game and the
+	/// <c>CS...</c> share code use (lengths, thickness and gap are whole pixels).
 	/// </summary>
-	/// <remarks>
-	/// This record is used with <see cref="CrosshairShareCode"/> to encode and decode <c>CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</c>
-	/// share codes, and with <see cref="CrosshairService"/> to apply, read, and export crosshair settings.
-	/// </remarks>
 	public sealed record CrosshairSettings
 	{
-		/// <summary>
-		/// Gets the crosshair size (<c>cl_crosshairsize</c>). Default is <c>2.0</c>.
-		/// </summary>
-		public float Size { get; init; } = 2.0f;
+		/// <summary><c>cl_crosshairstyle</c>. 0-31 fits the share code.</summary>
+		public CrosshairStyle Style { get; init; } = CrosshairStyle.StaticCross;
 
-		/// <summary>
-		/// Gets the crosshair gap (<c>cl_crosshairgap</c>). Negative values bring lines closer together. Default is <c>-3.0</c>.
-		/// </summary>
-		public float Gap { get; init; } = -3.0f;
+		/// <summary><c>cl_crosshair_recoil</c>.</summary>
+		public bool FollowRecoil { get; init; }
 
-		/// <summary>
-		/// Gets the crosshair line thickness (<c>cl_crosshairthickness</c>). Default is <c>0.5</c>.
-		/// </summary>
-		public float Thickness { get; init; } = 0.5f;
-
-		/// <summary>
-		/// Gets the crosshair alpha transparency (<c>cl_crosshairalpha</c>). Range 0–255. Default is <c>200</c>.
-		/// </summary>
-		public int Alpha { get; init; } = 200;
-
-		/// <summary>
-		/// Gets the preset crosshair color (<c>cl_crosshaircolor</c>). Default is <see cref="CrosshairColor.Green"/>.
-		/// </summary>
-		public CrosshairColor Color { get; init; } = CrosshairColor.Green;
-
-		/// <summary>
-		/// Gets the custom red channel (<c>cl_crosshaircolor_r</c>). Used when <see cref="Color"/> is <see cref="CrosshairColor.Custom"/>. Range 0–255.
-		/// </summary>
-		public int CustomColorR { get; init; } = 50;
-
-		/// <summary>
-		/// Gets the custom green channel (<c>cl_crosshaircolor_g</c>). Used when <see cref="Color"/> is <see cref="CrosshairColor.Custom"/>. Range 0–255.
-		/// </summary>
-		public int CustomColorG { get; init; } = 250;
-
-		/// <summary>
-		/// Gets the custom blue channel (<c>cl_crosshaircolor_b</c>). Used when <see cref="Color"/> is <see cref="CrosshairColor.Custom"/>. Range 0–255.
-		/// </summary>
-		public int CustomColorB { get; init; } = 50;
-
-		/// <summary>
-		/// Gets a value indicating whether the center dot is shown (<c>cl_crosshairdot</c>). Default is <c>false</c>.
-		/// </summary>
+		/// <summary><c>cl_crosshairdot</c>.</summary>
 		public bool Dot { get; init; }
 
-		/// <summary>
-		/// Gets a value indicating whether the crosshair uses T-style (no top line) (<c>cl_crosshair_t</c>). Default is <c>false</c>.
-		/// </summary>
+		/// <summary><c>cl_crosshair_length</c> in pixels, 0-255.</summary>
+		public int Length { get; init; } = 8;
+
+		/// <summary><c>cl_crosshair_thickness</c> in pixels, 0-32.</summary>
+		public int Thickness { get; init; } = 2;
+
+		/// <summary><c>cl_crosshair_gap</c> in pixels, -3840 to 3840.</summary>
+		public int Gap { get; init; } = 4;
+
+		/// <summary><c>cl_crosshair_drawoutline</c>.</summary>
+		public CrosshairOutline Outline { get; init; } = CrosshairOutline.Off;
+
+		/// <summary><c>cl_crosshairoutline_r</c>, 0-255.</summary>
+		public int OutlineRed { get; init; }
+
+		/// <summary><c>cl_crosshairoutline_g</c>, 0-255.</summary>
+		public int OutlineGreen { get; init; }
+
+		/// <summary><c>cl_crosshairoutline_b</c>, 0-255.</summary>
+		public int OutlineBlue { get; init; }
+
+		/// <summary><c>cl_crosshairoutline_a</c>, 0-255.</summary>
+		public int OutlineAlpha { get; init; } = 255;
+
+		/// <summary><c>cl_crosshaircolor_r</c>, 0-255.</summary>
+		public int Red { get; init; }
+
+		/// <summary><c>cl_crosshaircolor_g</c>, 0-255.</summary>
+		public int Green { get; init; } = 255;
+
+		/// <summary><c>cl_crosshaircolor_b</c>, 0-255.</summary>
+		public int Blue { get; init; }
+
+		/// <summary><c>cl_crosshaircolor_a</c>, 0-255.</summary>
+		public int Alpha { get; init; } = 255;
+
+		/// <summary><c>cl_crosshair_t</c>.</summary>
 		public bool TStyle { get; init; }
 
-		/// <summary>
-		/// Gets a value indicating whether an outline is drawn around the crosshair lines (<c>cl_crosshair_drawoutline</c>). Default is <c>false</c>.
-		/// </summary>
-		public bool DrawOutline { get; init; }
+		/// <summary><c>cl_crosshair_dynamic_splitdist</c>, 0-127.</summary>
+		public int SplitDistance { get; init; } = 3;
 
-		/// <summary>
-		/// Gets the outline thickness (<c>cl_crosshair_outlinethickness</c>). Range 0.0–3.0. Default is <c>1.0</c>.
-		/// </summary>
-		public float OutlineThickness { get; init; } = 1.0f;
+		/// <summary><c>cl_crosshair_dynamic_splitalpha_innermod</c>, 0-1 in 0.01 steps.</summary>
+		public double InnerSplitAlpha { get; init; }
 
-		/// <summary>
-		/// Gets a value indicating whether alpha transparency is applied (<c>cl_crosshairusealpha</c>). Default is <c>true</c>.
-		/// </summary>
-		public bool UseAlpha { get; init; } = true;
+		/// <summary><c>cl_crosshair_dynamic_splitalpha_outermod</c>, 0.3-1 in 0.01 steps.</summary>
+		public double OuterSplitAlpha { get; init; } = 1;
 
-		/// <summary>
-		/// Gets a value indicating whether the crosshair gap scales with the equipped weapon (<c>cl_crosshairgap_useweaponvalue</c>). Default is <c>false</c>.
-		/// </summary>
-		public bool UseWeaponGap { get; init; }
+		/// <summary><c>cl_crosshair_dynamic_maxdist_splitratio</c>, 0-1 in 0.01 steps.</summary>
+		public double SplitSizeRatio { get; init; } = 1;
 
-		/// <summary>
-		/// Gets the sniper scope crosshair width (<c>cl_crosshair_sniper_width</c>). Default is <c>1.0</c>.
-		/// </summary>
-		public float SniperWidth { get; init; } = 1.0f;
+		/// <summary><c>cl_crosshair_dynamic_spread_limit</c>, 0-255.</summary>
+		public int SpreadLimit { get; init; } = 255;
+
+		/// <summary><c>cl_crosshair_screen_height</c>, 240-65535.</summary>
+		public int ScreenHeight { get; init; } = 1080;
+
+		/// <summary><c>cl_ironsight_usecrosshaircolor</c>.</summary>
+		public bool ScopeDotUsesCrosshairColor { get; init; }
+
+		/// <summary><c>cl_ironsight_dot_scale</c>, 0.1-2 in 0.01 steps.</summary>
+		public double ScopeDotScale { get; init; } = 1;
+
+		/// <summary><c>cl_crosshair_sniper_width</c>. Applied through <see cref="CrosshairService.ApplySettingsAsync"/> only, the share code does not carry it.</summary>
+		public int SniperWidth { get; init; }
 	}
 }

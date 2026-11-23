@@ -14,7 +14,9 @@
 
 ## StrikeLink.Crosshair
 
-[CrosshairColor](./strikelink/crosshair/crosshaircolor.md)
+[CrosshairOutline](./strikelink/crosshair/crosshairoutline.md)
+
+[CrosshairStyle](./strikelink/crosshair/crosshairstyle.md)
 
 [CrosshairService](./strikelink/crosshair/crosshairservice.md)
 

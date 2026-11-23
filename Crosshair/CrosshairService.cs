@@ -14,9 +14,9 @@ namespace StrikeLink.Crosshair
 	/// <para>
 	/// Crosshair settings can be applied in two ways:
 	/// <list type="bullet">
-	///   <item><description><see cref="ApplyShareCodeAsync"/> — sends <c>cl_crosshaircode CSGO-...</c> via the console,
+	///   <item><description><see cref="ApplyShareCodeAsync"/> - sends <c>cl_crosshaircode CS...</c> via the console,
 	///   which is the same mechanism CS2 uses natively when importing a share code.</description></item>
-	///   <item><description><see cref="ApplySettingsAsync"/> — writes every individual cvar to a temporary cfg file
+	///   <item><description><see cref="ApplySettingsAsync"/> - writes every individual cvar to a temporary cfg file
 	///   and execs it, giving full control over each setting independently.</description></item>
 	/// </list>
 	/// </para>
@@ -48,14 +48,14 @@ namespace StrikeLink.Crosshair
 		/// Encodes a <see cref="CrosshairSettings"/> record into a CS2 share code string.
 		/// </summary>
 		/// <param name="settings">The settings to encode.</param>
-		/// <returns>A share code in the format <c>CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</c>.</returns>
+		/// <returns>A share code in the format <c>CS...</c>.</returns>
 		public static string ToShareCode(CrosshairSettings settings) =>
 			CrosshairShareCode.Encode(settings);
 
 		/// <summary>
 		/// Decodes a CS2 share code into a <see cref="CrosshairSettings"/> record.
 		/// </summary>
-		/// <param name="shareCode">A share code in the format <c>CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</c>.</param>
+		/// <param name="shareCode">A share code in the format <c>CS...</c>.</param>
 		/// <returns>The decoded <see cref="CrosshairSettings"/>.</returns>
 		/// <exception cref="ArgumentException">Thrown when the share code is invalid.</exception>
 		public static CrosshairSettings FromShareCode(string shareCode) =>
@@ -65,7 +65,7 @@ namespace StrikeLink.Crosshair
 		/// Applies a crosshair share code in CS2 via the <c>cl_crosshaircode</c> console command.
 		/// </summary>
 		/// <param name="shareCode">
-		/// A valid share code in the format <c>CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX</c>.
+		/// A valid share code in the format <c>CS...</c>.
 		/// </param>
 		/// <param name="config">Optional console configuration; uses the instance default when <see langword="null"/>.</param>
 		/// <param name="ct">Cancellation token.</param>
@@ -105,44 +105,74 @@ namespace StrikeLink.Crosshair
 		}
 
 		/// <summary>
-		/// Reads the current crosshair share code from the user's saved CS2 convars file.
+		/// Reads the crosshair CS2 last saved for a Steam account and returns it as a share code.
 		/// </summary>
-		/// <param name="userId">
-		/// The Steam account ID to read from; uses the current user when <see langword="null"/>.
-		/// </param>
-		/// <returns>
-		/// The stored share code, or <see langword="null"/> if the convars file or key is not found.
-		/// </returns>
-		public string? ReadCurrentShareCode(long? userId = null)
-		{
-			ConfigNode? root = TryGetConvarsRoot(userId);
-			if (root is null) return null;
-
-			return root.Value.TryGetProperty("cl_crosshaircode", out ConfigNode node)
-				? node.GetString()
-				: null;
-		}
+		/// <param name="userId">The Steam account ID to read from; uses the current user when <see langword="null"/>.</param>
+		/// <returns>The share code, or <see langword="null"/> if the convars file is missing or has no crosshair in the current format.</returns>
+		public static string? ReadCurrentShareCode(long? userId = null) =>
+			ReadCurrentSettings(userId) is { } settings ? CrosshairShareCode.Encode(settings) : null;
 
 		/// <summary>
-		/// Reads and decodes the current crosshair settings from the user's saved CS2 convars file.
+		/// Reads the crosshair cvars CS2 last saved to <c>cs2_user_convars*.vcfg</c>; CS2 does not need to be running.
+		/// Cvars missing from the file fall back to the <see cref="CrosshairSettings"/> defaults.
 		/// </summary>
-		/// <param name="userId">
-		/// The Steam account ID to read from; uses the current user when <see langword="null"/>.
-		/// </param>
+		/// <param name="userId">The Steam account ID to read from; uses the current user when <see langword="null"/>.</param>
 		/// <returns>
-		/// The decoded <see cref="CrosshairSettings"/>, or <see langword="null"/> if no share code is stored
-		/// or it cannot be decoded.
+		/// The saved settings, or <see langword="null"/> if the file is missing or predates the new crosshair cvars
+		/// (no <c>cl_crosshair_length</c>).
 		/// </returns>
-		public CrosshairSettings? ReadCurrentSettings(long? userId = null)
+		public static CrosshairSettings? ReadCurrentSettings(long? userId = null)
 		{
-			string? code = ReadCurrentShareCode(userId);
-			if (string.IsNullOrEmpty(code)) return null;
+			ConfigNode? root = TryGetConfigRoot(userId);
+			if (root is null || !root.Value.TryGetProperty("convars", out ConfigNode convars) || !convars.TryGetProperty("cl_crosshair_length", out _))
+				return null;
 
-			try { return CrosshairShareCode.Decode(code); }
-			catch { return null; }
+			return FromConvars(convars);
 		}
 
-		private static ConfigNode? TryGetConvarsRoot(long? userId)
+		private static CrosshairSettings FromConvars(ConfigNode convars)
+		{
+			CrosshairSettings d = new();
+
+			string? Get(string name) => convars.TryGetProperty(name, out ConfigNode node) ? node.GetString() : null;
+			double Num(string name, double fallback) => double.TryParse(Get(name), NumberStyles.Float, CultureInfo.InvariantCulture, out double v) ? v : fallback;
+			int Int(string name, int fallback) => (int)Math.Round(Num(name, fallback));
+			bool Bool(string name, bool fallback) => Get(name) switch { "true" or "1" => true, "false" or "0" => false, _ => fallback };
+
+			// cl_crosshair_drawoutline is saved as 0/1/2, tolerate true/false too.
+			int outline = Get("cl_crosshair_drawoutline") switch { "true" => 1, "false" => 0, _ => Int("cl_crosshair_drawoutline", 0) };
+
+			return new CrosshairSettings
+			{
+				Style = (CrosshairStyle)Int("cl_crosshairstyle", (int)d.Style),
+				FollowRecoil = Bool("cl_crosshair_recoil", d.FollowRecoil),
+				Dot = Bool("cl_crosshairdot", d.Dot),
+				Length = Int("cl_crosshair_length", d.Length),
+				Thickness = Int("cl_crosshair_thickness", d.Thickness),
+				Gap = Int("cl_crosshair_gap", d.Gap),
+				Outline = (CrosshairOutline)Math.Clamp(outline, 0, 2),
+				OutlineRed = Int("cl_crosshairoutline_r", d.OutlineRed),
+				OutlineGreen = Int("cl_crosshairoutline_g", d.OutlineGreen),
+				OutlineBlue = Int("cl_crosshairoutline_b", d.OutlineBlue),
+				OutlineAlpha = Int("cl_crosshairoutline_a", d.OutlineAlpha),
+				Red = Int("cl_crosshaircolor_r", d.Red),
+				Green = Int("cl_crosshaircolor_g", d.Green),
+				Blue = Int("cl_crosshaircolor_b", d.Blue),
+				Alpha = Int("cl_crosshaircolor_a", d.Alpha),
+				TStyle = Bool("cl_crosshair_t", d.TStyle),
+				SplitDistance = Int("cl_crosshair_dynamic_splitdist", d.SplitDistance),
+				InnerSplitAlpha = Num("cl_crosshair_dynamic_splitalpha_innermod", d.InnerSplitAlpha),
+				OuterSplitAlpha = Num("cl_crosshair_dynamic_splitalpha_outermod", d.OuterSplitAlpha),
+				SplitSizeRatio = Num("cl_crosshair_dynamic_maxdist_splitratio", d.SplitSizeRatio),
+				SpreadLimit = Int("cl_crosshair_dynamic_spread_limit", d.SpreadLimit),
+				ScreenHeight = Int("cl_crosshair_screen_height", d.ScreenHeight),
+				ScopeDotUsesCrosshairColor = Bool("cl_ironsight_usecrosshaircolor", d.ScopeDotUsesCrosshairColor),
+				ScopeDotScale = Num("cl_ironsight_dot_scale", d.ScopeDotScale),
+				SniperWidth = Int("cl_crosshair_sniper_width", d.SniperWidth)
+			};
+		}
+
+		private static ConfigNode? TryGetConfigRoot(long? userId)
 		{
 			long id = userId ?? SteamService.GetCurrentUserId();
 			string cfgPath = Path.Combine(
@@ -153,33 +183,46 @@ namespace StrikeLink.Crosshair
 
 			if (!Directory.Exists(cfgPath)) return null;
 
-			string[] files = Directory.GetFiles(cfgPath, "cs2_user_convars*.vcfg");
-			if (files.Length == 0) return null;
-
-			string file = files.OrderBy(f => f, StringComparer.OrdinalIgnoreCase).First();
+			string? file = Directory.GetFiles(cfgPath, "cs2_user_convars*.vcfg")
+				.OrderBy(f => f, StringComparer.OrdinalIgnoreCase)
+				.FirstOrDefault();
+			if (file is null) return null;
 
 			try { return new ValveCfgReader(file).Document.Root; }
-			catch { return null; }
+			catch (IOException) { return null; }
 		}
 
 		private static string BuildCfg(CrosshairSettings s)
 		{
 			StringBuilder sb = new();
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairsize {s.Size}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairgap {s.Gap}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairthickness {s.Thickness}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairalpha {s.Alpha}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshaircolor {(int)s.Color}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshaircolor_r {s.CustomColorR}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshaircolor_g {s.CustomColorG}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshaircolor_b {s.CustomColorB}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairdot {(s.Dot ? 1 : 0)}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshair_t {(s.TStyle ? 1 : 0)}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshair_drawoutline {(s.DrawOutline ? 1 : 0)}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshair_outlinethickness {s.OutlineThickness}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairusealpha {(s.UseAlpha ? 1 : 0)}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshairgap_useweaponvalue {(s.UseWeaponGap ? 1 : 0)}");
-			sb.AppendLine(CultureInfo.InvariantCulture, $"cl_crosshair_sniper_width {s.SniperWidth}");
+			void Add(string cvar, object value) =>
+				sb.AppendLine(CultureInfo.InvariantCulture, $"{cvar} {value}");
+
+			Add("cl_crosshairstyle", (int)s.Style);
+			Add("cl_crosshair_recoil", s.FollowRecoil ? 1 : 0);
+			Add("cl_crosshairdot", s.Dot ? 1 : 0);
+			Add("cl_crosshair_length", s.Length);
+			Add("cl_crosshair_thickness", s.Thickness);
+			Add("cl_crosshair_gap", s.Gap);
+			Add("cl_crosshair_drawoutline", (int)s.Outline);
+			Add("cl_crosshairoutline_r", s.OutlineRed);
+			Add("cl_crosshairoutline_g", s.OutlineGreen);
+			Add("cl_crosshairoutline_b", s.OutlineBlue);
+			Add("cl_crosshairoutline_a", s.OutlineAlpha);
+			Add("cl_crosshaircolor_r", s.Red);
+			Add("cl_crosshaircolor_g", s.Green);
+			Add("cl_crosshaircolor_b", s.Blue);
+			Add("cl_crosshaircolor_a", s.Alpha);
+			Add("cl_crosshair_t", s.TStyle ? 1 : 0);
+			Add("cl_crosshair_dynamic_splitdist", s.SplitDistance);
+			Add("cl_crosshair_dynamic_splitalpha_innermod", s.InnerSplitAlpha);
+			Add("cl_crosshair_dynamic_splitalpha_outermod", s.OuterSplitAlpha);
+			Add("cl_crosshair_dynamic_maxdist_splitratio", s.SplitSizeRatio);
+			Add("cl_crosshair_sniper_width", s.SniperWidth);
+			Add("cl_crosshair_dynamic_spread_limit", s.SpreadLimit);
+			Add("cl_crosshair_screen_height", s.ScreenHeight);
+			Add("cl_ironsight_usecrosshaircolor", s.ScopeDotUsesCrosshairColor ? 1 : 0);
+			Add("cl_ironsight_dot_scale", s.ScopeDotScale);
 			return sb.ToString();
 		}
 	}

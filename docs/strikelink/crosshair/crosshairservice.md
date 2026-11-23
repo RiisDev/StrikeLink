@@ -8,16 +8,16 @@ Provides crosshair import, export, and application for CS2.
 public class CrosshairService
 ```
 
-Inheritance [Object](https://docs.microsoft.com/en-us/dotnet/api/system.object) → [CrosshairService](./strikelink/crosshair/crosshairservice.md)<br>
-Attributes [NullableContextAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
+Inheritance [Object](https://learn.microsoft.com/en-us/dotnet/api/system.object) → [CrosshairService](./strikelink/crosshair/crosshairservice.md)<br>
+Attributes [NullableContextAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullablecontextattribute), [NullableAttribute](https://learn.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.nullableattribute)
 
 **Remarks:**
 
 Crosshair settings can be applied in two ways:
 
-- - [CrosshairService.ApplyShareCodeAsync(String, ConsoleServiceConfig, CancellationToken)](./strikelink/crosshair/crosshairservice.md#applysharecodeasyncstring-consoleserviceconfig-cancellationtoken) — sends `cl_crosshaircode CSGO-...` via the console,
+- - [CrosshairService.ApplyShareCodeAsync(String, ConsoleServiceConfig, CancellationToken)](./strikelink/crosshair/crosshairservice.md#applysharecodeasyncstring-consoleserviceconfig-cancellationtoken) - sends `cl_crosshaircode CS...` via the console,
  which is the same mechanism CS2 uses natively when importing a share code.
-- - [CrosshairService.ApplySettingsAsync(CrosshairSettings, ConsoleServiceConfig, CancellationToken)](./strikelink/crosshair/crosshairservice.md#applysettingsasynccrosshairsettings-consoleserviceconfig-cancellationtoken) — writes every individual cvar to a temporary cfg file
+- - [CrosshairService.ApplySettingsAsync(CrosshairSettings, ConsoleServiceConfig, CancellationToken)](./strikelink/crosshair/crosshairservice.md#applysettingsasynccrosshairsettings-consoleserviceconfig-cancellationtoken) - writes every individual cvar to a temporary cfg file
  and execs it, giving full control over each setting independently.
 
 Current crosshair settings can be read from the user's saved `cs2_user_convars*.vcfg` file without
@@ -40,7 +40,7 @@ A [ConsoleService](./strikelink/services/consoleservice.md) instance used to sen
 
 #### Exceptions
 
-[DirectoryNotFoundException](https://docs.microsoft.com/en-us/dotnet/api/system.io.directorynotfoundexception)<br>
+[DirectoryNotFoundException](https://learn.microsoft.com/en-us/dotnet/api/system.io.directorynotfoundexception)<br>
 Thrown when the CS2 installation directory cannot be located.
 
 ## Methods
@@ -60,8 +60,8 @@ The settings to encode.
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-A share code in the format `CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`.
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+A share code in the format `CS...`.
 
 ### **FromShareCode(String)**
 
@@ -73,8 +73,8 @@ public static CrosshairSettings FromShareCode(string shareCode)
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-A share code in the format `CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`.
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+A share code in the format `CS...`.
 
 #### Returns
 
@@ -83,7 +83,7 @@ The decoded [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md).
 
 #### Exceptions
 
-[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+[ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
 Thrown when the share code is invalid.
 
 ### **ApplyShareCodeAsync(String, ConsoleServiceConfig, CancellationToken)**
@@ -91,27 +91,27 @@ Thrown when the share code is invalid.
 Applies a crosshair share code in CS2 via the `cl_crosshaircode` console command.
 
 ```csharp
-public Task ApplyShareCodeAsync(string shareCode, ConsoleServiceConfig config, CancellationToken ct)
+public async Task ApplyShareCodeAsync(string shareCode, ConsoleServiceConfig? config = null, CancellationToken ct = null)
 ```
 
 #### Parameters
 
-`shareCode` [String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-A valid share code in the format `CSGO-XXXXX-XXXXX-XXXXX-XXXXX-XXXXX`.
+`shareCode` [String](https://learn.microsoft.com/en-us/dotnet/api/system.string)<br>
+A valid share code in the format `CS...`.
 
-`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)<br>
+`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)?<br>
 Optional console configuration; uses the instance default when .
 
-`ct` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
+`ct` [CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 Cancellation token.
 
 #### Returns
 
-[Task](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
+[Task](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
 
 #### Exceptions
 
-[ArgumentException](https://docs.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
+[ArgumentException](https://learn.microsoft.com/en-us/dotnet/api/system.argumentexception)<br>
 Thrown when the share code format is invalid.
 
 ### **ApplyShareCodeAsync(CrosshairSettings, ConsoleServiceConfig, CancellationToken)**
@@ -119,7 +119,7 @@ Thrown when the share code format is invalid.
 Encodes the given settings into a share code and applies it in CS2 via `cl_crosshaircode`.
 
 ```csharp
-public Task ApplyShareCodeAsync(CrosshairSettings settings, ConsoleServiceConfig config, CancellationToken ct)
+public Task ApplyShareCodeAsync(CrosshairSettings settings, ConsoleServiceConfig? config = null, CancellationToken ct = null)
 ```
 
 #### Parameters
@@ -127,22 +127,22 @@ public Task ApplyShareCodeAsync(CrosshairSettings settings, ConsoleServiceConfig
 `settings` [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
 The settings to apply.
 
-`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)<br>
+`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)?<br>
 Optional console configuration; uses the instance default when .
 
-`ct` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
+`ct` [CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 Cancellation token.
 
 #### Returns
 
-[Task](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
+[Task](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
 
 ### **ApplySettingsAsync(CrosshairSettings, ConsoleServiceConfig, CancellationToken)**
 
 Applies all crosshair settings individually by writing a temporary cfg file and executing it via `exec`.
 
 ```csharp
-public Task ApplySettingsAsync(CrosshairSettings settings, ConsoleServiceConfig config, CancellationToken ct)
+public async Task ApplySettingsAsync(CrosshairSettings settings, ConsoleServiceConfig? config = null, CancellationToken ct = null)
 ```
 
 #### Parameters
@@ -150,54 +150,55 @@ public Task ApplySettingsAsync(CrosshairSettings settings, ConsoleServiceConfig 
 `settings` [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
 The settings to apply.
 
-`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)<br>
+`config` [ConsoleServiceConfig](./strikelink/chatbot/consoleserviceconfig.md)?<br>
 Optional console configuration; uses the instance default when .
 
-`ct` [CancellationToken](https://docs.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
+`ct` [CancellationToken](https://learn.microsoft.com/en-us/dotnet/api/system.threading.cancellationtoken)<br>
 Cancellation token.
 
 #### Returns
 
-[Task](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
+[Task](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task)<br>
 
 **Remarks:**
 
 This writes `strike_link_crosshair.cfg` to the CS2 cfg directory and execs it.
  Use this method when you need per-cvar control rather than share-code import.
 
-### **ReadCurrentShareCode(Nullable&lt;Int64&gt;)**
+### **ReadCurrentShareCode(Int64?)**
 
-Reads the current crosshair share code from the user's saved CS2 convars file.
+Reads the crosshair CS2 last saved for a Steam account and returns it as a share code.
 
 ```csharp
-public string ReadCurrentShareCode(Nullable<long> userId)
+public static string? ReadCurrentShareCode(long? userId = null)
 ```
 
 #### Parameters
 
-`userId` [Nullable&lt;Int64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`userId` [Int64?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The Steam account ID to read from; uses the current user when .
 
 #### Returns
 
-[String](https://docs.microsoft.com/en-us/dotnet/api/system.string)<br>
-The stored share code, or  if the convars file or key is not found.
+[String](https://learn.microsoft.com/en-us/dotnet/api/system.string)?<br>
+The share code, or  if the convars file is missing or has no crosshair in the current format.
 
-### **ReadCurrentSettings(Nullable&lt;Int64&gt;)**
+### **ReadCurrentSettings(Int64?)**
 
-Reads and decodes the current crosshair settings from the user's saved CS2 convars file.
+Reads the crosshair cvars CS2 last saved to `cs2_user_convars*.vcfg`; CS2 does not need to be running.
+ Cvars missing from the file fall back to the [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md) defaults.
 
 ```csharp
-public CrosshairSettings ReadCurrentSettings(Nullable<long> userId)
+public static CrosshairSettings? ReadCurrentSettings(long? userId = null)
 ```
 
 #### Parameters
 
-`userId` [Nullable&lt;Int64&gt;](https://docs.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
+`userId` [Int64?](https://learn.microsoft.com/en-us/dotnet/api/system.nullable-1)<br>
 The Steam account ID to read from; uses the current user when .
 
 #### Returns
 
-[CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)<br>
-The decoded [CrosshairSettings](./strikelink/crosshair/crosshairsettings.md), or  if no share code is stored
- or it cannot be decoded.
+[CrosshairSettings](./strikelink/crosshair/crosshairsettings.md)?<br>
+The saved settings, or  if the file is missing or predates the new crosshair cvars
+ (no `cl_crosshair_length`).
